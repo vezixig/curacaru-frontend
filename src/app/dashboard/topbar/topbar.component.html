@@ -1,0 +1,42 @@
+<nav class="navbar bg-primary">
+  <div class="container-fluid">
+    <p class="navbar-brand p-0 m-0" href="#">
+      <img
+        src="../assets/img/logo.png"
+        alt="Logo"
+        width="30"
+        height="30"
+        style="margin-right: 8px"
+        class="d-inline-block align-text-top"
+      />
+      <span class="text-white" style="opacity: 0.5">CURACARU </span>
+      <span
+        style="font-size: 0.5em; opacity: 0.5; margin-right: 20px"
+        class="text-white"
+        >0.1</span
+      >
+      <span class="text-white">Betruungsdienst Schlüter</span>
+    </p>
+
+    <div class="d-flex">
+      <div ngbDropdown class="d-inline-block" display="dynamic">
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          id="dropdownBasic1"
+          ngbDropdownToggle
+        >
+          <img
+            src="../assets/img/portrait.png"
+            height="32"
+            width="32"
+            style="border-radius: 16px"
+          />
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <button (click)="handleLogout()" ngbDropdownItem>Abmelden</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

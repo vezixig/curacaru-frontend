@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { LoginComponent } from './auth/login/login.component';
+import { TopbarComponent } from './dashboard/topbar/topbar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, LoginComponent],
+  imports: [CommonModule, RouterOutlet, LoginComponent, TopbarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

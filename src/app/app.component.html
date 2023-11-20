@@ -1,8 +1,7 @@
 <ng-container *ngIf="isAuthenticated$ | async; else unAuthenticated">
-  DASHBOARD
+  <cura-topbar />
+  <router-outlet></router-outlet>
 </ng-container>
 <ng-template #unAuthenticated>
   <cura-login />
 </ng-template>
-
-<router-outlet></router-outlet>
