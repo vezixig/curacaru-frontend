@@ -5,17 +5,12 @@ import { AuthService } from '@auth0/auth0-angular';
 import { LoginComponent } from './auth/login/login.component';
 import { TopbarComponent } from './dashboard/topbar/topbar.component';
 import { SidebarComponent } from './dashboard/sidebar/sidebar.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    LoginComponent,
-    TopbarComponent,
-    SidebarComponent,
-  ],
+  imports: [CommonModule, DashboardComponent, LoginComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

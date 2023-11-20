@@ -1,0 +1,11 @@
+<div *ngIf="hasCompany; else componentB">
+  <cura-topbar />
+  <main style="height: calc(100vh - 60px)">
+    <cura-sidebar />
+    <router-outlet></router-outlet>
+  </main>
+</div>
+<ng-template #componentB>
+  <!-- Display ComponentB content here -->
+  nope
+</ng-template>
