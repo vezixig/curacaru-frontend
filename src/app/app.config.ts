@@ -16,7 +16,10 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       AuthModule.forRoot({
         ...environment.auth0,
-        authorizationParams: { redirect_uri: environment.auth0.callbackUri },
+        authorizationParams: {
+          redirect_uri: environment.auth0.callbackUri,
+          audience: environment.auth0.authorizationParams.audience,
+        },
         httpInterceptor: {
           allowedList: [`${environment.auth0.api.serverUrl}/*`],
         },

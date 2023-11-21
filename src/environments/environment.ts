@@ -4,7 +4,7 @@ export const environment = {
     clientId: '9d7Kn4iWGujaoODgiDwTNN1DzHRZaWPo',
     callbackUri: 'http://localhost:4200',
     authorizationParams: {
-      audience: '123456',
+      audience: 'https://localhost:7077',
       redirect_uri: 'http://localhost:4200',
     },
     api: {
