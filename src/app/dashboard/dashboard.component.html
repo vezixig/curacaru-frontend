@@ -1,12 +1,26 @@
-<div *ngIf="hasCompany; else componentB">
-  <cura-topbar />
-  <main style="height: calc(100vh - 60px)">
-    <cura-sidebar />
-    <router-outlet></router-outlet>
-  </main>
+<div class="h-100 container" *ngIf="isLoading; else view">
+  <div
+    class="row d-flex justify-content-center align-items-center h-100 align-center"
+  >
+    <div class="spinner-border" role="status"></div>
+    <p class="sr-only" style="text-align: center">Bitte warten...</p>
+  </div>
 </div>
-<ng-template #componentB>
-  <cura-signup style="height: 100vh"></cura-signup>
-  <!-- <div *ngIf="hasEmployee; else componentC">no company</div>
-  <ng-template #componentC> No emplopyee </ng-template> -->
+<div *ngIf="hasError">Error</div>
+<ng-template #view>
+  <div *ngIf="hasCompany; else componentB">
+    <cura-topbar />
+    <main style="height: calc(100vh - 60px)">
+      <cura-sidebar />
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+  <ng-template #componentB>
+    <cura-signup
+      style="height: 100vh"
+      (signUpCompleted)="handleSignUpCompleted()"
+    ></cura-signup>
+    <!-- <div *ngIf="hasEmployee; else componentC">no company</div>
+    <ng-template #componentC> No emplopyee </ng-template> -->
+  </ng-template>
 </ng-template>

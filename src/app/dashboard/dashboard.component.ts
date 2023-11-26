@@ -24,18 +24,38 @@ import { SignupComponent } from '../auth/signup/signup.component';
 export class DashboardComponent {
   hasCompany: boolean = false;
   hasEmployee: boolean = false;
+  isLoading: boolean = true;
+  hasError: boolean = false;
 
   constructor(private http: HttpClient) {}
 
+  handleSignUpCompleted() {
+    this.loadCompany();
+  }
+
   ngOnInit() {
-    this.http.get<Employee>('https://localhost:7077/employee').subscribe(
-      (response) => {
-        this.hasEmployee = response != null;
-        this.hasCompany = response.companyId != null;
+    this.loadCompany();
+  }
+
+  private loadCompany() {
+    this.isLoading = true;
+    this.http.get<Employee>('https://localhost:7077/employee').subscribe({
+      next: (result: Employee) => {
+        this.hasEmployee = result != null;
+        this.hasCompany = result.companyId != null;
+        this.isLoading = false;
       },
-      (error) => {
-        console.error('API request failed:', error);
-      }
-    );
+      error: (error) => {
+        // show error modal
+        if (error.status == 404) {
+          this.hasEmployee = false;
+          this.hasCompany = false;
+          this.isLoading = false;
+        } else {
+          this.hasError = true;
+          console.error('API request failed:', error);
+        }
+      },
+    });
   }
 }
