@@ -1,9 +1,11 @@
 import { UUID } from 'angular2-uuid';
 
 export interface Employee {
-  id: UUID;
-  firstName: string;
-  lastName: string;
   companyId: UUID;
-  Email: string;
+  email: string;
+  firstName: string;
+  id: UUID;
+  isManager: boolean;
+  lastName: string;
+  phoneNumber: string;
 }

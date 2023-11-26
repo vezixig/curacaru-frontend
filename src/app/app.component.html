@@ -1,6 +1,4 @@
-<ng-container *ngIf="isAuthenticated$ | async; else unAuthenticated">
-  <cura-dashboard />
-</ng-container>
-<ng-template #unAuthenticated>
+<cura-dashboard *ngIf="isAuthenticated; else login" />
+<ng-template #login>
   <cura-login />
 </ng-template>

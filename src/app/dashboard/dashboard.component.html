@@ -12,7 +12,9 @@
     <cura-topbar />
     <main style="height: calc(100vh - 60px)">
       <cura-sidebar />
-      <router-outlet></router-outlet>
+      <div class="m-4 p-3 w-100 bg-white rounded">
+        <router-outlet></router-outlet>
+      </div>
     </main>
   </div>
   <ng-template #componentB>
