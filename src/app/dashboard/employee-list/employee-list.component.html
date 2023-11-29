@@ -1,7 +1,10 @@
 <div class="container-fluid p-4">
   <div class="row">
     <h4>Mitarbeiterliste</h4>
-    <Button type="button" class="btn btn-primary text-white btn-block"
+    <Button
+      type="button"
+      [routerLink]="['/dashboard/employee/new']"
+      class="btn btn-primary text-white btn-block"
       >Mitarbeiter hinzufügen</Button
     >
     <table class="col-12 table mt-3 table-striped">

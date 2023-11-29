@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faClipboard } from '@fortawesome/free-regular-svg-icons';
 import {
@@ -12,7 +13,7 @@ import {
   selector: 'cura-sidebar',
   standalone: true,
   templateUrl: './sidebar.component.html',
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, RouterLink, RouterLinkActive],
 })
 export class SidebarComponent {
   faUsersGear = faUsersGear;

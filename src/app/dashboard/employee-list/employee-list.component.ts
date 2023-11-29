@@ -5,9 +5,10 @@ import { Employee } from '../../models/employee.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule, FontAwesomeModule, RouterModule],
   selector: 'cura-employee-list',
   standalone: true,
   templateUrl: './employee-list.component.html',
