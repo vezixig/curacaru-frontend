@@ -17,8 +17,8 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './employee-editor.component.html',
 })
 export class EmployeeEditorComponent implements OnInit {
-  private isNew: boolean = true;
-
+  public isNew: boolean = true;
+  private employeeId: string | undefined;
   public employeeForm: FormGroup;
 
   constructor(
@@ -46,25 +46,52 @@ export class EmployeeEditorComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required]],
       role: ['employee', [Validators.required]],
+      id: [''],
     });
   }
 
   ngOnInit(): void {
-    // todo: edit employee
+    if (this.router.url === '/dashboard/employee/new') {
+      this.isNew = true;
+    } else {
+      this.InitEdit();
+    }
+  }
+
+  private InitEdit(): void {
+    this.isNew = false;
+    this.employeeId = this.router.url.split('/').pop();
+    this.httpClient
+      .get<Employee>(`https://localhost:7077/employee/${this.employeeId}`)
+      .subscribe({
+        next: (result) => {
+          this.employeeForm.get('id')?.setValue(result.id);
+          this.employeeForm.get('firstName')?.setValue(result.firstName);
+          this.employeeForm.get('lastName')?.setValue(result.lastName);
+          this.employeeForm.get('email')?.setValue(result.email);
+          this.employeeForm.get('phone')?.setValue(result.phoneNumber);
+          this.employeeForm
+            .get('role')
+            ?.setValue(result.isManager ? 'manager' : 'employee');
+        },
+        error: (error) => {
+          console.error('API request failed:', error);
+        },
+      });
   }
 
   handleSave(): void {
-    if (this.isNew) {
-      const employee: Employee = {
-        email: this.employeeForm.get('email')?.value,
-        firstName: this.employeeForm.get('firstName')?.value,
-        lastName: this.employeeForm.get('lastName')?.value,
-        phoneNumber: this.employeeForm.get('phone')?.value,
-        isManager: this.employeeForm.get('role')?.value === 'manager',
-        companyId: '',
-        id: '',
-      };
+    const employee: Employee = {
+      email: this.employeeForm.get('email')?.value,
+      firstName: this.employeeForm.get('firstName')?.value,
+      lastName: this.employeeForm.get('lastName')?.value,
+      phoneNumber: this.employeeForm.get('phone')?.value,
+      isManager: this.employeeForm.get('role')?.value === 'manager',
+      companyId: '',
+      id: this.employeeForm.get('id')?.value,
+    };
 
+    if (this.isNew) {
       this.httpClient
         .post('https://localhost:7077/employee/new', employee)
         .subscribe({
@@ -74,7 +101,14 @@ export class EmployeeEditorComponent implements OnInit {
           },
         });
     } else {
-      this.httpClient.put<Employee>('https://localhost:7077/employee', {});
+      this.httpClient
+        .put<Employee>('https://localhost:7077/employee', employee)
+        .subscribe({
+          complete: () => {
+            console.log('Employee created');
+            this.router.navigate(['/dashboard/employee']);
+          },
+        });
     }
   }
 }

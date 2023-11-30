@@ -6,4 +6,5 @@ export const routes: Routes = [
   { path: 'dashboard', redirectTo: 'dashboard/employee', pathMatch: 'full' },
   { path: 'dashboard/employee', component: EmployeeListComponent },
   { path: 'dashboard/employee/new', component: EmployeeEditorComponent },
+  { path: 'dashboard/employee/:id', component: EmployeeEditorComponent },
 ];
