@@ -3,8 +3,8 @@ import { EmployeeEditorComponent } from './dashboard/employee-editor/employee-ed
 import { EmployeeListComponent } from './dashboard/employee-list/employee-list.component';
 
 export const routes: Routes = [
-  { path: 'dashboard', redirectTo: 'dashboard/employee', pathMatch: 'full' },
-  { path: 'dashboard/employee', component: EmployeeListComponent },
   { path: 'dashboard/employee/new', component: EmployeeEditorComponent },
   { path: 'dashboard/employee/:id', component: EmployeeEditorComponent },
+  { path: 'dashboard/employee', component: EmployeeListComponent },
+  { path: 'dashboard', redirectTo: 'dashboard/employee', pathMatch: 'full' },
 ];

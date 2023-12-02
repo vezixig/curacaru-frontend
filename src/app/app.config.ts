@@ -4,6 +4,8 @@ import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { AuthHttpInterceptor, AuthModule } from '@auth0/auth0-angular';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideToastr } from 'ngx-toastr';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,5 +27,7 @@ export const appConfig: ApplicationConfig = {
         },
       })
     ),
+    provideAnimations(),
+    provideToastr(),
   ],
 };
