@@ -82,6 +82,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
           this.employeeForm.get('firstName')?.setValue(result.firstName);
           this.employeeForm.get('lastName')?.setValue(result.lastName);
           this.employeeForm.get('email')?.setValue(result.email);
+          this.employeeForm.get('email')?.disable();
           this.employeeForm.get('phone')?.setValue(result.phoneNumber);
           this.employeeForm.get('role')?.setValue(result.isManager ? 'manager' : 'employee');
         },

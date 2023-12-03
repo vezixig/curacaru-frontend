@@ -11,17 +11,13 @@
           id="exampleInputEmail1"
           [ngClass]="{
             'is-valid': employeeForm.controls['email'].valid,
-            'is-invalid':
-              employeeForm.controls['email'].invalid &&
-              employeeForm.controls['email'].touched
+            'is-invalid': employeeForm.controls['email'].invalid && employeeForm.controls['email'].touched
           }"
           formControlName="email"
           aria-describedby="emailHelp"
           placeholder="Enter email"
         />
-        <small id="emailHelp" class="form-text text-muted"
-          >Das Password wird automatisch an diese Adresse geschickt.</small
-        >
+        <small id="emailHelp" class="form-text text-muted">Das Password wird automatisch an diese Adresse geschickt.</small>
       </div>
       <div class="form-group">
         <label for="inputFirstName">Vorname</label>
@@ -32,9 +28,7 @@
           id="inputFirstName"
           [ngClass]="{
             'is-valid': employeeForm.controls['firstName'].valid,
-            'is-invalid':
-              employeeForm.controls['firstName'].invalid &&
-              employeeForm.controls['firstName'].touched
+            'is-invalid': employeeForm.controls['firstName'].invalid && employeeForm.controls['firstName'].touched
           }"
           placeholder="Vorname eingeben"
         />
@@ -45,9 +39,7 @@
           type="text"
           [ngClass]="{
             'is-valid': employeeForm.controls['lastName'].valid,
-            'is-invalid':
-              employeeForm.controls['lastName'].invalid &&
-              employeeForm.controls['lastName'].touched
+            'is-invalid': employeeForm.controls['lastName'].invalid && employeeForm.controls['lastName'].touched
           }"
           class="form-control"
           formControlName="lastName"
@@ -63,9 +55,7 @@
           id="inputPhone"
           [ngClass]="{
             'is-valid': employeeForm.controls['phone'].valid,
-            'is-invalid':
-              employeeForm.controls['phone'].invalid &&
-              employeeForm.controls['phone'].touched
+            'is-invalid': employeeForm.controls['phone'].invalid && employeeForm.controls['phone'].touched
           }"
           formControlName="phone"
           placeholder="Telefonnummer eingeben"
@@ -73,29 +63,13 @@
       </div>
       <div class="form-group">
         <label for="exampleFormControlSelect1">Mitarbeiterrolle</label>
-        <select
-          formControlName="role"
-          class="form-control"
-          id="exampleFormControlSelect1"
-        >
+        <select formControlName="role" class="form-control" id="exampleFormControlSelect1">
           <option value="employee">Mitarbeiter</option>
           <option value="manager">Manager</option>
         </select>
       </div>
-      <button
-        [disabled]="!employeeForm.valid"
-        type="submit"
-        class="btn btn-primary text-white"
-      >
-        Mitarbeiter {{ isNew ? "hinzufügen" : "speichern" }}
-      </button>
-      <button
-        type="button"
-        [routerLink]="['/dashboard/employee']"
-        class="btn btn-outline-secondary m-3"
-      >
-        Verwerfen
-      </button>
+      <button [disabled]="!employeeForm.valid" type="submit" class="btn btn-primary text-white">Mitarbeiter {{ isNew ? "hinzufügen" : "speichern" }}</button>
+      <button type="button" [routerLink]="['/dashboard/employee']" class="btn btn-outline-secondary m-3">Verwerfen</button>
     </form>
   </div>
 </div>
