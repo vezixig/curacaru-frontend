@@ -9,7 +9,8 @@
     <div class="d-flex">
       <div ngbDropdown class="d-inline-block" display="dynamic" container="body">
         <button type="button" class="btn btn-outline-secondary" id="dropdownBasic1" ngbDropdownToggle>
-          <img src="../assets/img/portrait.png" height="32" width="32" style="border-radius: 16px" />
+          <fa-icon [icon]="faUser" />
+          <!-- <img src="../assets/img/portrait.png" height="32" width="32" style="border-radius: 16px" /> -->
         </button>
         <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
           <button (click)="handleLogout()" ngbDropdownItem>Abmelden</button>
