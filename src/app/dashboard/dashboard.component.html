@@ -1,28 +1,30 @@
-<div class="h-100 container" *ngIf="isLoading; else view">
-  <div
-    class="row d-flex justify-content-center align-items-center h-100 align-center"
-  >
-    <div class="spinner-border" role="status"></div>
-    <p class="sr-only" style="text-align: center">Bitte warten...</p>
+<div class="container h-100" *ngIf="isLoading || hasError">
+  <div class="row align-items-center h-100">
+    <div clasS="col">
+      <div class="card mx-auto p-5" style="width: 18rem" *ngIf="isLoading">
+        <div class="spinner-border mx-auto m-3 text-primary" style="width: 8rem; height: 8rem" role="status"></div>
+        <p class="sr-only" style="text-align: center">Curacaru wirds geladen...</p>
+      </div>
+
+      <div class="card mx-auto text-danger" style="width: 20rem" *ngIf="hasError">
+        <div class="card-header bg-danger text-white">Fehler</div>
+        <div class="card-body">
+          <p class="sr-only" style="text-align: center">Ein unerwarteter Fehler ist aufgetreten</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<div *ngIf="hasError">Error</div>
-<ng-template #view>
-  <div *ngIf="hasCompany; else componentB">
-    <cura-topbar />
-    <main style="height: calc(100vh - 60px)">
-      <cura-sidebar />
-      <div class="m-4 p-3 w-100 bg-white rounded">
-        <router-outlet></router-outlet>
-      </div>
-    </main>
-  </div>
-  <ng-template #componentB>
-    <cura-signup
-      style="height: 100vh"
-      (signUpCompleted)="handleSignUpCompleted()"
-    ></cura-signup>
-    <!-- <div *ngIf="hasEmployee; else componentC">no company</div>
-    <ng-template #componentC> No emplopyee </ng-template> -->
-  </ng-template>
+
+<div *ngIf="hasCompany; else componentB">
+  <cura-topbar />
+  <main style="height: calc(100vh - 60px)">
+    <cura-sidebar />
+    <div class="m-4 p-3 w-100 bg-white rounded">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+<ng-template #componentB>
+  <cura-signup style="height: 100vh" (signUpCompleted)="handleSignUpCompleted()"></cura-signup>
 </ng-template>

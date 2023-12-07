@@ -11,14 +11,7 @@ import { SignupComponent } from '../auth/signup/signup.component';
 @Component({
   selector: 'cura-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    TopbarComponent,
-    SidebarComponent,
-    RouterOutlet,
-    SignupComponent,
-    HttpClientModule,
-  ],
+  imports: [CommonModule, TopbarComponent, SidebarComponent, RouterOutlet, SignupComponent, HttpClientModule],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent {
@@ -52,6 +45,7 @@ export class DashboardComponent {
           this.hasCompany = false;
           this.isLoading = false;
         } else {
+          this.isLoading = false;
           this.hasError = true;
           console.error('API request failed:', error);
         }
