@@ -7,6 +7,7 @@ import { RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Employee } from '../models/employee.model';
 import { SignupComponent } from '../auth/signup/signup.component';
+import { UserEmployee } from '../models/user-employee.model';
 
 @Component({
   selector: 'cura-dashboard',
@@ -19,6 +20,7 @@ export class DashboardComponent {
   hasEmployee: boolean = false;
   isLoading: boolean = true;
   hasError: boolean = false;
+  employee: UserEmployee | undefined;
 
   constructor(private http: HttpClient) {}
 
@@ -32,11 +34,12 @@ export class DashboardComponent {
 
   private loadCompany() {
     this.isLoading = true;
-    this.http.get<Employee>('https://localhost:7077/employee').subscribe({
-      next: (result: Employee) => {
+    this.http.get<UserEmployee>('https://localhost:7077/employee').subscribe({
+      next: (result: UserEmployee) => {
         this.hasEmployee = result != null;
         this.hasCompany = result.companyId != null;
         this.isLoading = false;
+        this.employee = result;
       },
       error: (error) => {
         // show error modal
