@@ -3,13 +3,13 @@
     <div clasS="col">
       <div class="card mx-auto p-5" style="width: 18rem" *ngIf="isLoading">
         <div class="spinner-border mx-auto m-3 text-primary" style="width: 8rem; height: 8rem" role="status"></div>
-        <p class="sr-only" style="text-align: center">Curacaru wirds geladen...</p>
+        <p style="text-align: center">Curacaru wirds geladen...</p>
       </div>
 
       <div class="card mx-auto text-danger" style="width: 20rem" *ngIf="hasError">
         <div class="card-header bg-danger text-white">Fehler</div>
         <div class="card-body">
-          <p class="sr-only" style="text-align: center">Ein unerwarteter Fehler ist aufgetreten</p>
+          <p style="text-align: center">Ein unerwarteter Fehler ist aufgetreten</p>
         </div>
       </div>
     </div>
