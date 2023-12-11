@@ -24,7 +24,7 @@
           <td>{{ customer.associatedEmployeeName }}</td>
           <td>
             <div class="btn-group" role="group">
-              <button type="button" [routerLink]="['/dashboard/employee', customer.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+              <button type="button" [routerLink]="['/dashboard/customer', customer.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
                 <fa-icon [icon]="faGear" [fixedWidth]="true" />
               </button>
               <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
