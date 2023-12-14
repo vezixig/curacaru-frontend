@@ -34,7 +34,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
 
   ngOnInit(): void {
     this.httpClient
-      .get<CustomerListEntry[]>('https://localhost:7077/customers/list')
+      .get<CustomerListEntry[]>('https://localhost:7077/customer/list')
       .pipe(first())
       .subscribe({
         next: (result) => {

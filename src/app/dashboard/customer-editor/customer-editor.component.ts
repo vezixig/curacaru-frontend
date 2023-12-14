@@ -7,6 +7,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first } from 'rxjs';
 import { Customer } from '../../models/customer.model';
+import { UUID } from 'angular2-uuid';
 
 @Component({
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule],
@@ -20,12 +21,19 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   public customerForm: FormGroup;
   public newDeclarationOfAssignment: number | null = null;
   public employees: Employee[] = [];
+  public CityName: string = '';
 
+  // Gets the two newest declarations of assignment
   get sortedDeclarations(): number[] {
-    return this.customerForm.get('declarationsOfAssignment')?.value.sort((a: number, b: number) => a - b);
+    return this.customerForm
+      .get('declarationsOfAssignment')
+      ?.value.sort((a: number, b: number) => b - a)
+      .slice(0, 2);
   }
 
-  private employeeId: string | undefined;
+  private customerId: UUID | null = null;
+
+  private getZipCodeSubscription: Subscription | undefined = undefined;
   private httpSubscription: Subscription | undefined = undefined;
 
   constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService) {
@@ -47,8 +55,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       associatedEmployeeId: ['', [Validators.required]],
     });
 
-    this.customerForm.valueChanges.subscribe((value) => {
-      this.logValidationErrors();
+    this.customerForm.get('zipCode')?.valueChanges.subscribe((value) => {
+      this.handleZipCodeChange(value);
     });
 
     this.httpSubscription = this.httpClient
@@ -63,11 +71,35 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         },
       });
   }
+
+  // Tries to get the name of the city for the entered zip code
+  handleZipCodeChange(zipCode: string) {
+    this.CityName = '';
+    if (zipCode.length == 5) {
+      this.getZipCodeSubscription?.unsubscribe();
+
+      this.getZipCodeSubscription = this.httpClient
+        .get(`https://localhost:7077/address/city/${zipCode}`, { responseType: 'text' })
+        .pipe(first())
+        .subscribe({
+          next: (result) => {
+            this.CityName = result;
+          },
+          error: (error) => {
+            this.CityName = 'Unbekannte PLZ';
+          },
+        });
+    }
+  }
+
   ngOnDestroy(): void {
     this.httpSubscription?.unsubscribe();
+    this.getZipCodeSubscription?.unsubscribe();
   }
 
   logValidationErrors(group: FormGroup = this.customerForm, controlName?: string): void {
+    console.log(this.employees.length);
+
     Object.keys(group.controls).forEach((key: string) => {
       const abstractControl = group.get(key);
 
@@ -105,54 +137,70 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   handleSave(): void {
     const customer: Customer = {
-      associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value,
+      associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value.toString(),
       birthDate: this.customerForm.get('birthDate')?.value,
       firstName: this.customerForm.get('firstName')?.value,
       lastName: this.customerForm.get('lastName')?.value,
       phone: this.customerForm.get('phone')?.value,
-      companyId: this.isNew ? null : null,
+      id: this.isNew ? null : this.customerId,
       street: this.customerForm.get('street')?.value,
       zipCode: this.customerForm.get('zipCode')?.value,
       careLevel: this.customerForm.get('careLevel')?.value,
+      insuredPersonNumber: this.customerForm.get('insuredPersonNumber')?.value,
+      insuranceStatus: parseInt(this.customerForm.get('insuranceStatus')?.value),
       isCareContractAvailable: this.customerForm.get('isCareContractAvailable')?.value,
       declarationsOfAssignment: this.customerForm.get('declarationsOfAssignment')?.value,
       emergencyContactName: this.customerForm.get('emergencyContactName')?.value,
       emergencyContactPhone: this.customerForm.get('emergencyContactPhone')?.value,
-      id: this.customerForm.get('id')?.value,
     };
 
-    this.isNew ? this.CreateCustomer(customer) : this.UpdateEmployee(customer);
+    this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);
   }
 
   private CreateCustomer(employee: Customer) {
     this.httpSubscription?.unsubscribe();
 
-    this.httpSubscription = this.httpClient.post('https://localhost:7077/customers/new', employee).subscribe({
-      complete: () => {
-        this.toastr.success('Ein neuer Kunde wurde angelegt');
-        this.router.navigate(['/dashboard/customer']);
-      },
-      error: (error) => {
-        this.toastr.error('Kunde konnte nicht angelegt werden: ' + error.message);
-      },
-    });
+    this.httpSubscription = this.httpClient
+      .post('https://localhost:7077/customer/new', employee)
+      .pipe(first())
+      .subscribe({
+        complete: () => {
+          this.toastr.success('Ein neuer Kunde wurde angelegt');
+          this.router.navigate(['/dashboard/customer']);
+        },
+        error: (error) => {
+          this.toastr.error('Kunde konnte nicht angelegt werden: ' + error.message);
+        },
+      });
   }
 
   private LoadEmployee(): void {
     this.isNew = false;
-    this.employeeId = this.router.url.split('/').pop();
+    this.customerId = this.router.url.split('/').pop() ?? '';
     this.httpClient
-      .get<Employee>(`https://localhost:7077/employee/${this.employeeId}`)
+      .get<Customer>(`https://localhost:7077/customer/${this.customerId}`)
       .pipe(first())
       .subscribe({
         next: (result) => {
-          this.customerForm.get('id')?.setValue(result.id);
-          this.customerForm.get('firstName')?.setValue(result.firstName);
-          this.customerForm.get('lastName')?.setValue(result.lastName);
-          this.customerForm.get('email')?.setValue(result.email);
-          this.customerForm.get('email')?.disable();
-          this.customerForm.get('phone')?.setValue(result.phoneNumber);
-          this.customerForm.get('role')?.setValue(result.isManager ? 'manager' : 'employee');
+          this.customerForm.patchValue({
+            associatedEmployeeId: result.associatedEmployeeId,
+            birthDate: result.birthDate,
+            careLevel: result.careLevel,
+            declarationsOfAssignment: result.declarationsOfAssignment,
+            emergencyContactName: result.emergencyContactName,
+            emergencyContactPhone: result.emergencyContactPhone,
+            firstName: result.firstName,
+            id: result.id,
+            insuranceStatus: result.insuranceStatus,
+            insuredPersonNumber: result.insuredPersonNumber,
+            isCareContractAvailable: result.isCareContractAvailable,
+            lastName: result.lastName,
+            phone: result.phone,
+            street: result.street,
+            zipCode: result.zipCode,
+          });
+
+          // this.customerForm.get('insurance')?.setValue(result.insurance);
         },
         error: (error) => {
           this.toastr.error('Mitarbeiter konnte nicht geladen werden: ' + error.message);
@@ -160,16 +208,16 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       });
   }
 
-  private UpdateEmployee(customer: Customer) {
-    // this.httpSubscription?.unsubscribe();
-    // this.httpSubscription = this.httpClient.put<Employee>('https://localhost:7077/employee', employee).subscribe({
-    //   complete: () => {
-    //     this.toastr.success('Änderungen am Mitarbeiter wurden gespeichert');
-    //     this.router.navigate(['/dashboard/employee']);
-    //   },
-    //   error: (error) => {
-    //     this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
-    //   },
-    // });
+  private UpdateCustomer(customer: Customer) {
+    this.httpSubscription?.unsubscribe();
+    this.httpSubscription = this.httpClient.put<Customer>('https://localhost:7077/customer', customer).subscribe({
+      complete: () => {
+        this.toastr.success('Änderungen am Kunden wurden gespeichert');
+        this.router.navigate(['/dashboard/customer']);
+      },
+      error: (error) => {
+        this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+      },
+    });
   }
 }

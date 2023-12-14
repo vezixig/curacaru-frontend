@@ -10,7 +10,6 @@
           aria-label="Default select example"
           id="selectAssociatedEmployeeId"
           formControlName="associatedEmployeeId"
-          placeholder="Jemanden auswählen"
           [ngClass]="{
             'is-valid': customerForm.controls['associatedEmployeeId'].valid,
             'is-invalid': customerForm.controls['associatedEmployeeId'].invalid && customerForm.controls['associatedEmployeeId'].touched
@@ -79,7 +78,7 @@
             id="inputZipCode"
             placeholder="PLZ eingeben"
           />
-          <span class="input-group-text">Darmstadt</span>
+          <span class="input-group-text">{{ CityName }}</span>
         </div>
       </div>
 
@@ -181,7 +180,7 @@
       <div class="form-group mb-2">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" formControlName="isCareContractAvailable" id="checkIsCareContractAvailable" />
-          <label class="form-check-label" for="checkIsCareContractAvailable"> Pflegevertrag vorhanden</label>
+          <label class="form-check-label" for="checkIsCareContractAvailable"> Betreuungsvertrag vorhanden</label>
         </div>
       </div>
 
@@ -205,7 +204,7 @@
       </div>
 
       <button [disabled]="!customerForm.valid" type="submit" class="btn btn-primary text-white">Kunden {{ isNew ? "hinzufügen" : "speichern" }}</button>
-      <button type="button" [routerLink]="['/dashboard/employee']" class="btn btn-outline-secondary m-3">Verwerfen</button>
+      <button type="button" [routerLink]="['/dashboard/customer']" class="btn btn-outline-secondary m-3">Verwerfen</button>
     </form>
   </div>
 </div>

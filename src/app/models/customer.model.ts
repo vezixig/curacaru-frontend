@@ -4,13 +4,13 @@ export interface Customer {
   associatedEmployeeId: UUID;
   birthDate: Date;
   careLevel: number;
-  companyId: UUID | null;
   declarationsOfAssignment: number[];
   emergencyContactName: string;
   emergencyContactPhone: string;
   firstName: string;
-  id: UUID;
+  id: UUID | null;
   insuranceId?: string | null;
+  insuredPersonNumber?: string | null;
   insuranceStatus?: InsuranceStatus | null;
   isCareContractAvailable: boolean;
   lastName: string;

@@ -6,6 +6,7 @@ import { CustomerEditorComponent } from './dashboard/customer-editor/customer-ed
 
 export const routes: Routes = [
   { path: 'dashboard/customer/new', component: CustomerEditorComponent },
+  { path: 'dashboard/customer/:id', component: CustomerEditorComponent },
   { path: 'dashboard/customer', component: CustomerListComponent },
   { path: 'dashboard/employee/new', component: EmployeeEditorComponent },
   { path: 'dashboard/employee/:id', component: EmployeeEditorComponent },
