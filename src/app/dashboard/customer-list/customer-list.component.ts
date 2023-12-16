@@ -47,21 +47,21 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   }
 
   public handleDelete(customer: CustomerListEntry) {
-    // const modalRef = this.modalService.open(NgbdModalConfirm);
-    // modalRef.result.then(() => {
-    //   this.deleteEmployee(employee);
-    // });
-    // modalRef.componentInstance.title = 'Mitarbeiter löschen';
-    // modalRef.componentInstance.text = `Soll ${employee.firstName} ${employee.lastName} wirklich gelöscht werden?`;
+    const modalRef = this.modalService.open(NgbdModalConfirm);
+    modalRef.result.then(() => {
+      this.deleteEmployee(customer);
+    });
+    modalRef.componentInstance.title = 'Kunden löschen';
+    modalRef.componentInstance.text = `Soll ${customer.firstName} ${customer.lastName} wirklich gelöscht werden?`;
   }
 
-  private deleteEmployee(employee: Employee) {
+  private deleteEmployee(customer: CustomerListEntry) {
     this.httpSubscription?.unsubscribe();
 
-    this.httpSubscription = this.httpClient.delete(`https://localhost:7077/employee/${employee.id}`).subscribe({
+    this.httpSubscription = this.httpClient.delete(`https://localhost:7077/customer/${customer.id}`).subscribe({
       complete: () => {
-        this.toastr.success(`${employee.firstName} ${employee.lastName} wurde gelöscht.`);
-        // this.employees = this.employees.filter((e) => e.id !== employee.id);
+        this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
+        this.customers = this.customers.filter((e) => e.id !== customer.id);
       },
       error: (error) => {
         this.toastr.error('Mitarbeiter konnte nicht gelöscht werden: ' + error.message);
