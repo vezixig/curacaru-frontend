@@ -127,15 +127,20 @@
         <label for="inputInsurance">Krankenkasse, Versichertennummer und Status</label>
         <div class="input-group">
           <input
+            id="inputInsurance"
             type="text"
             class="form-control"
-            formControlName="insurance"
-            id="inputInsurance"
+            [(ngModel)]="selectedInsurance"
+            [inputFormatter]="insuranceFormatter"
+            [resultFormatter]="insuranceFormatter"
             [ngClass]="{
-              'is-valid': customerForm.controls['insurance'].valid,
-              'is-invalid': customerForm.controls['insurance'].invalid && customerForm.controls['insurance'].touched
+              'is-valid': customerForm.controls['insuranceId'].valid,
+              'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
             }"
+            [ngbTypeahead]="search"
             placeholder="Krankenkasse"
+            [editable]="false"
+            [ngModelOptions]="{ standalone: true }"
           />
           <input
             type="text"
