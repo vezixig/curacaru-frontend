@@ -1,17 +1,19 @@
 import { UUID } from 'angular2-uuid';
+import { Insurance } from './insurance.model';
 
 export interface Customer {
   associatedEmployeeId: UUID;
   birthDate: Date;
   careLevel: number;
-  companyId: UUID | null;
   declarationsOfAssignment: number[];
   emergencyContactName: string;
   emergencyContactPhone: string;
   firstName: string;
-  id: UUID;
-  insuranceId?: string | null;
-  insuranceStatus?: InsuranceStatus | null;
+  id?: UUID;
+  insuranceId?: UUID;
+  insurance?: Insurance;
+  insuredPersonNumber?: string;
+  insuranceStatus?: InsuranceStatus;
   isCareContractAvailable: boolean;
   lastName: string;
   phone: string;

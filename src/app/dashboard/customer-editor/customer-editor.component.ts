@@ -5,28 +5,51 @@ import { Employee } from '../../models/employee.model';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription, first } from 'rxjs';
+import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, first, firstValueFrom, map, mergeMap } from 'rxjs';
 import { Customer } from '../../models/customer.model';
+import { UUID } from 'angular2-uuid';
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { Insurance } from '../../models/insurance.model';
 
 @Component({
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
   selector: 'cura-customer-editor',
   standalone: true,
   templateUrl: './customer-editor.component.html',
   styleUrls: ['./customer-editor.component.scss'],
 })
 export class CustomerEditorComponent implements OnInit, OnDestroy {
-  public isNew: boolean = true;
+  public CityName: string = '';
   public customerForm: FormGroup;
-  public newDeclarationOfAssignment: number | null = null;
   public employees: Employee[] = [];
+  public insuranceFormatter = (insurance: Insurance) => insurance.name;
+  public isNew: boolean = true;
+  public newDeclarationOfAssignment: number | null = null;
 
+  // Gets the two newest declarations of assignment
   get sortedDeclarations(): number[] {
-    return this.customerForm.get('declarationsOfAssignment')?.value.sort((a: number, b: number) => a - b);
+    return this.customerForm
+      .get('declarationsOfAssignment')
+      ?.value.sort((a: number, b: number) => b - a)
+      .slice(0, 2);
   }
 
-  private employeeId: string | undefined;
-  private httpSubscription: Subscription | undefined = undefined;
+  set selectedInsurance(value: Insurance | undefined) {
+    this._selectedInsurance = value;
+    console.log('setting ' + value?.id);
+    this.customerForm.get('insuranceId')?.setValue(value?.id ?? null);
+  }
+
+  get selectedInsurance(): Insurance | undefined {
+    return this._selectedInsurance;
+  }
+
+  private _customerId?: UUID;
+  private _getEmployeeListSubscription?: Subscription;
+  private _getZipCodeSubscription?: Subscription;
+  private _postCustomerSubscription?: Subscription;
+  private _selectedInsurance: Insurance | undefined;
+  private _updateCustomerSubscription?: Subscription;
 
   constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService) {
     this.customerForm = this.formBuilder.group({
@@ -34,7 +57,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       street: ['', [Validators.required, Validators.maxLength(150)]],
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
-      insurance: ['', [Validators.required]],
+      insuranceId: ['', [Validators.required]],
       insuredPersonNumber: ['', [Validators.required]],
       emergencyContactName: [''],
       emergencyContactPhone: [''],
@@ -47,11 +70,11 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       associatedEmployeeId: ['', [Validators.required]],
     });
 
-    this.customerForm.valueChanges.subscribe((value) => {
-      this.logValidationErrors();
+    this.customerForm.get('zipCode')?.valueChanges.subscribe((value) => {
+      this.handleZipCodeChange(value);
     });
 
-    this.httpSubscription = this.httpClient
+    this._getEmployeeListSubscription = this.httpClient
       .get<Employee[]>('https://localhost:7077/employee/list')
       .pipe(first())
       .subscribe({
@@ -63,33 +86,54 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         },
       });
   }
+
   ngOnDestroy(): void {
-    this.httpSubscription?.unsubscribe();
-  }
-
-  logValidationErrors(group: FormGroup = this.customerForm, controlName?: string): void {
-    Object.keys(group.controls).forEach((key: string) => {
-      const abstractControl = group.get(key);
-
-      if (abstractControl instanceof FormGroup) {
-        this.logValidationErrors(abstractControl, key);
-      } else {
-        if (controlName) {
-          console.log(`Control: ${controlName}.${key}, Errors: ${JSON.stringify(abstractControl?.errors)}`);
-        } else {
-          console.log(`Control: ${key}, Errors: ${JSON.stringify(abstractControl?.errors)}`);
-        }
-      }
-    });
+    this._getEmployeeListSubscription?.unsubscribe();
+    this._getZipCodeSubscription?.unsubscribe();
+    this._postCustomerSubscription?.unsubscribe();
+    this._updateCustomerSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
     if (this.router.url.endsWith('new')) {
       this.isNew = true;
     } else {
-      this.LoadEmployee();
+      this.LoadCustomer();
     }
   }
+
+  // Tries to get the name of the city for the entered zip code
+  handleZipCodeChange(zipCode: string) {
+    this.CityName = '';
+    if (zipCode.length == 5) {
+      this._getZipCodeSubscription?.unsubscribe();
+
+      this._getZipCodeSubscription = this.httpClient
+        .get(`https://localhost:7077/address/city/${zipCode}`, { responseType: 'text' })
+        .pipe(first())
+        .subscribe({
+          next: (result) => {
+            this.CityName = result;
+          },
+          error: (error) => {
+            this.CityName = 'Unbekannte PLZ';
+          },
+        });
+    }
+  }
+
+  // Function for the typeahead to search for insurances
+  search: OperatorFunction<string, readonly Insurance[]> = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      mergeMap(async (term) => {
+        if (term.length < 2) return [];
+
+        let insurances = await firstValueFrom(this.httpClient.get<Insurance[]>(`https://localhost:7077/insurance?search=${term}`));
+        return insurances;
+      })
+    );
 
   handleAddDeclarationOfAssignment(event: Event | undefined = undefined) {
     event?.preventDefault();
@@ -105,54 +149,70 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   handleSave(): void {
     const customer: Customer = {
-      associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value,
+      associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value.toString(),
       birthDate: this.customerForm.get('birthDate')?.value,
-      firstName: this.customerForm.get('firstName')?.value,
-      lastName: this.customerForm.get('lastName')?.value,
-      phone: this.customerForm.get('phone')?.value,
-      companyId: this.isNew ? null : null,
-      street: this.customerForm.get('street')?.value,
-      zipCode: this.customerForm.get('zipCode')?.value,
       careLevel: this.customerForm.get('careLevel')?.value,
-      isCareContractAvailable: this.customerForm.get('isCareContractAvailable')?.value,
       declarationsOfAssignment: this.customerForm.get('declarationsOfAssignment')?.value,
       emergencyContactName: this.customerForm.get('emergencyContactName')?.value,
       emergencyContactPhone: this.customerForm.get('emergencyContactPhone')?.value,
-      id: this.customerForm.get('id')?.value,
+      firstName: this.customerForm.get('firstName')?.value,
+      id: this.isNew ? undefined : this._customerId,
+      insuranceId: this.customerForm.get('insuranceId')?.value,
+      insuranceStatus: parseInt(this.customerForm.get('insuranceStatus')?.value),
+      insuredPersonNumber: this.customerForm.get('insuredPersonNumber')?.value,
+      isCareContractAvailable: this.customerForm.get('isCareContractAvailable')?.value,
+      lastName: this.customerForm.get('lastName')?.value,
+      phone: this.customerForm.get('phone')?.value,
+      street: this.customerForm.get('street')?.value,
+      zipCode: this.customerForm.get('zipCode')?.value,
     };
 
-    this.isNew ? this.CreateCustomer(customer) : this.UpdateEmployee(customer);
+    this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);
   }
 
   private CreateCustomer(employee: Customer) {
-    this.httpSubscription?.unsubscribe();
-
-    this.httpSubscription = this.httpClient.post('https://localhost:7077/customers/new', employee).subscribe({
-      complete: () => {
-        this.toastr.success('Ein neuer Kunde wurde angelegt');
-        this.router.navigate(['/dashboard/customer']);
-      },
-      error: (error) => {
-        this.toastr.error('Kunde konnte nicht angelegt werden: ' + error.message);
-      },
-    });
+    this._postCustomerSubscription = this.httpClient
+      .post('https://localhost:7077/customer/new', employee)
+      .pipe(first())
+      .subscribe({
+        complete: () => {
+          this.toastr.success('Ein neuer Kunde wurde angelegt');
+          this.router.navigate(['/dashboard/customer']);
+        },
+        error: (error) => {
+          this.toastr.error('Kunde konnte nicht angelegt werden: ' + error.message);
+        },
+      });
   }
 
-  private LoadEmployee(): void {
+  private LoadCustomer(): void {
     this.isNew = false;
-    this.employeeId = this.router.url.split('/').pop();
+    this._customerId = this.router.url.split('/').pop() ?? '';
     this.httpClient
-      .get<Employee>(`https://localhost:7077/employee/${this.employeeId}`)
+      .get<Customer>(`https://localhost:7077/customer/${this._customerId}`)
       .pipe(first())
       .subscribe({
         next: (result) => {
-          this.customerForm.get('id')?.setValue(result.id);
-          this.customerForm.get('firstName')?.setValue(result.firstName);
-          this.customerForm.get('lastName')?.setValue(result.lastName);
-          this.customerForm.get('email')?.setValue(result.email);
-          this.customerForm.get('email')?.disable();
-          this.customerForm.get('phone')?.setValue(result.phoneNumber);
-          this.customerForm.get('role')?.setValue(result.isManager ? 'manager' : 'employee');
+          this.customerForm.patchValue({
+            associatedEmployeeId: result.associatedEmployeeId,
+            birthDate: result.birthDate,
+            careLevel: result.careLevel,
+            declarationsOfAssignment: result.declarationsOfAssignment,
+            emergencyContactName: result.emergencyContactName,
+            emergencyContactPhone: result.emergencyContactPhone,
+            firstName: result.firstName,
+            id: result.id,
+            insuranceId: result.insuranceId,
+            insuranceStatus: result.insuranceStatus,
+            insuredPersonNumber: result.insuredPersonNumber,
+            isCareContractAvailable: result.isCareContractAvailable,
+            lastName: result.lastName,
+            phone: result.phone,
+            street: result.street,
+            zipCode: result.zipCode,
+          });
+
+          this.selectedInsurance = result.insurance;
         },
         error: (error) => {
           this.toastr.error('Mitarbeiter konnte nicht geladen werden: ' + error.message);
@@ -160,16 +220,15 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       });
   }
 
-  private UpdateEmployee(customer: Customer) {
-    // this.httpSubscription?.unsubscribe();
-    // this.httpSubscription = this.httpClient.put<Employee>('https://localhost:7077/employee', employee).subscribe({
-    //   complete: () => {
-    //     this.toastr.success('Änderungen am Mitarbeiter wurden gespeichert');
-    //     this.router.navigate(['/dashboard/employee']);
-    //   },
-    //   error: (error) => {
-    //     this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
-    //   },
-    // });
+  private UpdateCustomer(customer: Customer) {
+    this._updateCustomerSubscription = this.httpClient.put<Customer>('https://localhost:7077/customer', customer).subscribe({
+      complete: () => {
+        this.toastr.success('Änderungen am Kunden wurden gespeichert');
+        this.router.navigate(['/dashboard/customer']);
+      },
+      error: (error) => {
+        this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+      },
+    });
   }
 }
