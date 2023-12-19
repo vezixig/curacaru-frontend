@@ -1,17 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Employee } from '../../models/employee.model';
+import { CustomerListEntry } from '../../models/customer-list-entry.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
-import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
-import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
-import { ToastrService } from 'ngx-toastr';
+import { RouterModule } from '@angular/router';
 import { Subscription, first } from 'rxjs';
-import { UUID } from 'angular2-uuid';
-import { CustomerListEntry } from '../../models/customer-list-entry.model';
+import { ToastrService } from 'ngx-toastr';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, RouterModule],
