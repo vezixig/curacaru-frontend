@@ -8,6 +8,7 @@ import { AppointmentEditorComponent } from './dashboard/appointment-editor/appoi
 
 export const routes: Routes = [
   { path: 'dashboard/appointment/new', component: AppointmentEditorComponent },
+  { path: 'dashboard/appointment/:id', component: AppointmentEditorComponent },
   { path: 'dashboard/appointment', component: AppointmentListComponent },
   { path: 'dashboard/customer/new', component: CustomerEditorComponent },
   { path: 'dashboard/customer/:id', component: CustomerEditorComponent },

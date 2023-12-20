@@ -1,12 +1,28 @@
 import { Time } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
-import { NgbTime } from '@ng-bootstrap/ng-bootstrap/timepicker/ngb-time';
+import { NgbTime } from '../models/ngbtime';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DateTimeService {
+  static toNgbTime(timeStart: Time | string): NgbTime {
+    if (typeof timeStart === 'string') {
+      const timeParts = timeStart.split(':');
+      return new NgbTime(parseInt(timeParts[0]), parseInt(timeParts[1]));
+    }
+    return new NgbTime(timeStart.hours, timeStart.minutes);
+  }
+
+  static toNgbDate(date: Date | string): NgbDate {
+    if (typeof date === 'string') {
+      const dateParts = date.split('-');
+      return new NgbDate(parseInt(dateParts[0]), parseInt(dateParts[1]), parseInt(dateParts[2]));
+    }
+    return new NgbDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+  }
+
   static toDateString(date: NgbDate | null): string {
     return date ? `${date.year}-${date.month}-${date.day}` : '';
   }
