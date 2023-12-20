@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable()
-export class CustomDateParserFormatter extends NgbDateParserFormatter {
+export class GermanDateParserFormatter extends NgbDateParserFormatter {
   readonly DELIMITER = '.';
 
   parse(value: string): NgbDateStruct | null {

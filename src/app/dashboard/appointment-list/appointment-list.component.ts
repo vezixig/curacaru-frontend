@@ -2,37 +2,38 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClient } from '@angular/common/http';
-import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { Subscription, first } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { faCalendar, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import { FormsModule } from '@angular/forms';
-import { CustomDateParserFormatter } from '../../i18n/date-formatter';
+import { GermanDateParserFormatter } from '../../i18n/date-formatter';
 import { AppointmentListEntry } from '../../models/appointment-list-entry.model';
 import { TimeFormatPipe } from '../../pipes/time.pipe';
-import { Employee } from '../../models/employee.model';
 import { Customer } from '../../models/customer.model';
+import { EmployeeBasic } from '../../models/employee-basic.model';
+import { DateTimeService } from '../../services/date-time.service';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, FormsModule, TimeFormatPipe],
   selector: 'cura-appointment-list',
   standalone: true,
-  providers: [{ provide: NgbDateParserFormatter, useClass: CustomDateParserFormatter }],
+  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }],
   styleUrls: ['./appointment-list.component.scss'],
   templateUrl: './appointment-list.component.html',
 })
 export class AppointmentListComponent implements OnDestroy, OnInit {
-  public faGear = faGear;
-  public faTrashCan = faTrashCan;
-  public faCalendar = faCalendar;
+  faGear = faGear;
+  faTrashCan = faTrashCan;
+  faCalendar = faCalendar;
 
-  public appointments: AppointmentListEntry[] = [];
-  public employees: Employee[] = [];
-  public selectedEmployee?: Employee;
-  public customers: Customer[] = [];
-  public selectedCustomer?: Customer;
+  appointments: AppointmentListEntry[] = [];
+  employees: EmployeeBasic[] = [];
+  selectedEmployee?: EmployeeBasic;
+  customers: Customer[] = [];
+  selectedCustomer?: Customer;
 
   private _getAppointmentsSubscription?: Subscription;
   private _getEmployeeListSubscription?: Subscription;
@@ -44,7 +45,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   selectedEmployeeId?: number;
   selectedCustomerId?: number;
 
-  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private httpClient: HttpClient, private modalService: NgbModal, private toastr: ToastrService) {}
+  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private httpClient: HttpClient, private toastr: ToastrService) {}
 
   isHovered(date: NgbDate) {
     return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
@@ -56,10 +57,6 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
 
   isRange(date: NgbDate) {
     return date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
-  }
-
-  toDateString(date: NgbDate | null): string {
-    return date ? `${date.year}-${date.month}-${date.day}` : '';
   }
 
   validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
@@ -74,10 +71,14 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
+    var dateBounds = DateTimeService.getStartAndEndOfWeek(new Date());
+    this.fromDate = dateBounds.start;
+    this.toDate = dateBounds.end;
+
     this.loadAppointments();
 
     this._getEmployeeListSubscription = this.httpClient
-      .get<Employee[]>('https://localhost:7077/employee/list')
+      .get<EmployeeBasic[]>('https://localhost:7077/employee/baselist')
       .pipe(first())
       .subscribe({
         next: (result) => {
@@ -128,8 +129,8 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
 
     let uri = `https://localhost:7077/appointment/list?`;
 
-    uri += this.fromDate ? `from=${this.toDateString(this.fromDate)}&` : '';
-    uri += this.toDate ? `to=${this.toDateString(this.toDate)}&` : '';
+    uri += this.fromDate ? `from=${DateTimeService.toDateString(this.fromDate)}&` : '';
+    uri += this.toDate ? `to=${DateTimeService.toDateString(this.toDate)}&` : '';
     uri += this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '';
     uri += this.selectedCustomerId ? `customerId=${this.selectedCustomerId}&` : '';
 

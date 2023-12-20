@@ -1,7 +1,7 @@
 <div class="container-fluid p-4">
   <div class="row">
     <h4>Termine</h4>
-    <button type="button" [routerLink]="['/dashboard/customer/new']" class="btn btn-primary text-white btn-block">Termin hinzufügen</button>
+    <button type="button" [routerLink]="['/dashboard/appointment/new']" class="btn btn-primary text-white btn-block">Termin hinzufügen</button>
   </div>
 
   <form class="mt-3">
@@ -53,7 +53,7 @@
           <label for="dpFromDate">Mitarbeiter</label>
           <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
             <option></option>
-            <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.firstName }} {{ employee.lastName }}</option>
+            <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
           </select>
         </div>
       </div>

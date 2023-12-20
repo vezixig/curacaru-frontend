@@ -36,7 +36,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   set selectedInsurance(value: Insurance | undefined) {
     this._selectedInsurance = value;
-    console.log('setting ' + value?.id);
     this.customerForm.get('insuranceId')?.setValue(value?.id ?? null);
   }
 

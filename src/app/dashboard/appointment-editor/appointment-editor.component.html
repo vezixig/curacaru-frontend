@@ -1,0 +1,93 @@
+<div class="container p-4">
+  <div class="row">
+    <h4>Termin {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
+    <form (ngSubmit)="onSave()" [formGroup]="appointmentForm">
+      <!-- Customer -->
+      <div class="form-group mb-4">
+        <label for="selectCustomer">Kunde:</label>
+        <select
+          class="form-select"
+          id="selectCustomer"
+          formControlName="customerId"
+          [ngClass]="{
+            'is-valid': appointmentForm.controls['customerId'].valid,
+            'is-invalid': appointmentForm.controls['customerId'].invalid && appointmentForm.controls['customerId'].touched
+          }"
+        >
+          <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.firstName }} {{ customer.lastName }}</option>
+        </select>
+      </div>
+
+      <!-- Employee -->
+      <div class="form-group mb-4">
+        <label for="selectEmployeeId">Bearbeitet von:</label>
+        <select
+          class="form-select"
+          id="selectEmployeeId"
+          formControlName="employeeId"
+          [ngClass]="{
+            'is-valid': appointmentForm.controls['employeeId'].valid,
+            'is-invalid': appointmentForm.controls['employeeId'].invalid && appointmentForm.controls['employeeId'].touched
+          }"
+        >
+          <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="selectEmployeeReplacementId">Vertreten von:</label>
+        <select class="form-select" id="selectEmployeeReplacementId" formControlName="employeeReplacementId">
+          <option></option>
+          <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
+        </select>
+      </div>
+
+      <!-- Date  -->
+      <div class="form-group mb-4">
+        <label for="date">Datum:</label>
+        <div class="input-group">
+          <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+            <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
+          </button>
+          <input class="form-control" placeholder="tt.mm.jjjj" name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker" />
+        </div>
+      </div>
+
+      <!-- Time  -->
+      <div class="row">
+        <div class="col-auto">
+          <label for="date">Von:</label>
+          <ngb-timepicker formControlName="timeStart" [minuteStep]="5" />
+        </div>
+        <div class="col-auto">
+          <label for="date">Bis:</label>
+          <ngb-timepicker formControlName="timeEnd" [minuteStep]="5" />
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group mb-4">
+        <label for="inputNotes">Notizen:</label>
+        <textarea class="form-control" formControlName="notes" rows="4" id="inputNotes" placeholder="Notizen"></textarea>
+      </div>
+
+      <!-- Signatures -->
+      <div class="form-group mb-4">
+        <label for="inputNotes">Unterschriften:</label>
+        <div class="input-group" style="cursor: pointer">
+          <span class="input-group-text" (click)="toggleIsSignedByCustomer()">Kunde</span>
+          <div class="input-group-text bg-white px-3" (click)="toggleIsSignedByCustomer()">
+            <input type="checkbox" formControlName="isSignedByCustomer" #checkSignatureCustomer />
+          </div>
+          <span class="input-group-text" (click)="toggleIsSignedByEmployee()">Mitarbeiter</span>
+          <div class="input-group-text bg-white px-3" (click)="toggleIsSignedByEmployee()">
+            <input type="checkbox" formControlName="isSignedByEmployee" />
+          </div>
+        </div>
+      </div>
+
+      <button [disabled]="!appointmentForm.valid" type="submit" class="btn btn-primary text-white">Termin {{ isNew ? "anlegen" : "speichern" }}</button>
+      <button type="button" [routerLink]="['/dashboard/appointment']" class="btn btn-outline-secondary m-3">Verwerfen</button>
+    </form>
+  </div>
+</div>
