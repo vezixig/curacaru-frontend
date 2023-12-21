@@ -1,5 +1,6 @@
 import { Time } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
+import { DateTimeService } from '../services/date-time.service';
 
 @Pipe({
   name: 'timeFormat',
@@ -8,6 +9,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class TimeFormatPipe implements PipeTransform {
   transform(time: Time): string {
     if (!time) return '';
-    return time.toString().substring(0, 5);
+    return DateTimeService.toTimeString(time, false);
   }
 }

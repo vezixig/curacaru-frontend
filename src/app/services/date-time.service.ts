@@ -31,12 +31,16 @@ export class DateTimeService {
     return date ? new Date(date.year, date.month, date.day) : new Date();
   }
 
-  static toTime(value: NgbTime): Time {
+  static toTime(value: NgbTime | string): Time {
+    if (typeof value === 'string') {
+      const timeParts = value.split(':');
+      return { hours: parseInt(timeParts[0]), minutes: parseInt(timeParts[1]) };
+    }
     return { hours: value.hour, minutes: value.minute };
   }
 
-  static toTimeString(time: Time) {
-    return `${time.hours.toString().padStart(2, '0')}:${time.minutes.toString().padStart(2, '0')}:00`;
+  static toTimeString(time: Time, includeSeconds = true) {
+    return `${time.hours.toString().padStart(2, '0')}:${time.minutes.toString().padStart(2, '0')}` + (includeSeconds ? ':00' : '');
   }
 
   /**

@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClient } from '@angular/common/http';
-import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
-import { Subscription, first } from 'rxjs';
+import { Subscription, first, map } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { faCalendar, faTrashCan } from '@fortawesome/free-regular-svg-icons';
@@ -15,6 +15,7 @@ import { TimeFormatPipe } from '../../pipes/time.pipe';
 import { Customer } from '../../models/customer.model';
 import { EmployeeBasic } from '../../models/employee-basic.model';
 import { DateTimeService } from '../../services/date-time.service';
+import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, FormsModule, TimeFormatPipe],
@@ -35,6 +36,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   customers: Customer[] = [];
   selectedCustomer?: Customer;
 
+  private _deleteAppointmentSubscription?: Subscription;
   private _getAppointmentsSubscription?: Subscription;
   private _getEmployeeListSubscription?: Subscription;
   private _getCustomerListSubscription?: Subscription;
@@ -45,7 +47,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   selectedEmployeeId?: number;
   selectedCustomerId?: number;
 
-  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private httpClient: HttpClient, private toastr: ToastrService) {}
+  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private httpClient: HttpClient, private toastr: ToastrService, private modalService: NgbModal) {}
 
   isHovered(date: NgbDate) {
     return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
@@ -65,6 +67,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy(): void {
+    this._deleteAppointmentSubscription?.unsubscribe();
     this._getAppointmentsSubscription?.unsubscribe();
     this._getCustomerListSubscription?.unsubscribe();
     this._getEmployeeListSubscription?.unsubscribe();
@@ -115,13 +118,17 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
     }
   }
 
-  onDelete(customer: AppointmentListEntry) {
-    // const modalRef = this.modalService.open(NgbdModalConfirm);
-    // modalRef.result.then(() => {
-    //   this.deleteEmployee(customer);
-    // });
-    // modalRef.componentInstance.title = 'Kunden löschen';
-    // modalRef.componentInstance.text = `Soll ${customer.firstName} ${customer.lastName} wirklich gelöscht werden?`;
+  onDelete(appointment: AppointmentListEntry) {
+    const modalRef = this.modalService.open(NgbdModalConfirm);
+    modalRef.result.then(() => {
+      this.deleteEmployee(appointment);
+    });
+    modalRef.componentInstance.title = 'Kunden löschen';
+
+    const date = appointment.date.toLocaleDateString();
+    const start = DateTimeService.toTimeString(appointment.timeStart, false);
+    const end = DateTimeService.toTimeString(appointment.timeEnd, false);
+    modalRef.componentInstance.text = `Soll der Termin am ${date} von ${start}-${end} wirklich gelöscht werden?`;
   }
 
   private loadAppointments() {
@@ -138,7 +145,10 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
 
     this._getAppointmentsSubscription = this.httpClient
       .get<AppointmentListEntry[]>(uri)
-      .pipe(first())
+      .pipe(
+        map((result) => result.map((entry) => this.deserializeDates(entry))),
+        first()
+      )
       .subscribe({
         next: (result) => {
           this.appointments = result;
@@ -149,16 +159,30 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
       });
   }
 
-  private deleteEmployee(customer: AppointmentListEntry) {
-    // this.httpSubscription?.unsubscribe();
-    // this.httpSubscription = this.httpClient.delete(`https://localhost:7077/customer/${customer.id}`).subscribe({
-    //   complete: () => {
-    //     this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
-    //     this.customers = this.customers.filter((e) => e.id !== customer.id);
-    //   },
-    //   error: (error) => {
-    //     this.toastr.error('Mitarbeiter konnte nicht gelöscht werden: ' + error.message);
-    //   },
-    // });
+  private deserializeDates(obj: any): any {
+    //Check if the property is a Date type
+    if (obj instanceof Object && obj.hasOwnProperty('date') && typeof obj.date === 'string') {
+      obj.date = new Date(obj.date);
+    }
+    if (obj instanceof Object && obj.hasOwnProperty('timeStart') && typeof obj.timeStart === 'string') {
+      obj.timeStart = DateTimeService.toTime(obj.timeStart);
+    }
+    if (obj instanceof Object && obj.hasOwnProperty('timeEnd') && typeof obj.timeEnd === 'string') {
+      obj.timeEnd = DateTimeService.toTime(obj.timeEnd);
+    }
+    return obj;
+  }
+
+  private deleteEmployee(appointment: AppointmentListEntry) {
+    this._deleteAppointmentSubscription?.unsubscribe();
+    this._deleteAppointmentSubscription = this.httpClient.delete(`https://localhost:7077/appointment/${appointment.id}`).subscribe({
+      complete: () => {
+        this.toastr.success(`Der Termin wurde gelöscht.`);
+        this.appointments = this.appointments.filter((e) => e.id !== appointment.id);
+      },
+      error: (error) => {
+        this.toastr.error('Termin konnte nicht gelöscht werden: ' + error.message);
+      },
+    });
   }
 }

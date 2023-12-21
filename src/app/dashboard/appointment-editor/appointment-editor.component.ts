@@ -1,22 +1,20 @@
-import { CommonModule, Time } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Employee } from '../../models/employee.model';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, first, firstValueFrom, map, mergeMap } from 'rxjs';
-import { Customer } from '../../models/customer.model';
-import { UUID } from 'angular2-uuid';
-import { NgbDate, NgbDateParserFormatter, NgbDatepicker, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
-import { Insurance } from '../../models/insurance.model';
-import { EmployeeBasic as EmployeeBase } from '../../models/employee-basic.model';
-import { CustomerListEntry } from '../../models/customer-list-entry.model';
-import { GermanDateParserFormatter } from '../../i18n/date-formatter';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { Router, RouterModule } from '@angular/router';
+import { Subscription, first } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { UUID } from 'angular2-uuid';
+
 import { Appointment } from '../../models/appointment.model';
+import { CommonModule } from '@angular/common';
+import { CustomerListEntry } from '../../models/customer-list-entry.model';
 import { DateTimeService } from '../../services/date-time.service';
+import { EmployeeBasic as EmployeeBase } from '../../models/employee-basic.model';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { GermanDateParserFormatter } from '../../i18n/date-formatter';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, FormsModule, NgbDatepickerModule, NgbTimepickerModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
@@ -55,29 +53,8 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
 
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
 
-    this._getEmployeeListSubscription = this.httpClient
-      .get<EmployeeBase[]>('https://localhost:7077/employee/baselist')
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.employees = result;
-        },
-        error: (error) => {
-          this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
-        },
-      });
-
-    this._getCustomerListSubscription = this.httpClient
-      .get<CustomerListEntry[]>('https://localhost:7077/customer/list')
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.customers = result;
-        },
-        error: (error) => {
-          this.toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message);
-        },
-      });
+    this.loadEmployeeList();
+    this.loadCustomerList();
   }
 
   ngOnDestroy() {
@@ -94,6 +71,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
       this.loadAppointment();
     }
   }
+
   loadAppointment() {
     this.isNew = false;
     this._appointmentId = this.router.url.split('/').pop() ?? '';
@@ -185,6 +163,39 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadCustomerList() {
+    this._getCustomerListSubscription = this.httpClient
+      .get<CustomerListEntry[]>('https://localhost:7077/customer/list')
+      .pipe(first())
+      .subscribe({
+        next: (result) => {
+          this.customers = result;
+        },
+        error: (error) => {
+          this.toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message);
+        },
+      });
+  }
+
+  private loadEmployeeList() {
+    this._getEmployeeListSubscription = this.httpClient
+      .get<EmployeeBase[]>('https://localhost:7077/employee/baselist')
+      .pipe(first())
+      .subscribe({
+        next: (result) => {
+          this.employees = result;
+        },
+        error: (error) => {
+          this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
+        },
+      });
+  }
+
+  private onCustomerChanged(customerId: number): void {
+    const employeeId = this.customers.find((e) => e.id === customerId)?.associatedEmployeeId ?? null;
+    this.appointmentForm.get('employeeId')?.setValue(employeeId);
+  }
+
   private UpdateAppointment(appointment: Appointment) {
     console.log(appointment);
 
@@ -212,10 +223,5 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
         this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
       },
     });
-  }
-
-  private onCustomerChanged(customerId: number): void {
-    const employeeId = this.customers.find((e) => e.id === customerId)?.associatedEmployeeId ?? null;
-    this.appointmentForm.get('employeeId')?.setValue(employeeId);
   }
 }
