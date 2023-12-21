@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faClipboard } from '@fortawesome/free-regular-svg-icons';
 import { faPersonCane, faUserClock, faUsersGear } from '@fortawesome/free-solid-svg-icons';
@@ -25,7 +25,6 @@ export class SidebarComponent implements OnInit {
   constructor(private _userService: UserService) {}
 
   ngOnInit(): void {
-    console.log(this._userService.user);
     this.isManager = this._userService.user?.isManager ?? false;
   }
 }

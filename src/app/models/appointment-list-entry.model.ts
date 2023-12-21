@@ -20,6 +20,9 @@ export interface AppointmentListEntry {
   /** Gets or sets the id of the appointment. */
   id: UUID;
 
+  /** Gets or sets a value indicating whether the appointment is done. */
+  isDone: boolean;
+
   /** Gets or sets the end time of the appointment. */
   timeEnd: Time;
 

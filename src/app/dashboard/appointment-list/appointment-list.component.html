@@ -81,7 +81,7 @@
         <td>{{ appointment.city }}</td>
         <td>{{ appointment.employeeName }}</td>
         <td>{{ appointment.employeeReplacementName }}</td>
-        <td><img width="16" height="16" class="bg-success" style="border-radius: 8px" /></td>
+        <td class="text-center"><img width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" /></td>
         <td>
           <div class="btn-group" role="group">
             <button type="button" [routerLink]="['/dashboard/appointment', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">

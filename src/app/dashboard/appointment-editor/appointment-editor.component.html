@@ -86,6 +86,7 @@
         </div>
       </div>
 
+      <button *ngIf="!isNew && !isDone" type="button" (click)="onFinish()" class="btn btn-success text-white mx-3" style="margin-left: 0 !important">Termin Abschließen</button>
       <button [disabled]="!appointmentForm.valid" type="submit" class="btn btn-primary text-white">Termin {{ isNew ? "anlegen" : "speichern" }}</button>
       <button type="button" [routerLink]="['/dashboard/appointment']" class="btn btn-outline-secondary m-3">Verwerfen</button>
     </form>

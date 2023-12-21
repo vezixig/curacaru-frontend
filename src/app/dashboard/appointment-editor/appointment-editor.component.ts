@@ -33,10 +33,12 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   customers: CustomerListEntry[] = [];
 
   isNew: boolean = true;
+  isDone: boolean = false;
 
   private _getEmployeeListSubscription?: Subscription;
   private _getCustomerListSubscription?: Subscription;
   private _postAppointmentSubscription?: Subscription;
+  private _postFinishSubscription?: Subscription;
   private _updateAppointmentSubscription?: Subscription;
   private _appointmentId?: UUID;
   user?: UserEmployee;
@@ -68,6 +70,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
     this._getEmployeeListSubscription?.unsubscribe();
     this._getCustomerListSubscription?.unsubscribe();
     this._postAppointmentSubscription?.unsubscribe();
+    this._postFinishSubscription?.unsubscribe();
     this._updateAppointmentSubscription?.unsubscribe();
   }
 
@@ -87,8 +90,6 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
       .pipe(first())
       .subscribe({
         next: (result) => {
-          console.log(result);
-
           this.appointmentForm.patchValue({
             customerId: result.customerId,
             employeeId: result.employeeId,
@@ -101,10 +102,26 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
             notes: result.notes,
           });
 
-          console.log(this.appointmentForm.value);
+          this.isDone = result.isDone;
         },
         error: (error) => {
           this.toastr.error('Termin konnte nicht geladen werden: ' + error.message);
+        },
+      });
+  }
+
+  onFinish() {
+    this._postFinishSubscription?.unsubscribe();
+    this._postFinishSubscription = this.httpClient
+      .post(`https://localhost:7077/appointment/${this._appointmentId}/finish`, {})
+      .pipe(first())
+      .subscribe({
+        complete: () => {
+          this.toastr.success('Termin wurde abgeschlossen');
+          this.router.navigate(['/dashboard/appointment']);
+        },
+        error: (error) => {
+          this.toastr.error('Termin konnte nicht abgeschlossen werden: ' + error.message);
         },
       });
   }
@@ -204,8 +221,6 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   }
 
   private UpdateAppointment(appointment: Appointment) {
-    console.log(appointment);
-
     const customSerializer = (key: string, value: any) => {
       if (typeof value === 'object' && 'year' in value && 'month' in value && 'day' in value) {
         return DateTimeService.toDateString(value);
