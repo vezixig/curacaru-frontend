@@ -15,6 +15,8 @@ import { DateTimeService } from '../../services/date-time.service';
 import { EmployeeBasic as EmployeeBase } from '../../models/employee-basic.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { GermanDateParserFormatter } from '../../i18n/date-formatter';
+import { UserService } from '../../services/user.service';
+import { UserEmployee } from '../../models/user-employee.model';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, FormsModule, NgbDatepickerModule, NgbTimepickerModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
@@ -37,8 +39,10 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   private _postAppointmentSubscription?: Subscription;
   private _updateAppointmentSubscription?: Subscription;
   private _appointmentId?: UUID;
+  user?: UserEmployee;
 
-  constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService) {
+  constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService, private _userService: UserService) {
+    this.user = this._userService.user;
     this.appointmentForm = this.formBuilder.group({
       isSignedByEmployee: [false],
       isSignedByCustomer: [false],
@@ -47,10 +51,13 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
       timeStart: ['', [Validators.required]],
       timeEnd: ['', [Validators.required]],
       customerId: ['', [Validators.required]],
-      employeeId: ['', [Validators.required]],
+      employeeId: [this.user?.isManager ? '' : this.user?.id, [Validators.required]],
       employeeReplacementId: [''],
     });
 
+    if (!this.user?.isManager) {
+      this.appointmentForm.get('employeeId')?.disable();
+    }
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
 
     this.loadEmployeeList();

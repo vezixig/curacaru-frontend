@@ -34,7 +34,7 @@
         </select>
       </div>
 
-      <div class="form-group mb-4">
+      <div class="form-group mb-4" *ngIf="user?.isManager">
         <label for="selectEmployeeReplacementId">Vertreten von:</label>
         <select class="form-select" id="selectEmployeeReplacementId" formControlName="employeeReplacementId">
           <option></option>

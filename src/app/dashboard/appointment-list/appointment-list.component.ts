@@ -16,6 +16,7 @@ import { Customer } from '../../models/customer.model';
 import { EmployeeBasic } from '../../models/employee-basic.model';
 import { DateTimeService } from '../../services/date-time.service';
 import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
+import { UserService } from '../../services/user.service';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, FormsModule, TimeFormatPipe],
@@ -46,8 +47,9 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   toDate: NgbDate | null = this.calendar.getToday();
   selectedEmployeeId?: number;
   selectedCustomerId?: number;
+  isManager: boolean = false;
 
-  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private httpClient: HttpClient, private toastr: ToastrService, private modalService: NgbModal) {}
+  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private httpClient: HttpClient, private toastr: ToastrService, private modalService: NgbModal, private _userService: UserService) {}
 
   isHovered(date: NgbDate) {
     return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
@@ -74,6 +76,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
+    this.isManager = this._userService.user?.isManager ?? false;
     var dateBounds = DateTimeService.getStartAndEndOfWeek(new Date());
     this.fromDate = dateBounds.start;
     this.toDate = dateBounds.end;
@@ -138,7 +141,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
 
     uri += this.fromDate ? `from=${DateTimeService.toDateString(this.fromDate)}&` : '';
     uri += this.toDate ? `to=${DateTimeService.toDateString(this.toDate)}&` : '';
-    uri += this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '';
+    uri += this.isManager ? (this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '') : `employeeId=${this._userService.user?.id}&`;
     uri += this.selectedCustomerId ? `customerId=${this.selectedCustomerId}&` : '';
 
     uri = uri.slice(0, -1);

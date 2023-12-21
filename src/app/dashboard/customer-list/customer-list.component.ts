@@ -10,6 +10,7 @@ import { Subscription, first } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { UserService } from '../../services/user.service';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, RouterModule],
@@ -18,20 +19,22 @@ import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
   templateUrl: './customer-list.component.html',
 })
 export class CustomerListComponent implements OnDestroy, OnInit {
+  public customers: CustomerListEntry[] = [];
   public faGear = faGear;
   public faTrashCan = faTrashCan;
-  public customers: CustomerListEntry[] = [];
+  public isManager: boolean = false;
 
   private httpSubscription: Subscription | undefined = undefined;
 
-  constructor(private httpClient: HttpClient, private modalService: NgbModal, private toastr: ToastrService) {}
+  constructor(private _httpClient: HttpClient, private _modalService: NgbModal, private _toastr: ToastrService, private _userService: UserService) {}
 
   ngOnDestroy(): void {
     this.httpSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
-    this.httpClient
+    this.isManager = this._userService.user?.isManager ?? false;
+    this._httpClient
       .get<CustomerListEntry[]>('https://localhost:7077/customer/list')
       .pipe(first())
       .subscribe({
@@ -39,13 +42,13 @@ export class CustomerListComponent implements OnDestroy, OnInit {
           this.customers = result;
         },
         error: (error) => {
-          this.toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message);
+          this._toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message);
         },
       });
   }
 
   public handleDelete(customer: CustomerListEntry) {
-    const modalRef = this.modalService.open(NgbdModalConfirm);
+    const modalRef = this._modalService.open(NgbdModalConfirm);
     modalRef.result.then(() => {
       this.deleteEmployee(customer);
     });
@@ -56,13 +59,13 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   private deleteEmployee(customer: CustomerListEntry) {
     this.httpSubscription?.unsubscribe();
 
-    this.httpSubscription = this.httpClient.delete(`https://localhost:7077/customer/${customer.id}`).subscribe({
+    this.httpSubscription = this._httpClient.delete(`https://localhost:7077/customer/${customer.id}`).subscribe({
       complete: () => {
-        this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
+        this._toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
         this.customers = this.customers.filter((e) => e.id !== customer.id);
       },
       error: (error) => {
-        this.toastr.error('Mitarbeiter konnte nicht gelöscht werden: ' + error.message);
+        this._toastr.error('Mitarbeiter konnte nicht gelöscht werden: ' + error.message);
       },
     });
   }

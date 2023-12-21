@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <div class="col">
+      <div class="col" *ngIf="isManager">
         <div class="form-group">
           <label for="dpFromDate">Mitarbeiter</label>
           <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">

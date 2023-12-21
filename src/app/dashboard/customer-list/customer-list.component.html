@@ -1,7 +1,7 @@
 <div class="container-fluid p-4">
   <div class="row">
     <h4>Kundenliste</h4>
-    <Button type="button" [routerLink]="['/dashboard/customer/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
+    <Button *ngIf="isManager" type="button" [routerLink]="['/dashboard/customer/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
     <table class="col-12 table mt-3 table-striped">
       <thead>
         <tr>
