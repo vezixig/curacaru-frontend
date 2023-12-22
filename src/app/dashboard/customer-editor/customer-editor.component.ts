@@ -82,7 +82,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
     this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
       next: (result) => (this.employees = result),
-      error: (error) => this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message),
+      error: (error) => this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`),
     });
   }
 
@@ -172,7 +172,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/customer']);
       },
       error: (error) => {
-        this.toastr.error('Kunde konnte nicht angelegt werden: ' + error.message);
+        this.toastr.error(`Kunde konnte nicht angelegt werden: [${error.status}] ${error.error}`);
         this.isSaving = false;
       },
     });
@@ -207,8 +207,13 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       },
       error: (error) => {
-        this.toastr.error('Mitarbeiter konnte nicht geladen werden: ' + error.message);
-        this.isLoading = false;
+        if (error.status === 404) {
+          this.toastr.error('Kunde wurde nicht gefunden');
+          this.router.navigate(['/dashboard/customer']);
+        } else {
+          this.toastr.error(`Kunde konnte nicht geladen werden: [${error.status}] ${error.error}`);
+          this.isLoading = false;
+        }
       },
     });
   }
@@ -222,7 +227,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/customer']);
       },
       error: (error) => {
-        this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+        this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);
         this.isSaving = false;
       },
     });

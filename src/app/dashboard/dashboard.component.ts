@@ -20,8 +20,8 @@ export class DashboardComponent {
   hasCompany: boolean = false;
   hasEmployee: boolean = false;
   isLoading: boolean = true;
-  hasError: boolean = false;
   user: UserEmployee | undefined;
+  error: any;
 
   constructor(private _httpClient: HttpClient, private _userService: UserService) {}
 
@@ -51,8 +51,7 @@ export class DashboardComponent {
           this.isLoading = false;
         } else {
           this.isLoading = false;
-          this.hasError = true;
-          console.error('API request failed:', error);
+          this.error = error;
         }
       },
     });

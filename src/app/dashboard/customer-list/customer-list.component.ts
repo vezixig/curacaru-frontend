@@ -46,7 +46,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message);
+        this.toastr.error(`Kundenliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
         this.isLoading = false;
       },
     });
@@ -66,7 +66,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
         this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
         this.customers = this.customers.filter((e) => e.id !== customer.id);
       },
-      error: (error) => this.toastr.error('Mitarbeiter konnte nicht gelöscht werden: ' + error.message),
+      error: (error) => this.toastr.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
     });
   }
 }

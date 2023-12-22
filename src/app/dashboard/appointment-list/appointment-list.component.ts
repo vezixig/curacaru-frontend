@@ -74,7 +74,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
         this.employees = result;
       },
       error: (error) => {
-        this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
+        this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
       },
     });
 
@@ -83,7 +83,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
         this.customers = result;
       },
       error: (error) => {
-        this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
+        this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
       },
     });
   }
@@ -141,7 +141,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
           this.isLoading = false;
         },
         error: (error) => {
-          this.toastr.error('Termine konnten nicht abgerufen werden: ' + error.message);
+          this.toastr.error(`Termine konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
           this.isLoading = false;
         },
       });
@@ -169,7 +169,7 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
         this.appointments = this.appointments.filter((e) => e.id !== appointment.id);
       },
       error: (error) => {
-        this.toastr.error('Termin konnte nicht gelöscht werden: ' + error.message);
+        this.toastr.error(`Termin konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
       },
     });
   }

@@ -43,7 +43,7 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
+        this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
         this.isLoading = false;
       },
     });
@@ -64,7 +64,7 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
         this.toastr.success(`${employee.firstName} ${employee.lastName} wurde gelöscht.`);
         this.employees = this.employees.filter((e) => e.id !== employee.id);
       },
-      error: (error) => this.toastr.error('Mitarbeiter konnte nicht gelöscht werden: ' + error.message),
+      error: (error) => this.toastr.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
     });
   }
 }

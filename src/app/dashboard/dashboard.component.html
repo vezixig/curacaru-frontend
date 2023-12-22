@@ -1,4 +1,4 @@
-<div class="container h-100" *ngIf="isLoading || hasError">
+<div class="container h-100" *ngIf="isLoading || error">
   <div class="row align-items-center h-100">
     <div clasS="col">
       <div class="card mx-auto p-5" style="width: 18rem" *ngIf="isLoading">
@@ -6,10 +6,10 @@
         <p style="text-align: center">Curacaru wirds geladen...</p>
       </div>
 
-      <div class="card mx-auto text-danger" style="width: 20rem" *ngIf="hasError">
+      <div class="card mx-auto text-danger" style="width: 20rem" *ngIf="error">
         <div class="card-header bg-danger text-white">Fehler</div>
         <div class="card-body">
-          <p style="text-align: center">Ein unerwarteter Fehler ist aufgetreten</p>
+          <p style="text-align: center">Ein unerwarteter Fehler ist aufgetreten: {{ error.status }} {{ error.statusText }}</p>
         </div>
       </div>
     </div>

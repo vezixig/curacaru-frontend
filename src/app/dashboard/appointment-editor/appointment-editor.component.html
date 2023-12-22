@@ -7,6 +7,7 @@
         <label for="selectCustomer">Kunde:</label>
         <ngx-skeleton-loader *ngIf="isLoading" />
         <select
+          *ngIf="!isLoading"
           class="form-select"
           id="selectCustomer"
           formControlName="customerId"
@@ -24,6 +25,7 @@
         <label for="selectEmployeeId">Bearbeitet von:</label>
         <ngx-skeleton-loader *ngIf="isLoading" />
         <select
+          *ngIf="!isLoading"
           class="form-select"
           id="selectEmployeeId"
           formControlName="employeeId"
@@ -39,7 +41,7 @@
       <div class="form-group mb-4" *ngIf="user?.isManager">
         <label for="selectEmployeeReplacementId">Vertreten von:</label>
         <ngx-skeleton-loader *ngIf="isLoading" />
-        <select class="form-select" id="selectEmployeeReplacementId" formControlName="employeeReplacementId">
+        <select *ngIf="!isLoading" class="form-select" id="selectEmployeeReplacementId" formControlName="employeeReplacementId">
           <option></option>
           <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
         </select>
@@ -49,7 +51,7 @@
       <div class="form-group mb-4">
         <label for="date">Datum:</label>
         <ngx-skeleton-loader *ngIf="isLoading" />
-        <div class="input-group">
+        <div *ngIf="!isLoading" class="input-group">
           <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
             <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
           </button>
@@ -73,7 +75,7 @@
       <div class="form-group mb-4">
         <label for="inputNotes">Notizen:</label>
         <ngx-skeleton-loader *ngIf="isLoading" count="4" />
-        <textarea class="form-control" formControlName="notes" rows="4" id="inputNotes" placeholder="Notizen"></textarea>
+        <textarea *ngIf="!isLoading" class="form-control" formControlName="notes" rows="4" id="inputNotes" placeholder="Notizen"></textarea>
       </div>
 
       <!-- Signatures -->

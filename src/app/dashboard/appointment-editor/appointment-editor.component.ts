@@ -114,8 +114,13 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          this.toastr.error('Termin konnte nicht geladen werden: ' + error.message);
-          this.isLoading = false;
+          if (error.status === 404) {
+            this.toastr.error('Termin wurde nicht gefunden');
+            this.router.navigate(['/dashboard/appointment']);
+          } else {
+            this.toastr.error(`Termin konnte nicht geladen werden: [${error.status}] ${error.error}`);
+            this.isLoading = false;
+          }
         },
       });
   }
@@ -143,7 +148,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/appointment']);
       },
       error: (error) => {
-        this.toastr.error('Termin konnte nicht abgeschlossen werden: ' + error.message);
+        this.toastr.error(`Termin konnte nicht abgeschlossen werden: [${error.status}] ${error.error}`);
         this.isFinishing = false;
       },
     });
@@ -190,7 +195,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/appointment']);
       },
       error: (error) => {
-        this.toastr.error('Termin konnte nicht angelegt werden: ' + error.message);
+        this.toastr.error(`Termin konnte nicht angelegt werden: [${error.status}] ${error.error}`);
         this.isSaving = false;
       },
     });
@@ -199,14 +204,14 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   private loadCustomerList() {
     this.getCustomerListSubscription = this.apiService.getCustomerList().subscribe({
       next: (result) => (this.customers = result),
-      error: (error) => this.toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message),
+      error: (error) => this.toastr.error(`Kundenliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`),
     });
   }
 
   private loadEmployeeList() {
     this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
       next: (result) => (this.employees = result),
-      error: (error) => this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message),
+      error: (error) => this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`),
     });
   }
 
@@ -224,7 +229,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/appointment']);
       },
       error: (error) => {
-        this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+        this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);
         this.isSaving = false;
       },
     });

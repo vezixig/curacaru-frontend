@@ -72,7 +72,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/employee']);
       },
       error: (error) => {
-        this.toastr.error('Mitarbeiter konnte nicht angelegt werden: ' + error.message);
+        this.toastr.error(`Mitarbeiter konnte nicht angelegt werden: [${error.status}] ${error.error}`);
         this.isSaving = false;
       },
     });
@@ -97,8 +97,13 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          this.toastr.error('Mitarbeiter konnte nicht geladen werden: ' + error.message);
-          this.isLoading = false;
+          if (error.status === 404) {
+            this.toastr.error('Mitarbeiter wurde nicht gefunden');
+            this.router.navigate(['/dashboard/employee']);
+          } else {
+            this.toastr.error(`Mitarbeiter konnte nicht geladen werden: [${error.status}] ${error.error}`);
+            this.isLoading = false;
+          }
         },
       });
   }
@@ -112,7 +117,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard/employee']);
       },
       error: (error) => {
-        this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+        this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);
         this.isSaving = false;
       },
     });
