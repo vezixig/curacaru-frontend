@@ -49,7 +49,7 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
     });
   }
 
-  public handleDelete(employee: Employee) {
+  handleDelete(employee: Employee) {
     const modalRef = this.modalService.open(NgbdModalConfirm);
     modalRef.result.then(() => this.deleteEmployee(employee));
     modalRef.componentInstance.title = 'Mitarbeiter löschen';

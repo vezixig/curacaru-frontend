@@ -6,19 +6,24 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first } from 'rxjs';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
 @Component({
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule],
   selector: 'cura-employee-editor',
   standalone: true,
   templateUrl: './employee-editor.component.html',
 })
 export class EmployeeEditorComponent implements OnInit, OnDestroy {
-  public isNew: boolean = true;
-  public employeeForm: FormGroup;
+  employeeForm: FormGroup;
+  isNew: boolean = true;
+  isLoading: boolean = false;
+  isSaving: boolean = false;
 
   private employeeId: string | undefined;
-  private httpSubscription: Subscription | undefined = undefined;
+  private createEmployeeSubscription: Subscription | undefined = undefined;
+  private getEmployeeSubscription?: Subscription;
+  private updateEmployeeSubscription?: Subscription;
 
   constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService) {
     this.employeeForm = this.formBuilder.group({
@@ -31,7 +36,9 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy(): void {
-    this.httpSubscription?.unsubscribe();
+    this.createEmployeeSubscription?.unsubscribe();
+    this.getEmployeeSubscription?.unsubscribe();
+    this.updateEmployeeSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -57,23 +64,25 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
   }
 
   private CreateEmployee(employee: Employee) {
-    this.httpSubscription?.unsubscribe();
-
-    this.httpSubscription = this.httpClient.post('https://localhost:7077/employee/new', employee).subscribe({
+    this.isSaving = true;
+    this.createEmployeeSubscription?.unsubscribe();
+    this.createEmployeeSubscription = this.httpClient.post('https://localhost:7077/employee/new', employee).subscribe({
       complete: () => {
         this.toastr.success('Ein neuer Mitarbeiter wurde angelegt');
         this.router.navigate(['/dashboard/employee']);
       },
       error: (error) => {
         this.toastr.error('Mitarbeiter konnte nicht angelegt werden: ' + error.message);
+        this.isSaving = false;
       },
     });
   }
 
   private LoadEmployee(): void {
+    this.isLoading = true;
     this.isNew = false;
     this.employeeId = this.router.url.split('/').pop();
-    this.httpClient
+    this.getEmployeeSubscription = this.httpClient
       .get<Employee>(`https://localhost:7077/employee/${this.employeeId}`)
       .pipe(first())
       .subscribe({
@@ -85,23 +94,26 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
           this.employeeForm.get('email')?.disable();
           this.employeeForm.get('phone')?.setValue(result.phoneNumber);
           this.employeeForm.get('role')?.setValue(result.isManager ? 'manager' : 'employee');
+          this.isLoading = false;
         },
         error: (error) => {
           this.toastr.error('Mitarbeiter konnte nicht geladen werden: ' + error.message);
+          this.isLoading = false;
         },
       });
   }
 
   private UpdateEmployee(employee: Employee) {
-    this.httpSubscription?.unsubscribe();
-
-    this.httpSubscription = this.httpClient.put<Employee>('https://localhost:7077/employee', employee).subscribe({
+    this.isSaving = true;
+    this.updateEmployeeSubscription?.unsubscribe();
+    this.updateEmployeeSubscription = this.httpClient.put<Employee>('https://localhost:7077/employee', employee).subscribe({
       complete: () => {
         this.toastr.success('Änderungen am Mitarbeiter wurden gespeichert');
         this.router.navigate(['/dashboard/employee']);
       },
       error: (error) => {
         this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+        this.isSaving = false;
       },
     });
   }

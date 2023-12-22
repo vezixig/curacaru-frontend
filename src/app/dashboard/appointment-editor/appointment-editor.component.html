@@ -5,6 +5,7 @@
       <!-- Customer -->
       <div class="form-group mb-4">
         <label for="selectCustomer">Kunde:</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <select
           class="form-select"
           id="selectCustomer"
@@ -21,6 +22,7 @@
       <!-- Employee -->
       <div class="form-group mb-4">
         <label for="selectEmployeeId">Bearbeitet von:</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <select
           class="form-select"
           id="selectEmployeeId"
@@ -36,6 +38,7 @@
 
       <div class="form-group mb-4" *ngIf="user?.isManager">
         <label for="selectEmployeeReplacementId">Vertreten von:</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <select class="form-select" id="selectEmployeeReplacementId" formControlName="employeeReplacementId">
           <option></option>
           <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
@@ -45,6 +48,7 @@
       <!-- Date  -->
       <div class="form-group mb-4">
         <label for="date">Datum:</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <div class="input-group">
           <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
             <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
@@ -68,6 +72,7 @@
       <!-- Notes -->
       <div class="form-group mb-4">
         <label for="inputNotes">Notizen:</label>
+        <ngx-skeleton-loader *ngIf="isLoading" count="4" />
         <textarea class="form-control" formControlName="notes" rows="4" id="inputNotes" placeholder="Notizen"></textarea>
       </div>
 
@@ -86,8 +91,16 @@
         </div>
       </div>
 
-      <button *ngIf="!isNew && !isDone" type="button" (click)="onFinish()" class="btn btn-success text-white mx-3" style="margin-left: 0 !important">Termin Abschließen</button>
-      <button [disabled]="!appointmentForm.valid" type="submit" class="btn btn-primary text-white">Termin {{ isNew ? "anlegen" : "speichern" }}</button>
+      <button *ngIf="!isNew && !isDone" [disabled]="isSaving || isFinishing" type="button" (click)="onFinish()" class="btn btn-success text-white mx-3" style="margin-left: 0 !important">
+        <span *ngIf="isFinishing" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        <span>Termin Abschließen</span>
+        <span *ngIf="isFinishing">...</span>
+      </button>
+      <button [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing" type="submit" class="btn btn-primary text-white">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        <span>Termin {{ isNew ? "anlegen" : "speichern" }}</span>
+        <span *ngIf="isSaving">...</span>
+      </button>
       <button type="button" [routerLink]="['/dashboard/appointment']" class="btn btn-outline-secondary m-3">Verwerfen</button>
     </form>
   </div>

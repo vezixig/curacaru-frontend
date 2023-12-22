@@ -1,10 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router, RouterModule } from '@angular/router';
-import { Subscription, first } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
@@ -17,11 +16,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { GermanDateParserFormatter } from '../../i18n/date-formatter';
 import { UserService } from '../../services/user.service';
 import { UserEmployee } from '../../models/user-employee.model';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { ApiService } from '../../services/api.service';
 
 @Component({
-  imports: [CommonModule, FontAwesomeModule, FormsModule, NgbDatepickerModule, NgbTimepickerModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, NgbDatepickerModule, NgbTimepickerModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
   selector: 'cura-appointment-editor',
-  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }],
+  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   standalone: true,
   templateUrl: './appointment-editor.component.html',
 })
@@ -29,22 +30,25 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
 
   appointmentForm: FormGroup;
-  employees: EmployeeBase[] = [];
   customers: CustomerListEntry[] = [];
-
-  isNew: boolean = true;
+  employees: EmployeeBase[] = [];
   isDone: boolean = false;
-
-  private _getEmployeeListSubscription?: Subscription;
-  private _getCustomerListSubscription?: Subscription;
-  private _postAppointmentSubscription?: Subscription;
-  private _postFinishSubscription?: Subscription;
-  private _updateAppointmentSubscription?: Subscription;
-  private _appointmentId?: UUID;
+  isFinishing: boolean = false;
+  isLoading: boolean = false;
+  isNew: boolean = true;
+  isSaving: boolean = false;
   user?: UserEmployee;
 
-  constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService, private _userService: UserService) {
-    this.user = this._userService.user;
+  private appointmentId?: UUID;
+  private getAppointmentSubscription?: Subscription;
+  private getCustomerListSubscription?: Subscription;
+  private getEmployeeListSubscription?: Subscription;
+  private postAppointmentSubscription?: Subscription;
+  private postFinishSubscription?: Subscription;
+  private updateAppointmentSubscription?: Subscription;
+
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService, private userService: UserService) {
+    this.user = this.userService.user;
     this.appointmentForm = this.formBuilder.group({
       isSignedByEmployee: [false],
       isSignedByCustomer: [false],
@@ -57,8 +61,10 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
       employeeReplacementId: [''],
     });
 
+    // only managers can change the employee
     if (!this.user?.isManager) {
       this.appointmentForm.get('employeeId')?.disable();
+      this.appointmentForm.get('employeeReplacementId')?.disable();
     }
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
 
@@ -67,11 +73,12 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this._getEmployeeListSubscription?.unsubscribe();
-    this._getCustomerListSubscription?.unsubscribe();
-    this._postAppointmentSubscription?.unsubscribe();
-    this._postFinishSubscription?.unsubscribe();
-    this._updateAppointmentSubscription?.unsubscribe();
+    this.getAppointmentSubscription?.unsubscribe();
+    this.getEmployeeListSubscription?.unsubscribe();
+    this.getCustomerListSubscription?.unsubscribe();
+    this.postAppointmentSubscription?.unsubscribe();
+    this.postFinishSubscription?.unsubscribe();
+    this.updateAppointmentSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -83,11 +90,12 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   }
 
   loadAppointment() {
+    this.isLoading = true;
     this.isNew = false;
-    this._appointmentId = this.router.url.split('/').pop() ?? '';
-    this.httpClient
-      .get<Appointment>(`https://localhost:7077/appointment/${this._appointmentId}`)
-      .pipe(first())
+    this.appointmentId = this.router.url.split('/').pop() ?? '';
+    this.getAppointmentSubscription = this.apiService
+      .getAppointment(this.appointmentId)
+      .pipe(map((result) => this.deserializeDates(result)))
       .subscribe({
         next: (result) => {
           this.appointmentForm.patchValue({
@@ -103,36 +111,51 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
           });
 
           this.isDone = result.isDone;
+          this.isLoading = false;
         },
         error: (error) => {
           this.toastr.error('Termin konnte nicht geladen werden: ' + error.message);
+          this.isLoading = false;
         },
       });
   }
 
+  private deserializeDates(obj: any): any {
+    //Check if the property is a Date type
+    if (obj instanceof Object && obj.hasOwnProperty('date') && typeof obj.date === 'string') {
+      obj.date = new Date(obj.date);
+    }
+    if (obj instanceof Object && obj.hasOwnProperty('timeStart') && typeof obj.timeStart === 'string') {
+      obj.timeStart = DateTimeService.toTime(obj.timeStart);
+    }
+    if (obj instanceof Object && obj.hasOwnProperty('timeEnd') && typeof obj.timeEnd === 'string') {
+      obj.timeEnd = DateTimeService.toTime(obj.timeEnd);
+    }
+    return obj;
+  }
+
   onFinish() {
-    this._postFinishSubscription?.unsubscribe();
-    this._postFinishSubscription = this.httpClient
-      .post(`https://localhost:7077/appointment/${this._appointmentId}/finish`, {})
-      .pipe(first())
-      .subscribe({
-        complete: () => {
-          this.toastr.success('Termin wurde abgeschlossen');
-          this.router.navigate(['/dashboard/appointment']);
-        },
-        error: (error) => {
-          this.toastr.error('Termin konnte nicht abgeschlossen werden: ' + error.message);
-        },
-      });
+    this.isFinishing = true;
+    this.postFinishSubscription?.unsubscribe();
+    this.postFinishSubscription = this.apiService.finishAppointment(this.appointmentId!).subscribe({
+      complete: () => {
+        this.toastr.success('Termin wurde abgeschlossen');
+        this.router.navigate(['/dashboard/appointment']);
+      },
+      error: (error) => {
+        this.toastr.error('Termin konnte nicht abgeschlossen werden: ' + error.message);
+        this.isFinishing = false;
+      },
+    });
   }
 
   onSave() {
     const appointment: Appointment = {
-      id: this._appointmentId,
+      id: this.appointmentId,
       employeeId: this.appointmentForm.get('employeeId')?.value,
       employeeReplacementId: this.appointmentForm.get('employeeReplacementId')?.value,
       customerId: this.appointmentForm.get('customerId')?.value,
-      date: this.appointmentForm.get('date')?.value,
+      date: DateTimeService.toDate(this.appointmentForm.get('date')?.value),
       timeStart: DateTimeService.toTime(this.appointmentForm.get('timeStart')?.value),
       timeEnd: DateTimeService.toTime(this.appointmentForm.get('timeEnd')?.value),
       isSignedByEmployee: this.appointmentForm.get('isSignedByEmployee')?.value,
@@ -159,60 +182,32 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   }
 
   private CreateAppointment(appointment: Appointment) {
-    const customSerializer = (key: string, value: any) => {
-      if (typeof value === 'object' && 'year' in value && 'month' in value && 'day' in value) {
-        return DateTimeService.toDateString(value);
-      }
-      if (typeof value === 'object' && 'hours' in value && 'minutes' in value) {
-        return DateTimeService.toTimeString(value);
-      }
-      return value;
-    };
-
-    const serializedData = JSON.stringify(appointment, customSerializer);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    this._postAppointmentSubscription?.unsubscribe();
-    this._postAppointmentSubscription = this.httpClient
-      .post('https://localhost:7077/appointment/new', serializedData, { headers: headers })
-      .pipe(first())
-      .subscribe({
-        complete: () => {
-          this.toastr.success('Ein neuer Termin wurde angelegt');
-          this.router.navigate(['/dashboard/appointment']);
-        },
-        error: (error) => {
-          this.toastr.error('Termin konnte nicht angelegt werden: ' + error.message);
-        },
-      });
+    this.isSaving = true;
+    this.postAppointmentSubscription?.unsubscribe();
+    this.postAppointmentSubscription = this.apiService.createAppointment(appointment).subscribe({
+      complete: () => {
+        this.toastr.success('Ein neuer Termin wurde angelegt');
+        this.router.navigate(['/dashboard/appointment']);
+      },
+      error: (error) => {
+        this.toastr.error('Termin konnte nicht angelegt werden: ' + error.message);
+        this.isSaving = false;
+      },
+    });
   }
 
   private loadCustomerList() {
-    this._getCustomerListSubscription = this.httpClient
-      .get<CustomerListEntry[]>('https://localhost:7077/customer/list')
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.customers = result;
-        },
-        error: (error) => {
-          this.toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message);
-        },
-      });
+    this.getCustomerListSubscription = this.apiService.getCustomerList().subscribe({
+      next: (result) => (this.customers = result),
+      error: (error) => this.toastr.error('Kundenliste konnte nicht abgerufen werden: ' + error.message),
+    });
   }
 
   private loadEmployeeList() {
-    this._getEmployeeListSubscription = this.httpClient
-      .get<EmployeeBase[]>('https://localhost:7077/employee/baselist')
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.employees = result;
-        },
-        error: (error) => {
-          this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
-        },
-      });
+    this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
+      next: (result) => (this.employees = result),
+      error: (error) => this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message),
+    });
   }
 
   private onCustomerChanged(customerId: number): void {
@@ -221,28 +216,16 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   }
 
   private UpdateAppointment(appointment: Appointment) {
-    const customSerializer = (key: string, value: any) => {
-      if (typeof value === 'object' && 'year' in value && 'month' in value && 'day' in value) {
-        return DateTimeService.toDateString(value);
-      }
-      if (typeof value === 'object' && 'hours' in value && 'minutes' in value) {
-        return DateTimeService.toTimeString(value);
-      }
-      return value;
-    };
-
-    const serializedData = JSON.stringify(appointment, customSerializer);
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    this._updateAppointmentSubscription?.unsubscribe();
-
-    this._updateAppointmentSubscription = this.httpClient.put<Appointment>('https://localhost:7077/appointment', serializedData, { headers: headers }).subscribe({
+    this.isSaving = true;
+    this.updateAppointmentSubscription?.unsubscribe();
+    this.updateAppointmentSubscription = this.apiService.updateAppointment(appointment).subscribe({
       complete: () => {
         this.toastr.success('Änderungen am Termin wurden gespeichert');
         this.router.navigate(['/dashboard/appointment']);
       },
       error: (error) => {
         this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+        this.isSaving = false;
       },
     });
   }

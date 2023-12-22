@@ -1,30 +1,35 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Employee } from '../../models/employee.model';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, first, firstValueFrom, map, mergeMap } from 'rxjs';
-import { Customer } from '../../models/customer.model';
-import { UUID } from 'angular2-uuid';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { UUID } from 'angular2-uuid';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { ToastrService } from 'ngx-toastr';
+import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, first, firstValueFrom, mergeMap } from 'rxjs';
+import { Customer } from '../../models/customer.model';
 import { Insurance } from '../../models/insurance.model';
+import { ApiService } from '../../services/api.service';
+import { EmployeeBasic } from '../../models/employee-basic.model';
 
 @Component({
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
+  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule],
+  providers: [ApiService],
   selector: 'cura-customer-editor',
   standalone: true,
-  templateUrl: './customer-editor.component.html',
   styleUrls: ['./customer-editor.component.scss'],
+  templateUrl: './customer-editor.component.html',
 })
 export class CustomerEditorComponent implements OnInit, OnDestroy {
-  public CityName: string = '';
-  public customerForm: FormGroup;
-  public employees: Employee[] = [];
-  public insuranceFormatter = (insurance: Insurance) => insurance.name;
-  public isNew: boolean = true;
-  public newDeclarationOfAssignment: number | null = null;
+  cityName: string = '';
+  customerForm: FormGroup;
+  employees: EmployeeBasic[] = [];
+  isLoading: boolean = false;
+  isNew: boolean = true;
+  isSaving: boolean = false;
+  newDeclarationOfAssignment: number | null = null;
+
+  insuranceFormatter = (insurance: Insurance) => insurance.name;
 
   // Gets the two newest declarations of assignment
   get sortedDeclarations(): number[] {
@@ -43,14 +48,16 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     return this._selectedInsurance;
   }
 
-  private _customerId?: UUID;
-  private _getEmployeeListSubscription?: Subscription;
-  private _getZipCodeSubscription?: Subscription;
-  private _postCustomerSubscription?: Subscription;
+  private customerId?: UUID;
   private _selectedInsurance: Insurance | undefined;
-  private _updateCustomerSubscription?: Subscription;
+  private changeZipCodeSubscription?: Subscription;
+  private getCustomerSubscription?: Subscription;
+  private getEmployeeListSubscription?: Subscription;
+  private getZipCodeSubscription?: Subscription;
+  private postCustomerSubscription?: Subscription;
+  private updateCustomerSubscription?: Subscription;
 
-  constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService) {
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
     this.customerForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
@@ -69,28 +76,23 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       associatedEmployeeId: ['', [Validators.required]],
     });
 
-    this.customerForm.get('zipCode')?.valueChanges.subscribe((value) => {
+    this.changeZipCodeSubscription = this.customerForm.get('zipCode')?.valueChanges.subscribe((value) => {
       this.handleZipCodeChange(value);
     });
 
-    this._getEmployeeListSubscription = this.httpClient
-      .get<Employee[]>('https://localhost:7077/employee/list')
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.employees = result;
-        },
-        error: (error) => {
-          this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
-        },
-      });
+    this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
+      next: (result) => (this.employees = result),
+      error: (error) => this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message),
+    });
   }
 
   ngOnDestroy(): void {
-    this._getEmployeeListSubscription?.unsubscribe();
-    this._getZipCodeSubscription?.unsubscribe();
-    this._postCustomerSubscription?.unsubscribe();
-    this._updateCustomerSubscription?.unsubscribe();
+    this.changeZipCodeSubscription?.unsubscribe();
+    this.getCustomerSubscription?.unsubscribe();
+    this.getEmployeeListSubscription?.unsubscribe();
+    this.getZipCodeSubscription?.unsubscribe();
+    this.postCustomerSubscription?.unsubscribe();
+    this.updateCustomerSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -103,21 +105,13 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   // Tries to get the name of the city for the entered zip code
   handleZipCodeChange(zipCode: string) {
-    this.CityName = '';
+    this.cityName = '';
     if (zipCode.length == 5) {
-      this._getZipCodeSubscription?.unsubscribe();
-
-      this._getZipCodeSubscription = this.httpClient
-        .get(`https://localhost:7077/address/city/${zipCode}`, { responseType: 'text' })
-        .pipe(first())
-        .subscribe({
-          next: (result) => {
-            this.CityName = result;
-          },
-          error: (error) => {
-            this.CityName = 'Unbekannte PLZ';
-          },
-        });
+      this.getZipCodeSubscription?.unsubscribe();
+      this.getZipCodeSubscription = this.apiService.getCityName(zipCode).subscribe({
+        next: (result) => (this.cityName = result),
+        error: (error) => (this.cityName = 'Unbekannte PLZ'),
+      });
     }
   }
 
@@ -129,7 +123,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       mergeMap(async (term) => {
         if (term.length < 2) return [];
 
-        let insurances = await firstValueFrom(this.httpClient.get<Insurance[]>(`https://localhost:7077/insurance?search=${term}`));
+        let insurances = await firstValueFrom(this.apiService.getInsurance(term));
         return insurances;
       })
     );
@@ -155,7 +149,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       emergencyContactName: this.customerForm.get('emergencyContactName')?.value,
       emergencyContactPhone: this.customerForm.get('emergencyContactPhone')?.value,
       firstName: this.customerForm.get('firstName')?.value,
-      id: this.isNew ? undefined : this._customerId,
+      id: this.isNew ? undefined : this.customerId,
       insuranceId: this.customerForm.get('insuranceId')?.value,
       insuranceStatus: parseInt(this.customerForm.get('insuranceStatus')?.value),
       insuredPersonNumber: this.customerForm.get('insuredPersonNumber')?.value,
@@ -170,63 +164,66 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   }
 
   private CreateCustomer(employee: Customer) {
-    this._postCustomerSubscription = this.httpClient
-      .post('https://localhost:7077/customer/new', employee)
-      .pipe(first())
-      .subscribe({
-        complete: () => {
-          this.toastr.success('Ein neuer Kunde wurde angelegt');
-          this.router.navigate(['/dashboard/customer']);
-        },
-        error: (error) => {
-          this.toastr.error('Kunde konnte nicht angelegt werden: ' + error.message);
-        },
-      });
+    this.isSaving = true;
+    this.postCustomerSubscription?.unsubscribe();
+    this.postCustomerSubscription = this.apiService.createCustomer(employee).subscribe({
+      complete: () => {
+        this.toastr.success('Ein neuer Kunde wurde angelegt');
+        this.router.navigate(['/dashboard/customer']);
+      },
+      error: (error) => {
+        this.toastr.error('Kunde konnte nicht angelegt werden: ' + error.message);
+        this.isSaving = false;
+      },
+    });
   }
 
   private LoadCustomer(): void {
     this.isNew = false;
-    this._customerId = this.router.url.split('/').pop() ?? '';
-    this.httpClient
-      .get<Customer>(`https://localhost:7077/customer/${this._customerId}`)
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.customerForm.patchValue({
-            associatedEmployeeId: result.associatedEmployeeId,
-            birthDate: result.birthDate,
-            careLevel: result.careLevel,
-            declarationsOfAssignment: result.declarationsOfAssignment,
-            emergencyContactName: result.emergencyContactName,
-            emergencyContactPhone: result.emergencyContactPhone,
-            firstName: result.firstName,
-            id: result.id,
-            insuranceId: result.insuranceId,
-            insuranceStatus: result.insuranceStatus,
-            insuredPersonNumber: result.insuredPersonNumber,
-            isCareContractAvailable: result.isCareContractAvailable,
-            lastName: result.lastName,
-            phone: result.phone,
-            street: result.street,
-            zipCode: result.zipCode,
-          });
+    this.isLoading = true;
+    this.customerId = this.router.url.split('/').pop() ?? '';
+    this.getCustomerSubscription = this.apiService.getCustomer(this.customerId).subscribe({
+      next: (result) => {
+        this.customerForm.patchValue({
+          associatedEmployeeId: result.associatedEmployeeId,
+          birthDate: result.birthDate,
+          careLevel: result.careLevel,
+          declarationsOfAssignment: result.declarationsOfAssignment,
+          emergencyContactName: result.emergencyContactName,
+          emergencyContactPhone: result.emergencyContactPhone,
+          firstName: result.firstName,
+          id: result.id,
+          insuranceId: result.insuranceId,
+          insuranceStatus: result.insuranceStatus,
+          insuredPersonNumber: result.insuredPersonNumber,
+          isCareContractAvailable: result.isCareContractAvailable,
+          lastName: result.lastName,
+          phone: result.phone,
+          street: result.street,
+          zipCode: result.zipCode,
+        });
 
-          this.selectedInsurance = result.insurance;
-        },
-        error: (error) => {
-          this.toastr.error('Mitarbeiter konnte nicht geladen werden: ' + error.message);
-        },
-      });
+        this.selectedInsurance = result.insurance;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.toastr.error('Mitarbeiter konnte nicht geladen werden: ' + error.message);
+        this.isLoading = false;
+      },
+    });
   }
 
   private UpdateCustomer(customer: Customer) {
-    this._updateCustomerSubscription = this.httpClient.put<Customer>('https://localhost:7077/customer', customer).subscribe({
+    this.isSaving = true;
+    this.updateCustomerSubscription?.unsubscribe();
+    this.updateCustomerSubscription = this.apiService.updateCustomer(customer).subscribe({
       complete: () => {
         this.toastr.success('Änderungen am Kunden wurden gespeichert');
         this.router.navigate(['/dashboard/customer']);
       },
       error: (error) => {
         this.toastr.error('Fehler beim Speichern der Änderungen: ' + error.message);
+        this.isSaving = false;
       },
     });
   }

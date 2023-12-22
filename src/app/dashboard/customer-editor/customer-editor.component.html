@@ -6,7 +6,9 @@
     <form (ngSubmit)="handleSave()" [formGroup]="customerForm">
       <div class="form-group mb-4">
         <label for="selectAssociatedEmployeeId">Bearbeitet von:</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <select
+          *ngIf="!isLoading"
           class="form-select"
           aria-label="Default select example"
           id="selectAssociatedEmployeeId"
@@ -16,13 +18,14 @@
             'is-invalid': customerForm.controls['associatedEmployeeId'].invalid && customerForm.controls['associatedEmployeeId'].touched
           }"
         >
-          <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.firstName }} {{ employee.lastName }}</option>
+          <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
         </select>
       </div>
 
       <div class="form-group mb-2">
         <label for="inputFirstName">Vor- und Nachname</label>
-        <div class="input-group">
+        <ngx-skeleton-loader *ngIf="isLoading" />
+        <div class="input-group" *ngIf="!isLoading">
           <input
             type="text"
             class="form-control"
@@ -50,7 +53,9 @@
 
       <div class="form-group mb-2">
         <label for="inputStreet">Straße und Hausnummer</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <input
+          *ngIf="!isLoading"
           type="text"
           [ngClass]="{
             'is-valid': customerForm.controls['street'].valid,
@@ -66,7 +71,8 @@
       <div class="form-group mb-2">
         <label for="inputZipCode">Postleitzahl</label>
 
-        <div class="input-group">
+        <ngx-skeleton-loader *ngIf="isLoading" />
+        <div class="input-group" *ngIf="!isLoading">
           <input
             type="text"
             [ngClass]="{
@@ -79,13 +85,15 @@
             id="inputZipCode"
             placeholder="PLZ eingeben"
           />
-          <span class="input-group-text">{{ CityName }}</span>
+          <span class="input-group-text">{{ cityName }}</span>
         </div>
       </div>
 
       <div class="form-group mb-2">
         <label for="inputBirthDate">Geburtsdatum</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <input
+          *ngIf="!isLoading"
           type="date"
           [ngClass]="{
             'is-valid': customerForm.controls['birthDate'].valid,
@@ -100,7 +108,9 @@
 
       <div class="form-group mb-2">
         <label for="inputPhone">Telefonnummer</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <input
+          *ngIf="!isLoading"
           type="text"
           [ngClass]="{
             'is-valid': customerForm.controls['phone'].valid,
@@ -117,7 +127,8 @@
       <!-- Notfallkontakt -->
       <div class="form-group mb-4">
         <label for="inputEmergencyContactName">Notfallkontakt Name und Telefonnummer</label>
-        <div class="input-group">
+        <ngx-skeleton-loader *ngIf="isLoading" />
+        <div class="input-group" *ngIf="!isLoading">
           <input type="text" class="form-control" formControlName="emergencyContactName" id="inputEmergencyContactName" placeholder="Namen eingeben" />
           <input type="text" class="form-control" formControlName="emergencyContactPhone" id="inputEmergencyContactPhone" placeholder="Telefonnummer eingeben" />
         </div>
@@ -126,7 +137,8 @@
       <!-- Versicherung -->
       <div class="form-group mb-2">
         <label for="inputInsurance">Krankenkasse, Versichertennummer und Status</label>
-        <div class="input-group">
+        <ngx-skeleton-loader *ngIf="isLoading" />
+        <div class="input-group" *ngIf="!isLoading">
           <input
             id="inputInsurance"
             type="text"
@@ -165,7 +177,9 @@
       <!-- Pflegegrad -->
       <div class="form-group mb-2">
         <label for="selectCareLevel">Pflegegrad</label>
+        <ngx-skeleton-loader *ngIf="isLoading" />
         <select
+          *ngIf="!isLoading"
           class="form-select"
           id="selectCareLevel"
           formControlName="careLevel"
@@ -184,7 +198,7 @@
 
       <!-- Betreuungsvertrag -->
       <div class="form-group mb-2">
-        <div class="form-check">
+        <div class="form-check" *ngIf="!isLoading">
           <input class="form-check-input" type="checkbox" formControlName="isCareContractAvailable" id="checkIsCareContractAvailable" />
           <label class="form-check-label" for="checkIsCareContractAvailable"> Betreuungsvertrag vorhanden</label>
         </div>
@@ -193,7 +207,8 @@
       <!-- Abtretungserklärung -->
       <div class="form-group mb-2">
         <label for="selectCareLevel">Abtretungserklärung</label>
-        <div class="input-group">
+        <ngx-skeleton-loader *ngIf="isLoading" />
+        <div class="input-group" *ngIf="!isLoading">
           <input
             (keyup.enter)="handleAddDeclarationOfAssignment($event)"
             (keydown.enter)="$event.preventDefault()"
@@ -209,7 +224,11 @@
         </div>
       </div>
 
-      <button [disabled]="!customerForm.valid" type="submit" class="btn btn-primary text-white">Kunden {{ isNew ? "hinzufügen" : "speichern" }}</button>
+      <button [disabled]="!customerForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        <span>Kunden {{ isNew ? "hinzufügen" : "speichern" }}</span>
+        <span *ngIf="isSaving">...</span>
+      </button>
       <button type="button" [routerLink]="['/dashboard/customer']" class="btn btn-outline-secondary m-3">Verwerfen</button>
     </form>
   </div>
