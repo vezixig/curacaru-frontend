@@ -1,28 +1,30 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { HttpClient } from '@angular/common/http';
-import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { RouterModule } from '@angular/router';
-import { Subscription, first, map } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
-import { faCalendar, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCalendar, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription, first, map } from 'rxjs';
 import { GermanDateParserFormatter } from '../../i18n/date-formatter';
+import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../models/appointment-list-entry.model';
-import { TimeFormatPipe } from '../../pipes/time.pipe';
 import { Customer } from '../../models/customer.model';
 import { EmployeeBasic } from '../../models/employee-basic.model';
+import { TimeFormatPipe } from '../../pipes/time.pipe';
 import { DateTimeService } from '../../services/date-time.service';
-import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
 import { UserService } from '../../services/user.service';
+import { ApiService } from '../../services/api.service';
+import { CustomerListEntry } from '../../models/customer-list-entry.model';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
 @Component({
-  imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, FormsModule, TimeFormatPipe],
+  imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe],
+  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   selector: 'cura-appointment-list',
   standalone: true,
-  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }],
   styleUrls: ['./appointment-list.component.scss'],
   templateUrl: './appointment-list.component.html',
 })
@@ -32,81 +34,63 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   faCalendar = faCalendar;
 
   appointments: AppointmentListEntry[] = [];
+  customers: CustomerListEntry[] = [];
   employees: EmployeeBasic[] = [];
-  selectedEmployee?: EmployeeBasic;
-  customers: Customer[] = [];
-  selectedCustomer?: Customer;
-
-  private _deleteAppointmentSubscription?: Subscription;
-  private _getAppointmentsSubscription?: Subscription;
-  private _getEmployeeListSubscription?: Subscription;
-  private _getCustomerListSubscription?: Subscription;
-
-  hoveredDate: NgbDate | null = null;
   fromDate: NgbDate | null = this.calendar.getToday();
-  toDate: NgbDate | null = this.calendar.getToday();
-  selectedEmployeeId?: number;
-  selectedCustomerId?: number;
+  hoveredDate: NgbDate | null = null;
+  isLoading: boolean = true;
   isManager: boolean = false;
+  selectedCustomer?: Customer;
+  selectedCustomerId?: number;
+  selectedEmployee?: EmployeeBasic;
+  selectedEmployeeId?: number;
+  toDate: NgbDate | null = this.calendar.getToday();
 
-  constructor(private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private httpClient: HttpClient, private toastr: ToastrService, private modalService: NgbModal, private _userService: UserService) {}
+  private deleteAppointmentSubscription?: Subscription;
+  private getAppointmentsSubscription?: Subscription;
+  private getEmployeeListSubscription?: Subscription;
+  private getCustomerListSubscription?: Subscription;
 
-  isHovered(date: NgbDate) {
-    return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-  }
-
-  isInside(date: NgbDate) {
-    return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-  }
-
-  isRange(date: NgbDate) {
-    return date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
-  }
-
-  validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
-    const parsed = this.formatter.parse(input);
-    return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
-  }
+  constructor(private apiService: ApiService, private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private modalService: NgbModal, private toastr: ToastrService, private userService: UserService) {}
 
   ngOnDestroy(): void {
-    this._deleteAppointmentSubscription?.unsubscribe();
-    this._getAppointmentsSubscription?.unsubscribe();
-    this._getCustomerListSubscription?.unsubscribe();
-    this._getEmployeeListSubscription?.unsubscribe();
+    this.deleteAppointmentSubscription?.unsubscribe();
+    this.getAppointmentsSubscription?.unsubscribe();
+    this.getCustomerListSubscription?.unsubscribe();
+    this.getEmployeeListSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
-    this.isManager = this._userService.user?.isManager ?? false;
+    this.isManager = this.userService.user?.isManager ?? false;
     var dateBounds = DateTimeService.getStartAndEndOfWeek(new Date());
     this.fromDate = dateBounds.start;
     this.toDate = dateBounds.end;
 
+    this.isLoading = true;
     this.loadAppointments();
 
-    this._getEmployeeListSubscription = this.httpClient
-      .get<EmployeeBasic[]>('https://localhost:7077/employee/baselist')
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.employees = result;
-        },
-        error: (error) => {
-          this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
-        },
-      });
+    this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
+      next: (result) => {
+        this.employees = result;
+      },
+      error: (error) => {
+        this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
+      },
+    });
 
-    this._getCustomerListSubscription = this.httpClient
-      .get<Customer[]>('https://localhost:7077/customer/list')
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.customers = result;
-        },
-        error: (error) => {
-          this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
-        },
-      });
+    this.getCustomerListSubscription = this.apiService.getCustomerList().subscribe({
+      next: (result) => {
+        this.customers = result;
+      },
+      error: (error) => {
+        this.toastr.error('Mitarbeiterliste konnte nicht abgerufen werden: ' + error.message);
+      },
+    });
   }
+
+  isHovered = (date: NgbDate) => this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
+  isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate) && date.before(this.toDate);
+  isRange = (date: NgbDate) => date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
 
   onSelectionChanged = () => this.loadAppointments();
 
@@ -134,30 +118,31 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
     modalRef.componentInstance.text = `Soll der Termin am ${date} von ${start}-${end} wirklich gelöscht werden?`;
   }
 
+  validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
+    const parsed = this.formatter.parse(input);
+    return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
+  }
+
   private loadAppointments() {
-    this._getAppointmentsSubscription?.unsubscribe();
-
-    let uri = `https://localhost:7077/appointment/list?`;
-
+    let uri = `?`;
     uri += this.fromDate ? `from=${DateTimeService.toDateString(this.fromDate)}&` : '';
     uri += this.toDate ? `to=${DateTimeService.toDateString(this.toDate)}&` : '';
-    uri += this.isManager ? (this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '') : `employeeId=${this._userService.user?.id}&`;
+    uri += this.isManager ? (this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '') : `employeeId=${this.userService.user?.id}&`;
     uri += this.selectedCustomerId ? `customerId=${this.selectedCustomerId}&` : '';
-
     uri = uri.slice(0, -1);
 
-    this._getAppointmentsSubscription = this.httpClient
-      .get<AppointmentListEntry[]>(uri)
-      .pipe(
-        map((result) => result.map((entry) => this.deserializeDates(entry))),
-        first()
-      )
+    this.getAppointmentsSubscription?.unsubscribe();
+    this.getAppointmentsSubscription = this.apiService
+      .getAppointmentList(uri)
+      .pipe(map((result) => result.map((entry) => this.deserializeDates(entry))))
       .subscribe({
         next: (result) => {
           this.appointments = result;
+          this.isLoading = false;
         },
         error: (error) => {
           this.toastr.error('Termine konnten nicht abgerufen werden: ' + error.message);
+          this.isLoading = false;
         },
       });
   }
@@ -177,8 +162,8 @@ export class AppointmentListComponent implements OnDestroy, OnInit {
   }
 
   private deleteEmployee(appointment: AppointmentListEntry) {
-    this._deleteAppointmentSubscription?.unsubscribe();
-    this._deleteAppointmentSubscription = this.httpClient.delete(`https://localhost:7077/appointment/${appointment.id}`).subscribe({
+    this.deleteAppointmentSubscription?.unsubscribe();
+    this.deleteAppointmentSubscription = this.apiService.deleteAppointment(appointment.id).subscribe({
       complete: () => {
         this.toastr.success(`Der Termin wurde gelöscht.`);
         this.appointments = this.appointments.filter((e) => e.id !== appointment.id);

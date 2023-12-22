@@ -63,26 +63,40 @@
   <table class="col-12 table mt-3 table-striped">
     <thead>
       <tr>
-        <th scope="col">Datum</th>
-        <th scope="col">Uhrzeit</th>
+        <th class="text-center" scope="col">Datum</th>
+        <th class="text-center" scope="col">Uhrzeit</th>
         <th scope="col">Kunde</th>
         <th scope="col">Stadt</th>
         <th scope="col">Bearbeitung</th>
         <th scope="col">Vertretung</th>
-        <th scope="col">Status</th>
-        <th scope="col">Aktion</th>
+        <th class="text-center" scope="col">Status</th>
+        <th class="text-center" scope="col">Aktion</th>
       </tr>
     </thead>
+
     <tbody>
+      <ng-container *ngIf="isLoading">
+        <tr *ngFor="let _ of [].constructor(3)">
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td></td>
+        </tr>
+      </ng-container>
+
       <tr *ngFor="let appointment of appointments">
-        <td>{{ appointment.date | date : "dd.MM.yyyy" }}</td>
-        <td>{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</td>
+        <td class="text-center">{{ appointment.date | date : "dd.MM.yyyy" }}</td>
+        <td class="text-center">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</td>
         <td>{{ appointment.customerName }}</td>
         <td>{{ appointment.city }}</td>
         <td>{{ appointment.employeeName }}</td>
         <td>{{ appointment.employeeReplacementName }}</td>
         <td class="text-center"><img width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" /></td>
-        <td>
+        <td class="text-center">
           <div class="btn-group" role="group">
             <button type="button" [routerLink]="['/dashboard/appointment', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
               <fa-icon [icon]="faGear" [fixedWidth]="true" />

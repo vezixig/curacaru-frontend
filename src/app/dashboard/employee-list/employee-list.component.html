@@ -2,7 +2,7 @@
   <div class="row">
     <h4>Mitarbeiterliste</h4>
     <Button type="button" [routerLink]="['/dashboard/employee/new']" class="btn btn-primary text-white btn-block">Mitarbeiter hinzufügen</Button>
-    <table class="col-12 table mt-3 table-striped">
+    <table class="col-12 table mt-3 table-hover">
       <thead>
         <tr>
           <th scope="col">Vorname</th>
@@ -10,17 +10,28 @@
           <th scope="col">Telefonnummer</th>
           <th scope="col">E-Mail</th>
           <th scope="col">Rolle</th>
-          <th scope="col">Aktion</th>
+          <th class="text-center" scope="col">Aktion</th>
         </tr>
       </thead>
       <tbody>
+        <ng-container *ngIf="isLoading">
+          <tr *ngFor="let _ of [].constructor(3)">
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td></td>
+          </tr>
+        </ng-container>
+
         <tr *ngFor="let employee of employees">
           <td>{{ employee.firstName }}</td>
           <td>{{ employee.lastName }}</td>
           <td>{{ employee.phoneNumber }}</td>
           <td>{{ employee.email }}</td>
           <td>{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</td>
-          <td>
+          <td class="text-center">
             <div class="btn-group" role="group">
               <button type="button" [routerLink]="['/dashboard/employee', employee.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
                 <fa-icon [icon]="faGear" [fixedWidth]="true" />
