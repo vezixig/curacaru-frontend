@@ -11,6 +11,7 @@ import { Customer } from '../../models/customer.model';
 import { Insurance } from '../../models/insurance.model';
 import { ApiService } from '../../services/api.service';
 import { EmployeeBasic } from '../../models/employee-basic.model';
+import { ValidateUrl as ValidateInsuredPersonNumber } from '../../validators/insured-person-number.validator';
 
 @Component({
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule],
@@ -64,7 +65,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       street: ['', [Validators.required, Validators.maxLength(150)]],
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
       insuranceId: ['', [Validators.required]],
-      insuredPersonNumber: ['', [Validators.required]],
+      insuredPersonNumber: ['', [Validators.required, ValidateInsuredPersonNumber]],
       emergencyContactName: [''],
       emergencyContactPhone: [''],
       birthDate: ['', [Validators.required]],
