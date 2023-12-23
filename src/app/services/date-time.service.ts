@@ -28,7 +28,7 @@ export class DateTimeService {
   }
 
   static toDate(date: NgbDate | null): Date {
-    return date ? new Date(date.year, date.month, date.day) : new Date();
+    return date ? new Date(date.year, date.month - 1, date.day, 12) : new Date();
   }
 
   static toTime(value: NgbTime | string): Time {

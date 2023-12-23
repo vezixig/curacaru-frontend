@@ -93,15 +93,15 @@
         </div>
       </div>
 
-      <button *ngIf="!isNew && !isDone" [disabled]="isSaving || isFinishing" type="button" (click)="onFinish()" class="btn btn-success text-white mx-3" style="margin-left: 0 !important">
-        <span *ngIf="isFinishing" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-        <span>Termin Abschließen</span>
-        <span *ngIf="isFinishing">...</span>
-      </button>
-      <button [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing" type="submit" class="btn btn-primary text-white">
+      <button [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing" type="submit" class="btn btn-primary text-white mx-3" style="margin-left: 0 !important">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
         <span>Termin {{ isNew ? "anlegen" : "speichern" }}</span>
         <span *ngIf="isSaving">...</span>
+      </button>
+      <button *ngIf="!isNew && !isDone" [disabled]="isSaving || isFinishing" type="button" (click)="onFinish()" class="btn btn-outline-success">
+        <span *ngIf="isFinishing" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        <span>Termin Abschließen</span>
+        <span *ngIf="isFinishing">...</span>
       </button>
       <button type="button" [routerLink]="['/dashboard/appointment']" class="btn btn-outline-secondary m-3">Verwerfen</button>
     </form>

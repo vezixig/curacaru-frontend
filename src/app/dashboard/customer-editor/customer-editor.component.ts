@@ -111,7 +111,10 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       this.getZipCodeSubscription?.unsubscribe();
       this.getZipCodeSubscription = this.apiService.getCityName(zipCode).subscribe({
         next: (result) => (this.cityName = result),
-        error: (error) => (this.cityName = 'Unbekannte PLZ'),
+        error: (error) => {
+          this.cityName = 'Unbekannte PLZ';
+          this.customerForm.get('zipCode')?.setErrors({ unknownZipCode: true });
+        },
       });
     }
   }
