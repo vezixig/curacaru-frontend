@@ -7,10 +7,13 @@ import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first } from 'rxjs';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { ApiService } from '../../services/api.service';
+import { UUID } from 'angular2-uuid';
 
 @Component({
   imports: [CommonModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule],
   selector: 'cura-employee-editor',
+  providers: [ApiService],
   standalone: true,
   templateUrl: './employee-editor.component.html',
 })
@@ -20,12 +23,12 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   isSaving: boolean = false;
 
-  private employeeId: string | undefined;
+  private employeeId: UUID | undefined;
   private createEmployeeSubscription: Subscription | undefined = undefined;
   private getEmployeeSubscription?: Subscription;
   private updateEmployeeSubscription?: Subscription;
 
-  constructor(private formBuilder: FormBuilder, private httpClient: HttpClient, private router: Router, private toastr: ToastrService) {
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
     this.employeeForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
@@ -66,7 +69,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
   private CreateEmployee(employee: Employee) {
     this.isSaving = true;
     this.createEmployeeSubscription?.unsubscribe();
-    this.createEmployeeSubscription = this.httpClient.post('https://localhost:7077/employee/new', employee).subscribe({
+    this.createEmployeeSubscription = this.apiService.createEmployee(employee).subscribe({
       complete: () => {
         this.toastr.success('Ein neuer Mitarbeiter wurde angelegt');
         this.router.navigate(['/dashboard/employee']);
@@ -82,36 +85,33 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.isNew = false;
     this.employeeId = this.router.url.split('/').pop();
-    this.getEmployeeSubscription = this.httpClient
-      .get<Employee>(`https://localhost:7077/employee/${this.employeeId}`)
-      .pipe(first())
-      .subscribe({
-        next: (result) => {
-          this.employeeForm.get('id')?.setValue(result.id);
-          this.employeeForm.get('firstName')?.setValue(result.firstName);
-          this.employeeForm.get('lastName')?.setValue(result.lastName);
-          this.employeeForm.get('email')?.setValue(result.email);
-          this.employeeForm.get('email')?.disable();
-          this.employeeForm.get('phone')?.setValue(result.phoneNumber);
-          this.employeeForm.get('role')?.setValue(result.isManager ? 'manager' : 'employee');
+    this.getEmployeeSubscription = this.apiService.getEmployee(this.employeeId!).subscribe({
+      next: (result) => {
+        this.employeeForm.get('id')?.setValue(result.id);
+        this.employeeForm.get('firstName')?.setValue(result.firstName);
+        this.employeeForm.get('lastName')?.setValue(result.lastName);
+        this.employeeForm.get('email')?.setValue(result.email);
+        this.employeeForm.get('email')?.disable();
+        this.employeeForm.get('phone')?.setValue(result.phoneNumber);
+        this.employeeForm.get('role')?.setValue(result.isManager ? 'manager' : 'employee');
+        this.isLoading = false;
+      },
+      error: (error) => {
+        if (error.status === 404) {
+          this.toastr.error('Mitarbeiter wurde nicht gefunden');
+          this.router.navigate(['/dashboard/employee']);
+        } else {
+          this.toastr.error(`Mitarbeiter konnte nicht geladen werden: [${error.status}] ${error.error}`);
           this.isLoading = false;
-        },
-        error: (error) => {
-          if (error.status === 404) {
-            this.toastr.error('Mitarbeiter wurde nicht gefunden');
-            this.router.navigate(['/dashboard/employee']);
-          } else {
-            this.toastr.error(`Mitarbeiter konnte nicht geladen werden: [${error.status}] ${error.error}`);
-            this.isLoading = false;
-          }
-        },
-      });
+        }
+      },
+    });
   }
 
   private UpdateEmployee(employee: Employee) {
     this.isSaving = true;
     this.updateEmployeeSubscription?.unsubscribe();
-    this.updateEmployeeSubscription = this.httpClient.put<Employee>('https://localhost:7077/employee', employee).subscribe({
+    this.updateEmployeeSubscription = this.apiService.updateEmployee(employee).subscribe({
       complete: () => {
         this.toastr.success('Änderungen am Mitarbeiter wurden gespeichert');
         this.router.navigate(['/dashboard/employee']);

@@ -11,6 +11,7 @@ import { EmployeeBasic } from '../models/employee-basic.model';
 import { Insurance } from '../models/insurance.model';
 import { Appointment } from '../models/appointment.model';
 import { DateTimeService } from './date-time.service';
+import { UserEmployee } from '../models/user-employee.model';
 
 @Injectable({
   providedIn: 'root',
@@ -98,4 +99,19 @@ export class ApiService {
     const serializedData = JSON.stringify(appointment, this.customSerializer);
     return this.httpClient.put(`${this.apiUrl}/appointment`, serializedData, this.jsonHeader).pipe(first());
   }
+
+  /** Gets the employee of the current user */
+  getUser = () => this.httpClient.get<UserEmployee>(`${this.apiUrl}/employee`).pipe(first());
+
+  /** Creates a new employee */
+  createEmployee = (employee: Employee) => this.httpClient.post(`${this.apiUrl}/employee/new`, employee).pipe(first());
+
+  /** Gets the employee for the given id */
+  getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`).pipe(first());
+
+  /** Updates the employee */
+  updateEmployee = (employee: Employee) => this.httpClient.put<Employee>(`${this.apiUrl}/employee`, employee).pipe(first());
+
+  /** SignUp for a new user with company */
+  signup = (data: any) => this.httpClient.post(`${this.apiUrl}/signup`, data).pipe(first());
 }

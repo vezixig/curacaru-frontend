@@ -1,20 +1,21 @@
 // Import necessary modules
 import { Component } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { TopbarComponent } from './topbar/topbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Employee } from '../models/employee.model';
 import { SignupComponent } from '../auth/signup/signup.component';
 import { UserEmployee } from '../models/user-employee.model';
 import { UserService } from '../services/user.service';
+import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'cura-dashboard',
   standalone: true,
   imports: [CommonModule, TopbarComponent, SidebarComponent, RouterOutlet, SignupComponent, HttpClientModule],
   templateUrl: './dashboard.component.html',
+  providers: [ApiService],
 })
 export class DashboardComponent {
   hasCompany: boolean = false;
@@ -23,7 +24,7 @@ export class DashboardComponent {
   user: UserEmployee | undefined;
   error: any;
 
-  constructor(private _httpClient: HttpClient, private _userService: UserService) {}
+  constructor(private apiService: ApiService, private _userService: UserService) {}
 
   handleSignUpCompleted() {
     this.loadCompany();
@@ -35,7 +36,7 @@ export class DashboardComponent {
 
   private loadCompany() {
     this.isLoading = true;
-    this._httpClient.get<UserEmployee>('https://localhost:7077/employee').subscribe({
+    this.apiService.getUser().subscribe({
       next: (result: UserEmployee) => {
         this.hasEmployee = result != null;
         this.hasCompany = result.companyId != null;
