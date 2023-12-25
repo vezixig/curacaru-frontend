@@ -98,10 +98,10 @@
         <td class="text-center"><img width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" /></td>
         <td class="text-center">
           <div class="btn-group" role="group">
-            <button type="button" [routerLink]="['/dashboard/appointment', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+            <button type="button" [routerLink]="['/dashboard/appointment', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Termin bearbeiten">
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
-            <button type="button" (click)="onDelete(appointment)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+            <button type="button" (click)="onDelete(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin löschen">
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </button>
           </div>
