@@ -21,6 +21,8 @@ export class ApiService {
   private regexDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
   private customSerializer = (key: string, value: any) => {
+    if (value === null) return value;
+
     // ngDate
     if (typeof value === 'object' && 'year' in value && 'month' in value && 'day' in value) {
       return DateTimeService.toDateString(value);
