@@ -12,6 +12,7 @@ import { Insurance } from '../../models/insurance.model';
 import { ApiService } from '../../services/api.service';
 import { EmployeeBasic } from '../../models/employee-basic.model';
 import { ValidateUrl as ValidateInsuredPersonNumber } from '../../validators/insured-person-number.validator';
+import { UserService } from '../../services/user.service';
 
 @Component({
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule],
@@ -29,6 +30,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   isNew: boolean = true;
   isSaving: boolean = false;
   newDeclarationOfAssignment: number | null = null;
+  isManager: boolean = false;
 
   insuranceFormatter = (insurance: Insurance) => insurance.name;
 
@@ -58,14 +60,15 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   private postCustomerSubscription?: Subscription;
   private updateCustomerSubscription?: Subscription;
 
-  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private userService: UserService, private toastr: ToastrService) {
+    this.isManager = this.userService.user?.isManager ?? false;
     this.customerForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       street: ['', [Validators.required, Validators.maxLength(150)]],
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
-      insuranceId: ['', [Validators.required]],
-      insuredPersonNumber: ['', [Validators.required, ValidateInsuredPersonNumber]],
+      insuranceId: [''],
+      insuredPersonNumber: ['', [ValidateInsuredPersonNumber]],
       emergencyContactName: [''],
       emergencyContactPhone: [''],
       birthDate: ['', [Validators.required]],
@@ -76,6 +79,10 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       declarationsOfAssignment: [[]],
       associatedEmployeeId: ['', [Validators.required]],
     });
+
+    if (!this.isManager) {
+      this.customerForm.disable();
+    }
 
     this.changeZipCodeSubscription = this.customerForm.get('zipCode')?.valueChanges.subscribe((value) => {
       this.handleZipCodeChange(value);
@@ -141,6 +148,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   }
 
   handleRemoveDeclarationOfAssignment(year: number) {
+    if (!this.isManager) return;
     this.customerForm.get('declarationsOfAssignment')?.value.splice(this.customerForm.get('declarationsOfAssignment')?.value.indexOf(year), 1);
   }
 
@@ -163,6 +171,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       street: this.customerForm.get('street')?.value,
       zipCode: this.customerForm.get('zipCode')?.value,
     };
+
+    customer.insuranceId = customer.insuranceId === '' ? undefined : customer.insuranceId;
 
     this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);
   }

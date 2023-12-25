@@ -12,6 +12,7 @@ import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.compo
 import { CustomerListEntry } from '../../models/customer-list-entry.model';
 import { ApiService } from '../../services/api.service';
 import { UserService } from '../../services/user.service';
+import { UserEmployee } from '../../models/user-employee.model';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, NgxSkeletonLoaderModule, RouterModule],

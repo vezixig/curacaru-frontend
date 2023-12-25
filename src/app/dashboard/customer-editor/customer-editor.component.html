@@ -140,6 +140,7 @@
         <ngx-skeleton-loader *ngIf="isLoading" />
         <div class="input-group" *ngIf="!isLoading">
           <input
+            [disabled]="!isManager"
             id="inputInsurance"
             type="text"
             class="form-control"
@@ -147,7 +148,7 @@
             [inputFormatter]="insuranceFormatter"
             [resultFormatter]="insuranceFormatter"
             [ngClass]="{
-              'is-valid': customerForm.controls['insuranceId'].valid,
+              'is-valid': customerForm.controls['insuranceId'].valid && customerForm.controls['insuranceId'].value != '' && customerForm.controls['insuranceId'].value != undefined,
               'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
             }"
             [ngbTypeahead]="search"
@@ -159,7 +160,7 @@
             type="text"
             maxlength="10"
             [ngClass]="{
-              'is-valid': customerForm.controls['insuredPersonNumber'].valid,
+              'is-valid': customerForm.controls['insuredPersonNumber'].valid && customerForm.controls['insuredPersonNumber'].value != '',
               'is-invalid': customerForm.controls['insuredPersonNumber'].invalid && customerForm.controls['insuredPersonNumber'].touched
             }"
             class="form-control"
@@ -167,7 +168,17 @@
             id="inputInsuredPersonNumber"
             placeholder="Versichertennummer"
           />
-          <select class="form-select" formControlName="insuranceStatus" placeholder="Versicherungsstatus" id="inputEmergencyContactPhone" placeholder="Telefonnummer eingeben">
+          <select
+            class="form-select"
+            formControlName="insuranceStatus"
+            placeholder="Versicherungsstatus"
+            id="inputEmergencyContactPhone"
+            placeholder="Telefonnummer eingeben"
+            [ngClass]="{
+              'is-valid': customerForm.controls['insuranceStatus'].valid,
+              'is-invalid': customerForm.controls['insuranceStatus'].invalid && customerForm.controls['insuranceStatus'].touched
+            }"
+          >
             <option value="0">Gesetzlich</option>
             <option value="1">Privat</option>
             <option value="2">Selbstzahler</option>
@@ -211,6 +222,7 @@
         <ngx-skeleton-loader *ngIf="isLoading" />
         <div class="input-group" *ngIf="!isLoading">
           <input
+            [disabled]="!isManager"
             (keyup.enter)="handleAddDeclarationOfAssignment($event)"
             (keydown.enter)="$event.preventDefault()"
             [(ngModel)]="newDeclarationOfAssignment"
@@ -220,7 +232,7 @@
             id="inputDeclarationsOfAssignment"
             placeholder="Abtretungsjahr eingeben"
           />
-          <button (click)="handleAddDeclarationOfAssignment()" class="btn btn-outline-secondary" type="button">Hinzufügen</button>
+          <button [disabled]="!isManager" (click)="handleAddDeclarationOfAssignment()" class="btn btn-outline-secondary" type="button">Hinzufügen</button>
           <span class="input-group-text deleter" *ngFor="let declarationYear of sortedDeclarations" (click)="handleRemoveDeclarationOfAssignment(declarationYear)">{{ declarationYear }}</span>
         </div>
       </div>
