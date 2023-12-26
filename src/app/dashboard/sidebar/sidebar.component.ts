@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { faPersonCane, faUserClock, faUsersGear } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faPersonCane, faUserClock, faUsersGear } from '@fortawesome/free-solid-svg-icons';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -14,11 +14,12 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {
-  faUsersGear = faUsersGear;
-  faPersonCane = faPersonCane;
+  faBuilding = faBuilding;
   faCalendar = faCalendar;
-  faUserClock = faUserClock;
   faClipboard = faClipboard;
+  faPersonCane = faPersonCane;
+  faUserClock = faUserClock;
+  faUsersGear = faUsersGear;
 
   isManager: boolean = false;
 

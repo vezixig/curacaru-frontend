@@ -5,6 +5,7 @@ import { CustomerListComponent } from './dashboard/customer-list/customer-list.c
 import { CustomerEditorComponent } from './dashboard/customer-editor/customer-editor.component';
 import { AppointmentListComponent } from './dashboard/appointment-list/appointment-list.component';
 import { AppointmentEditorComponent } from './dashboard/appointment-editor/appointment-editor.component';
+import { InsuranceListComponent } from './dashboard/insurance-list/insurance-list.component';
 
 export const routes: Routes = [
   { path: 'dashboard/appointment/new', component: AppointmentEditorComponent },
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'dashboard/employee/new', component: EmployeeEditorComponent },
   { path: 'dashboard/employee/:id', component: EmployeeEditorComponent },
   { path: 'dashboard/employee', component: EmployeeListComponent },
+  { path: 'dashboard/insurance', component: InsuranceListComponent },
   { path: 'dashboard', redirectTo: 'dashboard/appointment', pathMatch: 'full' },
 ];

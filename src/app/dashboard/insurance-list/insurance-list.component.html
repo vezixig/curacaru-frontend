@@ -1,0 +1,39 @@
+<div class="container-fluid p-4">
+  <div class="row">
+    <h4>Versicherungsliste</h4>
+    <Button type="button" [routerLink]="['/dashboard/insurance/new']" class="btn btn-primary text-white btn-block">Versicherung hinzufügen</Button>
+    <table class="col-12 table mt-3 table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Versicherung</th>
+          <th scope="col">IK-Nummer</th>
+          <th class="text-center" scope="col">Aktion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="isLoading">
+          <tr *ngFor="let _ of [].constructor(3)">
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td></td>
+          </tr>
+        </ng-container>
+
+        <tr *ngFor="let insurance of insurances">
+          <td>{{ insurance.name }}</td>
+          <td>{{ insurance.institutionCode }}</td>
+          <td class="text-center">
+            <div class="btn-group" role="group">
+              <button type="button" [routerLink]="['/dashboard/insurance', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Versicherung bearbeiten">
+                <fa-icon [icon]="faGear" [fixedWidth]="true" />
+              </button>
+              <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Versicherung löschen">
+                <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

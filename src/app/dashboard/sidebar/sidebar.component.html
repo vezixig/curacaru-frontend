@@ -30,5 +30,12 @@
         Einsatznachweise
       </a>
     </li> -->
+    <div clasS="my-2"></div>
+    <li *ngIf="isManager" class="nav-item">
+      <a class="nav-link" routerLink="/dashboard/insurance" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
+        <fa-icon [icon]="faBuilding" [fixedWidth]="true" />
+        Versicherungen
+      </a>
+    </li>
   </ul>
 </div>
