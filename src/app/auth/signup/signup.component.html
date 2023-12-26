@@ -7,16 +7,9 @@
             <div class="col-lg-6">
               <div class="card-body p-md-5 mx-md-4">
                 <div class="text-center">
-                  <img
-                    src="../assets/img/logo.png"
-                    style="width: 128px"
-                    alt="logo"
-                  />
+                  <img src="../assets/img/logo.png" style="width: 128px" alt="logo" />
                   <h4 class="mt-1 mb-2 pb-1">Willkommen bei Curacaru</h4>
-                  <p>
-                    Du scheinst dich gerade bei uns angemeldet zu haben! Wir
-                    brauchen nur noch paar Daten von dir um loszulegen:
-                  </p>
+                  <p>Du scheinst dich gerade bei uns angemeldet zu haben! Wir brauchen nur noch paar Daten von dir um loszulegen:</p>
                 </div>
                 <form (ngSubmit)="handleSignup()" [formGroup]="signupForm">
                   <div class="text-left">
@@ -29,18 +22,11 @@
                         formControlName="firstName"
                         [ngClass]="{
                           'is-valid': signupForm.controls['firstName'].valid,
-                          'is-invalid':
-                            signupForm.controls['firstName'].invalid &&
-                            signupForm.controls['firstName'].touched
+                          'is-invalid': signupForm.controls['firstName'].invalid && signupForm.controls['firstName'].touched
                         }"
                         placeholder="Gib deinen Vornamen ein"
                       />
-                      <div
-                        id="validationServerUsernameFeedback"
-                        class="invalid-feedback"
-                      >
-                        Name muss mindestens drei Zeichen lang sein
-                      </div>
+                      <div id="validationServerUsernameFeedback" class="invalid-feedback">Name muss mindestens drei Zeichen lang sein</div>
                     </div>
                     <div class="form-group">
                       <label for="inputLastName">Nachname</label>
@@ -51,18 +37,11 @@
                         id="inputLastName"
                         [ngClass]="{
                           'is-valid': signupForm.controls['lastName'].valid,
-                          'is-invalid':
-                            signupForm.controls['lastName'].invalid &&
-                            signupForm.controls['lastName'].touched
+                          'is-invalid': signupForm.controls['lastName'].invalid && signupForm.controls['lastName'].touched
                         }"
                         placeholder="Gib deinen Nachnamen ein"
                       />
-                      <div
-                        id="validationLastNameFeedback"
-                        class="invalid-feedback"
-                      >
-                        Name muss mindestens drei Zeichen lang sein
-                      </div>
+                      <div id="validationLastNameFeedback" class="invalid-feedback">Name muss mindestens drei Zeichen lang sein</div>
                     </div>
                     <div class="form-group">
                       <label for="intputCompanyName">Dienstname</label>
@@ -73,35 +52,21 @@
                         id="intputCompanyName"
                         [ngClass]="{
                           'is-valid': signupForm.controls['companyName'].valid,
-                          'is-invalid':
-                            signupForm.controls['companyName'].invalid &&
-                            signupForm.controls['companyName'].touched
+                          'is-invalid': signupForm.controls['companyName'].invalid && signupForm.controls['companyName'].touched
                         }"
-                        placeholder="Gib den Namen deines Pflegedienstes ein"
+                        placeholder="Gib den Namen deines Betreuungsdienstes ein"
                       />
-                      <div
-                        id="validationCompanyNameFeedback"
-                        class="invalid-feedback"
-                      >
-                        Name muss mindestens drei Zeichen lang sei
-                      </div>
+                      <div id="validationCompanyNameFeedback" class="invalid-feedback">Name muss mindestens drei Zeichen lang sei</div>
                     </div>
                   </div>
-                  <button
-                    type="submit"
-                    [disabled]="!signupForm.valid"
-                    class="my-2 btn btn-primary text-white float-end"
-                  >
+                  <button type="submit" [disabled]="!signupForm.valid" class="my-2 btn btn-primary text-white float-end">
                     Los geht's
                     <fa-icon [icon]="faCircleRight" />
                   </button>
                 </form>
               </div>
             </div>
-            <div
-              class="col-lg-6 d-flex align-items-center gradient-custom-2"
-              style="overflow: hidden"
-            >
+            <div class="col-lg-6 d-flex align-items-center gradient-custom-2" style="overflow: hidden">
               <img height="650" src="../assets/img/signup.jpg" />
             </div>
           </div>

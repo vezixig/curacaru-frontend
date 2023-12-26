@@ -33,7 +33,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required]],
+      phone: [''],
       role: ['employee', [Validators.required]],
       id: [''],
     });

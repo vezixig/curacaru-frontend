@@ -62,7 +62,7 @@
           class="form-control"
           id="inputPhone"
           [ngClass]="{
-            'is-valid': employeeForm.controls['phone'].valid,
+            'is-valid': employeeForm.controls['phone'].valid && employeeForm.controls['phone'].value != '',
             'is-invalid': employeeForm.controls['phone'].invalid && employeeForm.controls['phone'].touched
           }"
           formControlName="phone"

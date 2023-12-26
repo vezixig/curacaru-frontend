@@ -30,6 +30,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
 
   appointmentForm: FormGroup;
+  canFinish: boolean = false;
   customers: CustomerListEntry[] = [];
   employees: EmployeeBase[] = [];
   isDone: boolean = false;
@@ -110,7 +111,11 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
             notes: result.notes,
           });
 
+          if (result.isDone) {
+            this.appointmentForm.disable();
+          }
           this.isDone = result.isDone;
+          this.canFinish = !result.isDone && result.isSignedByCustomer && result.isSignedByEmployee;
           this.isLoading = false;
         },
         error: (error) => {
