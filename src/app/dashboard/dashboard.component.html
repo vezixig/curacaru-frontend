@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<div *ngIf="hasCompany; else componentB">
+<div *ngIf="hasCompany; else signup">
   <cura-topbar />
   <main style="height: calc(100vh - 60px)">
     <cura-sidebar />
@@ -25,6 +25,6 @@
     </div>
   </main>
 </div>
-<ng-template #componentB>
-  <cura-signup style="height: 100vh" (signUpCompleted)="handleSignUpCompleted()"></cura-signup>
+<ng-template #signup>
+  <cura-signup *ngIf="!isLoading" style="height: 100vh" (signUpCompleted)="handleSignUpCompleted()"></cura-signup>
 </ng-template>

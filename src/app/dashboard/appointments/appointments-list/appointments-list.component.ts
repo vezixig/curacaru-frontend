@@ -8,27 +8,27 @@ import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first, map } from 'rxjs';
-import { GermanDateParserFormatter } from '../../i18n/date-formatter';
-import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
-import { AppointmentListEntry } from '../../models/appointment-list-entry.model';
-import { Customer } from '../../models/customer.model';
-import { EmployeeBasic } from '../../models/employee-basic.model';
-import { TimeFormatPipe } from '../../pipes/time.pipe';
-import { DateTimeService } from '../../services/date-time.service';
-import { UserService } from '../../services/user.service';
-import { ApiService } from '../../services/api.service';
-import { CustomerListEntry } from '../../models/customer-list-entry.model';
+import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
+import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
+import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
+import { Customer } from '../../../models/customer.model';
+import { EmployeeBasic } from '../../../models/employee-basic.model';
+import { TimeFormatPipe } from '../../../pipes/time.pipe';
+import { DateTimeService } from '../../../services/date-time.service';
+import { UserService } from '../../../services/user.service';
+import { ApiService } from '../../../services/api.service';
+import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe],
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
-  selector: 'cura-appointment-list',
+  selector: 'cura-appointments-list',
   standalone: true,
-  styleUrls: ['./appointment-list.component.scss'],
-  templateUrl: './appointment-list.component.html',
+  styleUrls: ['./appointments-list.component.scss'],
+  templateUrl: './appointments-list.component.html',
 })
-export class AppointmentListComponent implements OnDestroy, OnInit {
+export class AppointmentsListComponent implements OnDestroy, OnInit {
   faGear = faGear;
   faTrashCan = faTrashCan;
   faCalendar = faCalendar;
