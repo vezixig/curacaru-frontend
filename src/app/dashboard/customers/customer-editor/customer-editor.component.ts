@@ -80,6 +80,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       associatedEmployeeId: ['', [Validators.required]],
     });
 
+    this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
+
     if (!this.isManager) {
       this.customerForm.disable();
     }
@@ -245,5 +247,15 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         this.isSaving = false;
       },
     });
+  }
+
+  // If the care level is set to 0, the insurance status must be self payment
+  private onCareLEvelChange(value: any): void {
+    if (value == 0) {
+      this.customerForm.get('insuranceStatus')?.setValue(2);
+      this.customerForm.get('insuranceStatus')?.disable();
+    } else {
+      this.customerForm.get('insuranceStatus')?.enable();
+    }
   }
 }

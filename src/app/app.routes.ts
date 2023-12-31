@@ -24,5 +24,5 @@ export const routes: Routes = [
   { path: 'dashboard/employee/:id', component: EmployeeEditorComponent },
   { path: 'dashboard/employee', component: EmployeeListComponent },
   { path: 'dashboard/insurance', component: InsuranceListComponent },
-  { path: 'dashboard', redirectTo: 'dashboard/appointment', pathMatch: 'full' },
+  { path: 'dashboard', redirectTo: 'dashboard/appointments', pathMatch: 'full' },
 ];
