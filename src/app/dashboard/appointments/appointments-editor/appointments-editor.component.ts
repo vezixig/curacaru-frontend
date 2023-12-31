@@ -7,26 +7,26 @@ import { Subscription, map } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
-import { Appointment } from '../../models/appointment.model';
+import { Appointment } from '../../../models/appointment.model';
 import { CommonModule } from '@angular/common';
-import { CustomerListEntry } from '../../models/customer-list-entry.model';
-import { DateTimeService } from '../../services/date-time.service';
-import { EmployeeBasic as EmployeeBase } from '../../models/employee-basic.model';
+import { CustomerListEntry } from '../../../models/customer-list-entry.model';
+import { DateTimeService } from '../../../services/date-time.service';
+import { EmployeeBasic as EmployeeBase } from '../../../models/employee-basic.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { GermanDateParserFormatter } from '../../i18n/date-formatter';
-import { UserService } from '../../services/user.service';
-import { UserEmployee } from '../../models/user-employee.model';
+import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
+import { UserService } from '../../../services/user.service';
+import { UserEmployee } from '../../../models/user-employee.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { ApiService } from '../../services/api.service';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, FormsModule, NgbDatepickerModule, NgbTimepickerModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
-  selector: 'cura-appointment-editor',
+  selector: 'cura-appointments-editor',
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   standalone: true,
-  templateUrl: './appointment-editor.component.html',
+  templateUrl: './appointments-editor.component.html',
 })
-export class AppointmentEditorComponent implements OnInit, OnDestroy {
+export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
 
   appointmentForm: FormGroup;
@@ -121,7 +121,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
         error: (error) => {
           if (error.status === 404) {
             this.toastr.error('Termin wurde nicht gefunden');
-            this.router.navigate(['/dashboard/appointment']);
+            this.router.navigate(['/dashboard/appointments']);
           } else {
             this.toastr.error(`Termin konnte nicht geladen werden: [${error.status}] ${error.error}`);
             this.isLoading = false;
@@ -150,7 +150,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
     this.postFinishSubscription = this.apiService.finishAppointment(this.appointmentId!).subscribe({
       complete: () => {
         this.toastr.success('Termin wurde abgeschlossen');
-        this.router.navigate(['/dashboard/appointment']);
+        this.router.navigate(['/dashboard/appointments']);
       },
       error: (error) => {
         this.toastr.error(`Termin konnte nicht abgeschlossen werden: [${error.status}] ${error.error}`);
@@ -180,6 +180,11 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (appointment.employeeId === appointment.employeeReplacementId) {
+      this.toastr.warning('Mitarbeiter und Vertretung dürfen nicht identisch sein');
+      return;
+    }
+
     this.isNew ? this.CreateAppointment(appointment) : this.UpdateAppointment(appointment);
   }
 
@@ -197,7 +202,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
     this.postAppointmentSubscription = this.apiService.createAppointment(appointment).subscribe({
       complete: () => {
         this.toastr.success('Ein neuer Termin wurde angelegt');
-        this.router.navigate(['/dashboard/appointment']);
+        this.router.navigate(['/dashboard/appointments']);
       },
       error: (error) => {
         this.toastr.error(`Termin konnte nicht angelegt werden: [${error.status}] ${error.error}`);
@@ -231,7 +236,7 @@ export class AppointmentEditorComponent implements OnInit, OnDestroy {
     this.updateAppointmentSubscription = this.apiService.updateAppointment(appointment).subscribe({
       complete: () => {
         this.toastr.success('Änderungen am Termin wurden gespeichert');
-        this.router.navigate(['/dashboard/appointment']);
+        this.router.navigate(['/dashboard/appointments']);
       },
       error: (error) => {
         this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);

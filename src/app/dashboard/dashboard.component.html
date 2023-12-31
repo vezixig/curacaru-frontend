@@ -16,15 +16,17 @@
   </div>
 </div>
 
-<div *ngIf="hasCompany; else componentB">
+<div *ngIf="hasCompany; else signup">
   <cura-topbar />
   <main style="height: calc(100vh - 60px)">
     <cura-sidebar />
-    <div class="m-4 p-3 w-100 bg-white rounded overflow-auto">
-      <router-outlet></router-outlet>
+    <div class="m-4 w-100 bg-white rounded overflow-auto">
+      <div class="container-fluid p-4">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   </main>
 </div>
-<ng-template #componentB>
-  <cura-signup style="height: 100vh" (signUpCompleted)="handleSignUpCompleted()"></cura-signup>
+<ng-template #signup>
+  <cura-signup *ngIf="!isLoading" style="height: 100vh" (signUpCompleted)="handleSignUpCompleted()"></cura-signup>
 </ng-template>

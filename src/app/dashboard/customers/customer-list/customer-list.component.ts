@@ -8,11 +8,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first } from 'rxjs';
-import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
-import { CustomerListEntry } from '../../models/customer-list-entry.model';
-import { ApiService } from '../../services/api.service';
-import { UserService } from '../../services/user.service';
-import { UserEmployee } from '../../models/user-employee.model';
+import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
+import { CustomerListEntry } from '../../../models/customer-list-entry.model';
+import { ApiService } from '../../../services/api.service';
+import { UserService } from '../../../services/user.service';
+import { UserEmployee } from '../../../models/user-employee.model';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, NgxSkeletonLoaderModule, RouterModule],

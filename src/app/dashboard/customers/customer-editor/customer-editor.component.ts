@@ -7,12 +7,12 @@ import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, first, firstValueFrom, mergeMap } from 'rxjs';
-import { Customer } from '../../models/customer.model';
-import { Insurance } from '../../models/insurance.model';
-import { ApiService } from '../../services/api.service';
-import { EmployeeBasic } from '../../models/employee-basic.model';
-import { ValidateUrl as ValidateInsuredPersonNumber } from '../../validators/insured-person-number.validator';
-import { UserService } from '../../services/user.service';
+import { Customer } from '../../../models/customer.model';
+import { Insurance } from '../../../models/insurance.model';
+import { ApiService } from '../../../services/api.service';
+import { EmployeeBasic } from '../../../models/employee-basic.model';
+import { ValidateUrl as ValidateInsuredPersonNumber } from '../../../validators/insured-person-number.validator';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule],

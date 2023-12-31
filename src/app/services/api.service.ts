@@ -75,6 +75,9 @@ export class ApiService {
   /** Gets insurances matching the search string */
   getInsurance = (term: string) => this.httpClient.get<Insurance[]>(`${this.apiUrl}/insurance?search=${term}`);
 
+  /** Gets all insurances */
+  getInsuranceList = () => this.httpClient.get<Insurance[]>(`${this.apiUrl}/insurance/list`);
+
   /** Creates a new customer */
   createCustomer = (customer: Customer) => this.httpClient.post(`${this.apiUrl}/customer/new`, customer).pipe(first());
 
