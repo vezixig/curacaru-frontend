@@ -1,6 +1,6 @@
 <div class="row">
   <h4>Mitarbeiterliste</h4>
-  <Button type="button" [routerLink]="['/dashboard/employee/new']" class="btn btn-primary text-white btn-block">Mitarbeiter hinzufügen</Button>
+  <Button type="button" [routerLink]="['/dashboard/employees/new']" class="btn btn-primary text-white btn-block">Mitarbeiter hinzufügen</Button>
   <table class="col-12 table mt-3 table-striped">
     <thead>
       <tr>
@@ -32,7 +32,7 @@
         <td>{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</td>
         <td class="text-center">
           <div class="btn-group" role="group">
-            <button type="button" [routerLink]="['/dashboard/employee', employee.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+            <button type="button" [routerLink]="['/dashboard/employees', employee.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
             <button type="button" (click)="handleDelete(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">

@@ -1,0 +1,45 @@
+<h4>Versicherung {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
+<form (ngSubmit)="onSave()" [formGroup]="insuranceForm">
+  <div class="form-group">
+    <label for="inputName">Name</label>
+    <ngx-skeleton-loader *ngIf="isLoading" />
+    <input
+      *ngIf="!isLoading"
+      type="text"
+      class="form-control"
+      formControlName="name"
+      id="inputName"
+      [ngClass]="{
+        'is-valid': insuranceForm.controls['name'].valid && insuranceForm.controls['name'].touched,
+        'is-invalid': insuranceForm.controls['name'].invalid && insuranceForm.controls['name'].touched
+      }"
+      placeholder="Name der Versicherung eingeben"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="inputInstitutionCode">Institutionskennzeichen</label>
+    <ngx-skeleton-loader *ngIf="isLoading" />
+    <input
+      *ngIf="!isLoading"
+      type="text"
+      class="form-control"
+      formControlName="institutionCode"
+      id="inputInstitutionCode"
+      [ngClass]="{
+        'is-valid': insuranceForm.controls['institutionCode'].valid && insuranceForm.controls['institutionCode'].touched,
+        'is-invalid': insuranceForm.controls['institutionCode'].invalid && insuranceForm.controls['institutionCode'].touched
+      }"
+      placeholder="Institutionskennzeichen eingeben"
+    />
+  </div>
+
+  <div class="form-group">
+    <button [disabled]="!insuranceForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      <span>Versicherung {{ isNew ? "anlegen" : "speichern" }}</span>
+      <span *ngIf="isSaving">...</span>
+    </button>
+    <button type="button" [routerLink]="['/dashboard/insurances']" class="btn btn-outline-secondary m-3">Verwerfen</button>
+  </div>
+</form>

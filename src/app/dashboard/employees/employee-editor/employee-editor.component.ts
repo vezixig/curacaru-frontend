@@ -45,7 +45,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.router.url === '/dashboard/employee/new') {
+    if (this.router.url === '/dashboard/employees/new') {
       this.isNew = true;
     } else {
       this.LoadEmployee();
@@ -72,7 +72,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
     this.createEmployeeSubscription = this.apiService.createEmployee(employee).subscribe({
       complete: () => {
         this.toastr.success('Ein neuer Mitarbeiter wurde angelegt');
-        this.router.navigate(['/dashboard/employee']);
+        this.router.navigate(['/dashboard/employees']);
       },
       error: (error) => {
         this.toastr.error(`Mitarbeiter konnte nicht angelegt werden: [${error.status}] ${error.error}`);
@@ -99,7 +99,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
       error: (error) => {
         if (error.status === 404) {
           this.toastr.error('Mitarbeiter wurde nicht gefunden');
-          this.router.navigate(['/dashboard/employee']);
+          this.router.navigate(['/dashboard/employees']);
         } else {
           this.toastr.error(`Mitarbeiter konnte nicht geladen werden: [${error.status}] ${error.error}`);
           this.isLoading = false;
@@ -114,7 +114,7 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
     this.updateEmployeeSubscription = this.apiService.updateEmployee(employee).subscribe({
       complete: () => {
         this.toastr.success('Änderungen am Mitarbeiter wurden gespeichert');
-        this.router.navigate(['/dashboard/employee']);
+        this.router.navigate(['/dashboard/employees']);
       },
       error: (error) => {
         this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);

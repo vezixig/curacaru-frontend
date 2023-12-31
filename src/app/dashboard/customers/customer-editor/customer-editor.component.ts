@@ -11,7 +11,7 @@ import { Customer } from '../../../models/customer.model';
 import { Insurance } from '../../../models/insurance.model';
 import { ApiService } from '../../../services/api.service';
 import { EmployeeBasic } from '../../../models/employee-basic.model';
-import { ValidateUrl as ValidateInsuredPersonNumber } from '../../../validators/insured-person-number.validator';
+import { ValidateInsuredPersonNumber as ValidateInsuredPersonNumber } from '../../../validators/insured-person-number.validator';
 import { UserService } from '../../../services/user.service';
 
 @Component({
@@ -136,7 +136,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       mergeMap(async (term) => {
         if (term.length < 2) return [];
 
-        let insurances = await firstValueFrom(this.apiService.getInsurance(term));
+        let insurances = await firstValueFrom(this.apiService.getInsuranceByName(term));
         return insurances;
       })
     );
@@ -185,7 +185,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     this.postCustomerSubscription = this.apiService.createCustomer(employee).subscribe({
       complete: () => {
         this.toastr.success('Ein neuer Kunde wurde angelegt');
-        this.router.navigate(['/dashboard/customer']);
+        this.router.navigate(['/dashboard/customers']);
       },
       error: (error) => {
         this.toastr.error(`Kunde konnte nicht angelegt werden: [${error.status}] ${error.error}`);
@@ -225,7 +225,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       error: (error) => {
         if (error.status === 404) {
           this.toastr.error('Kunde wurde nicht gefunden');
-          this.router.navigate(['/dashboard/customer']);
+          this.router.navigate(['/dashboard/customers']);
         } else {
           this.toastr.error(`Kunde konnte nicht geladen werden: [${error.status}] ${error.error}`);
           this.isLoading = false;
@@ -240,7 +240,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     this.updateCustomerSubscription = this.apiService.updateCustomer(customer).subscribe({
       complete: () => {
         this.toastr.success('Änderungen am Kunden wurden gespeichert');
-        this.router.navigate(['/dashboard/customer']);
+        this.router.navigate(['/dashboard/customers']);
       },
       error: (error) => {
         this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);

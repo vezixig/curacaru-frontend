@@ -1,6 +1,6 @@
 <div class="row">
   <h4>Kundenliste</h4>
-  <Button *ngIf="isManager" type="button" [routerLink]="['/dashboard/customer/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
+  <Button *ngIf="isManager" type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
   <table class="col-12 table mt-3 table-striped">
     <thead>
       <tr>
@@ -35,7 +35,7 @@
         <td>{{ customer.associatedEmployeeName }}</td>
         <td class="text-center">
           <div class="btn-group" role="group">
-            <button type="button" [routerLink]="['/dashboard/customer', customer.id]" class="btn btn-outline-secondary btn-sm" title="Kunden bearbeiten">
+            <button type="button" [routerLink]="['/dashboard/customers', customer.id]" class="btn btn-outline-secondary btn-sm" title="Kunden bearbeiten">
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
             <button *ngIf="isManager" type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">

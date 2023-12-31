@@ -6,7 +6,7 @@ import { AbstractControl } from '@angular/forms';
  * @returns null if the control is valid, otherwise an error object
  * @see https://de.wikipedia.org/wiki/Krankenversichertennummer
  */
-export function ValidateUrl(control: AbstractControl) {
+export function ValidateInsuredPersonNumber(control: AbstractControl) {
   if (control.value == null || control.value == '') return null;
 
   let m = control.value.match(/^([A-Z]{1})([\d]{8})([\d]{1})$/);

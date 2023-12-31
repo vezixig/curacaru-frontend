@@ -1,6 +1,6 @@
 <div class="row">
   <h4>Versicherungsliste</h4>
-  <Button type="button" [routerLink]="['/dashboard/insurance/new']" class="btn btn-primary text-white btn-block">Versicherung hinzufügen</Button>
+  <Button type="button" [routerLink]="['/dashboard/insurances/new']" class="btn btn-primary text-white btn-block">Versicherung hinzufügen</Button>
   <table class="col-12 table mt-3 table-striped">
     <thead>
       <tr>
@@ -23,7 +23,7 @@
         <td>{{ insurance.institutionCode }}</td>
         <td class="text-center">
           <div class="btn-group" role="group">
-            <button type="button" [routerLink]="['/dashboard/insurance', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Versicherung bearbeiten">
+            <button type="button" [routerLink]="['/dashboard/insurances', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Versicherung bearbeiten">
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
             <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Versicherung löschen">

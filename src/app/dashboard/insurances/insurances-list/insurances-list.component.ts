@@ -16,11 +16,11 @@ import { Insurance } from '../../../models/insurance.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule],
   providers: [ApiService],
-  selector: 'cura-insurance-list',
+  selector: 'cura-insurances-list',
   standalone: true,
-  templateUrl: './insurance-list.component.html',
+  templateUrl: './insurances-list.component.html',
 })
-export class InsuranceListComponent implements OnDestroy {
+export class InsurancesListComponent implements OnDestroy {
   faGear = faGear;
   faTrashCan = faTrashCan;
 
