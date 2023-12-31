@@ -1,53 +1,46 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Employee } from '../../models/employee.model';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgbdModalConfirm } from '../../modals/confirm-modal/confirm-modal.component';
+import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
-import { ApiService } from '../../services/api.service';
+import { BehaviorSubject, EMPTY, Subscription, catchError, finalize } from 'rxjs';
+import { ApiService } from '../../../services/api.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { Insurance } from '../../models/insurance.model';
+import { Insurance } from '../../../models/insurance.model';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule],
   providers: [ApiService],
   selector: 'cura-insurance-list',
   standalone: true,
   templateUrl: './insurance-list.component.html',
 })
-export class InsuranceListComponent implements OnDestroy, OnInit {
+export class InsuranceListComponent implements OnDestroy {
   faGear = faGear;
   faTrashCan = faTrashCan;
-  isLoading: boolean = true;
-  insurances: Insurance[] = [];
+
+  private isLoading = new BehaviorSubject<boolean>(true);
+  isLoading$ = this.isLoading.asObservable();
+
+  insurances$? = this.apiService.getInsuranceList().pipe(
+    catchError((error) => {
+      this.toastr.error(`Versicherungsliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
+      return EMPTY;
+    }),
+    finalize(() => this.isLoading.next(false))
+  );
 
   private deleteEmployeeSubscription?: Subscription;
-  private getInsuranceListSubscription?: Subscription;
 
   constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService) {}
 
   ngOnDestroy(): void {
-    this.getInsuranceListSubscription?.unsubscribe();
     this.deleteEmployeeSubscription?.unsubscribe();
-  }
-
-  ngOnInit(): void {
-    this.isLoading = true;
-    this.getInsuranceListSubscription = this.apiService.getInsuranceList().subscribe({
-      next: (result) => {
-        this.insurances = result;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.toastr.error(`Versicherungsliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-        this.isLoading = false;
-      },
-    });
   }
 
   handleDelete(insurance: Insurance) {

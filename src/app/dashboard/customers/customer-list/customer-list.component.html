@@ -1,0 +1,49 @@
+<div class="row">
+  <h4>Kundenliste</h4>
+  <Button *ngIf="isManager" type="button" [routerLink]="['/dashboard/customer/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
+  <table class="col-12 table mt-3 table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Vorname</th>
+        <th scope="col">Nachname</th>
+        <th scope="col">Telefonnummer</th>
+        <th scope="col">PLZ</th>
+        <th scope="col">Stadt</th>
+        <th scope="col">Bearbeiter</th>
+        <th class="text-center" scope="col">Aktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngIf="isLoading">
+        <tr *ngFor="let _ of [].constructor(3)">
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
+          <td></td>
+        </tr>
+      </ng-container>
+
+      <tr *ngFor="let customer of customers">
+        <td>{{ customer.firstName }}</td>
+        <td>{{ customer.lastName }}</td>
+        <td>{{ customer.phone }}</td>
+        <td>{{ customer.zipCode }}</td>
+        <td>{{ customer.city }}</td>
+        <td>{{ customer.associatedEmployeeName }}</td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <button type="button" [routerLink]="['/dashboard/customer', customer.id]" class="btn btn-outline-secondary btn-sm" title="Kunden bearbeiten">
+              <fa-icon [icon]="faGear" [fixedWidth]="true" />
+            </button>
+            <button *ngIf="isManager" type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
+              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
