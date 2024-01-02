@@ -8,7 +8,6 @@ import { UUID } from 'angular2-uuid';
 
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { UserService } from '../../../services/user.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ApiService } from '../../../services/api.service';
 import { Insurance } from '../../../models/insurance.model';
@@ -32,9 +31,9 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
   private insuranceId?: UUID;
   private getInsuranceSubscription?: Subscription;
   private postInsuranceSubscription?: Subscription;
-  private updateAppointmentSubscription?: Subscription;
+  private updateInsuranceSubscription?: Subscription;
 
-  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService, private userService: UserService) {
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
     this.insuranceForm = this.formBuilder.group({
       name: ['', [Validators.required]],
       institutionCode: ['', [Validators.required, ValidateInstitutionCode]],
@@ -44,7 +43,7 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.getInsuranceSubscription?.unsubscribe();
     this.postInsuranceSubscription?.unsubscribe();
-    this.updateAppointmentSubscription?.unsubscribe();
+    this.updateInsuranceSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -86,7 +85,7 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
       institutionCode: this.insuranceForm.value.institutionCode,
     };
 
-    this.isNew ? this.CreateInsurance(insurance) : this.UpdateAppointment(insurance);
+    this.isNew ? this.CreateInsurance(insurance) : this.UpdateInsurance(insurance);
   }
 
   private CreateInsurance(insurance: Insurance) {
@@ -104,18 +103,18 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  private UpdateAppointment(insurance: Insurance) {
+  private UpdateInsurance(insurance: Insurance) {
     this.isSaving = true;
-    // this.updateAppointmentSubscription?.unsubscribe();
-    // this.updateAppointmentSubscription = this.apiService.updateAppointment(appointment).subscribe({
-    //   complete: () => {
-    //     this.toastr.success('Änderungen am Termin wurden gespeichert');
-    //     this.router.navigate(['/dashboard/appointments']);
-    //   },
-    //   error: (error) => {
-    //     this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);
-    //     this.isSaving = false;
-    //   },
-    // });
+    this.updateInsuranceSubscription?.unsubscribe();
+    this.updateInsuranceSubscription = this.apiService.updateInsurance(insurance).subscribe({
+      complete: () => {
+        this.toastr.success('Änderungen wurden gespeichert');
+        this.router.navigate(['/dashboard/insurances']);
+      },
+      error: (error) => {
+        this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);
+        this.isSaving = false;
+      },
+    });
   }
 }

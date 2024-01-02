@@ -62,6 +62,9 @@ export class ApiService {
   /** Delete the customer with the given id */
   deleteCustomer = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/customer/${id}`).pipe(first());
 
+  /** Deletes the insurance with the given id */
+  deleteInsurance = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/insurance/${id}`).pipe(first());
+
   /**
    * Gets the employee with the given ID from the API
    * @param id The id of the employee to delete
@@ -122,6 +125,9 @@ export class ApiService {
 
   /** Updates the employee */
   updateEmployee = (employee: Employee) => this.httpClient.put<Employee>(`${this.apiUrl}/employee`, employee).pipe(first());
+
+  /** Updates the insurance */
+  updateInsurance = (insurance: Insurance) => this.httpClient.put<Insurance>(`${this.apiUrl}/insurance`, insurance).pipe(first());
 
   /** SignUp for a new user with company */
   signup = (data: any) => this.httpClient.post(`${this.apiUrl}/signup`, data).pipe(first());

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
@@ -20,27 +20,37 @@ import { Insurance } from '../../../models/insurance.model';
   standalone: true,
   templateUrl: './insurances-list.component.html',
 })
-export class InsurancesListComponent implements OnDestroy {
+export class InsurancesListComponent implements OnDestroy, OnInit {
   faGear = faGear;
   faTrashCan = faTrashCan;
 
   private isLoading = new BehaviorSubject<boolean>(true);
   isLoading$ = this.isLoading.asObservable();
 
-  insurances$? = this.apiService.getInsuranceList().pipe(
-    catchError((error) => {
-      this.toastr.error(`Versicherungsliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-      return EMPTY;
-    }),
-    finalize(() => this.isLoading.next(false))
-  );
+  private insurances = new BehaviorSubject<Insurance[]>([]);
+  insurances$ = this.insurances.asObservable();
 
-  private deleteEmployeeSubscription?: Subscription;
+  private deleteInsuranceSubscription?: Subscription;
+  private getInsurancesSubscription?: Subscription;
 
   constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService) {}
 
+  ngOnInit(): void {
+    this.getInsurancesSubscription = this.apiService
+      .getInsuranceList()
+      .pipe(
+        catchError((error) => {
+          this.toastr.error(`Versicherungsliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
+          return EMPTY;
+        }),
+        finalize(() => this.isLoading.next(false))
+      )
+      .subscribe((insurances) => this.insurances.next(insurances));
+  }
+
   ngOnDestroy(): void {
-    this.deleteEmployeeSubscription?.unsubscribe();
+    this.getInsurancesSubscription?.unsubscribe();
+    this.deleteInsuranceSubscription?.unsubscribe();
   }
 
   handleDelete(insurance: Insurance) {
@@ -51,13 +61,13 @@ export class InsurancesListComponent implements OnDestroy {
   }
 
   private deleteInsurance(insurance: Insurance) {
-    // this.deleteEmployeeSubscription?.unsubscribe();
-    // this.deleteEmployeeSubscription = this.apiService.deleteEmployee(employee.id).subscribe({
-    //   complete: () => {
-    //     this.toastr.success(`${employee.firstName} ${employee.lastName} wurde gelöscht.`);
-    //     this.employees = this.employees.filter((e) => e.id !== employee.id);
-    //   },
-    //   error: (error) => this.toastr.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
-    // });
+    this.deleteInsuranceSubscription?.unsubscribe();
+    this.deleteInsuranceSubscription = this.apiService.deleteInsurance(insurance.id!).subscribe({
+      complete: () => {
+        this.toastr.success(`${insurance.name} wurde gelöscht.`);
+        this.insurances.next(this.insurances.value.filter((e) => e.id !== insurance.id));
+      },
+      error: (error) => this.toastr.error(`Versicherung konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
+    });
   }
 }
