@@ -115,7 +115,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             this.appointmentForm.disable();
           }
           this.isDone = result.isDone;
-          this.canFinish = !result.isDone && result.isSignedByCustomer && result.isSignedByEmployee;
+          this.canFinish = !result.isDone; // && result.isSignedByCustomer && result.isSignedByEmployee;
           this.isLoading = false;
         },
         error: (error) => {

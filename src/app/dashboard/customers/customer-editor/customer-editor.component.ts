@@ -72,7 +72,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       emergencyContactName: [''],
       emergencyContactPhone: [''],
       birthDate: ['', [Validators.required]],
-      phone: ['', [Validators.required]],
+      phone: [''],
       careLevel: [1, [Validators.required]],
       insuranceStatus: ['', [Validators.required]],
       isCareContractAvailable: [false],
@@ -254,7 +254,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     if (value == 0) {
       this.customerForm.get('insuranceStatus')?.setValue(2);
       this.customerForm.get('insuranceStatus')?.disable();
-    } else {
+    } else if (this.isManager) {
       this.customerForm.get('insuranceStatus')?.enable();
     }
   }

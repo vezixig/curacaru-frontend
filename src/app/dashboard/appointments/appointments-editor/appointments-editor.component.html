@@ -77,7 +77,7 @@
   </div>
 
   <!-- Signatures -->
-  <div class="form-group mb-4">
+  <!-- <div class="form-group mb-4">
     <label for="inputNotes">Unterschriften:</label>
     <div class="input-group" style="cursor: pointer">
       <span class="input-group-text" (click)="toggleIsSignedByCustomer()">Kunde</span>
@@ -89,7 +89,7 @@
         <input type="checkbox" formControlName="isSignedByEmployee" />
       </div>
     </div>
-  </div>
+  </div> -->
 
   <button [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing" type="submit" class="btn btn-primary text-white" style="margin-left: 0 !important; margin-right: 1em">
     <span *ngIf="isSaving" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
