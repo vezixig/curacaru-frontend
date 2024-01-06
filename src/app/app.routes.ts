@@ -7,6 +7,7 @@ import { AppointmentsListComponent } from './dashboard/appointments/appointments
 import { AppointmentsEditorComponent } from './dashboard/appointments/appointments-editor/appointments-editor.component';
 import { InsurancesListComponent } from './dashboard/insurances/insurances-list/insurances-list.component';
 import { InsurancesEditorComponent } from './dashboard/insurances/insurances-editor/insurances-editor.component';
+import { CompanyComponent } from './dashboard/company/company.component';
 
 export const routes: Routes = [
   {
@@ -18,6 +19,7 @@ export const routes: Routes = [
       { path: ':id', component: AppointmentsEditorComponent },
     ],
   },
+  { path: 'dashboard/company', component: CompanyComponent },
   {
     path: 'dashboard/customers',
     children: [

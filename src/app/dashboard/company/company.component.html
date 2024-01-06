@@ -1,0 +1,250 @@
+<div class="row">
+  <h4>Unternehmensdaten</h4>
+  <form (ngSubmit)="handleSave()" [formGroup]="companyForm">
+    <!-- company name -->
+    <div class="form-group">
+      <label for="inputName">Name des Angebots</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <input *ngIf="!isLoading" type="text" class="form-control" formControlName="name" id="inputName" />
+    </div>
+
+    <!-- owner name -->
+    <div class="form-group">
+      <label for="inputOwnerName">Vor- und Nachname (nur bei Privatadresse)</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <input
+        *ngIf="!isLoading"
+        type="text"
+        [ngClass]="{
+          'is-valid': companyForm.controls['ownerName'].valid && companyForm.controls['ownerName'].touched,
+          'is-invalid': companyForm.controls['ownerName'].invalid && companyForm.controls['ownerName'].touched
+        }"
+        class="form-control"
+        formControlName="ownerName"
+        id="inputOwnerName"
+        placeholder="Namen eingeben"
+      />
+    </div>
+
+    <!-- street -->
+    <div class="form-group mb-2">
+      <label for="inputStreet">Straße und Hausnummer</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <input
+        *ngIf="!isLoading"
+        type="text"
+        [ngClass]="{
+          'is-valid': companyForm.controls['street'].valid && companyForm.controls['street'].touched,
+          'is-invalid': companyForm.controls['street'].invalid && companyForm.controls['street'].touched
+        }"
+        class="form-control"
+        formControlName="street"
+        id="inputStreet"
+        placeholder="Straße und Hausnummer eingeben"
+      />
+    </div>
+
+    <!-- zip code -->
+    <div class="form-group mb-2">
+      <label for="inputZipCode">Postleitzahl</label>
+
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <div class="input-group" *ngIf="!isLoading">
+        <input
+          type="text"
+          [ngClass]="{
+            'is-valid': companyForm.controls['zipCode'].valid && companyForm.controls['zipCode'].touched,
+            'is-invalid': companyForm.controls['zipCode'].invalid && companyForm.controls['zipCode'].touched
+          }"
+          maxlength="5"
+          class="form-control"
+          formControlName="zipCode"
+          id="inputZipCode"
+          placeholder="PLZ eingeben"
+        />
+        <span class="input-group-text">{{ cityName }}</span>
+      </div>
+    </div>
+
+    <!-- service id -->
+    <div class="form-group mb-2">
+      <label for="inputserviceId">Angebots-ID</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <input
+        *ngIf="!isLoading"
+        type="text"
+        [ngClass]="{
+          'is-valid': companyForm.controls['serviceId'].valid && companyForm.controls['serviceId'].touched,
+          'is-invalid': companyForm.controls['serviceId'].invalid && companyForm.controls['serviceId'].touched
+        }"
+        class="form-control"
+        formControlName="serviceId"
+        id="inputserviceId"
+        placeholder="ID eingeben"
+      />
+    </div>
+
+    <!-- Date of recognition -->
+    <div class="form-group mb-2">
+      <label for="inputRecognitionDate">Anerkennungsdatum</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <input
+        *ngIf="!isLoading"
+        type="date"
+        [ngClass]="{
+          'is-valid': companyForm.controls['recognitionDate'].valid && companyForm.controls['recognitionDate'].touched,
+          'is-invalid': companyForm.controls['recognitionDate'].invalid && companyForm.controls['recognitionDate'].touched
+        }"
+        class="form-control"
+        formControlName="recognitionDate"
+        id="inputRecognitionDate"
+        placeholder="Datum wählen"
+      />
+    </div>
+
+    <!-- institution code -->
+    <div class="form-group mb-2">
+      <label for="inputInstitutionCode">IK-Nummer</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <input
+        *ngIf="!isLoading"
+        maxlength="10"
+        type="text"
+        [ngClass]="{
+          'is-valid': companyForm.controls['institutionCode'].valid && companyForm.controls['institutionCode'].touched,
+          'is-invalid': companyForm.controls['institutionCode'].invalid && companyForm.controls['institutionCode'].touched
+        }"
+        class="form-control"
+        formControlName="institutionCode"
+        id="inputInstitutionCode"
+        placeholder="ID eingeben"
+      />
+    </div>
+
+    <!-- tax number -->
+    <div class="form-group mb-2">
+      <label for="inputTaxNumber">Steuernummer</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <input
+        *ngIf="!isLoading"
+        maxlength="10"
+        type="text"
+        [ngClass]="{
+          'is-valid': companyForm.controls['taxNumber'].valid && companyForm.controls['taxNumber'].touched,
+          'is-invalid': companyForm.controls['taxNumber'].invalid && companyForm.controls['taxNumber'].touched
+        }"
+        class="form-control"
+        formControlName="taxNumber"
+        id="inputTaxNumber"
+        placeholder="Steuernummer eingeben"
+      />
+    </div>
+
+    <!-- banking info -->
+    <div class="form-group mb-2">
+      <label for="inputIban">Bankverbindung</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <div class="input-group" *ngIf="!isLoading">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="iban"
+          id="inputIban"
+          [ngClass]="{
+            'is-valid': companyForm.controls['iban'].valid && companyForm.controls['iban'].touched,
+            'is-invalid': companyForm.controls['iban'].invalid && companyForm.controls['iban'].touched
+          }"
+          placeholder="IBAN eingeben"
+        />
+        <input
+          type="text"
+          [ngClass]="{
+            'is-valid': companyForm.controls['bic'].valid && companyForm.controls['bic'].touched,
+            'is-invalid': companyForm.controls['bic'].invalid && companyForm.controls['bic'].touched
+          }"
+          class="form-control"
+          formControlName="bic"
+          id="inputBic"
+          placeholder="BIC eingeben"
+        />
+      </div>
+    </div>
+
+    <!-- hour price -->
+    <div class="form-group mb-2">
+      <label for="inputPricePerHour">Preis der Betreuungsleistung in Euro pro Stunde</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <div class="input-group">
+        <span class="input-group-text">EUR</span>
+        <input
+          *ngIf="!isLoading"
+          min="0"
+          maxlength="10"
+          type="number"
+          [ngClass]="{
+            'is-valid': companyForm.controls['pricePerHour'].valid && companyForm.controls['pricePerHour'].touched,
+            'is-invalid': companyForm.controls['pricePerHour'].invalid && companyForm.controls['pricePerHour'].touched
+          }"
+          class="form-control"
+          formControlName="pricePerHour"
+          id="inputPricePerHour"
+          placeholder="Preis eingeben"
+        />
+      </div>
+    </div>
+
+    <!-- employee wage -->
+    <div class="form-group mb-2">
+      <label for="inputEmployeeSalary">Stundenlohn für einen Mitarbeiter</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <div class="input-group">
+        <span class="input-group-text">EUR</span>
+        <input
+          *ngIf="!isLoading"
+          min="0"
+          type="number"
+          [ngClass]="{
+            'is-valid': companyForm.controls['employeeSalary'].valid && companyForm.controls['employeeSalary'].touched,
+            'is-invalid': companyForm.controls['employeeSalary'].invalid && companyForm.controls['employeeSalary'].touched
+          }"
+          class="form-control"
+          formControlName="employeeSalary"
+          id="inputEmployeeSalary"
+          placeholder="Stundenlohn eingeben"
+        />
+      </div>
+    </div>
+
+    <!-- ride fee -->
+    <div class="form-group mb-2">
+      <label for="inputRideCostsType">Anfahrtskosten</label>
+      <ngx-skeleton-loader *ngIf="isLoading" />
+      <div class="input-group" *ngIf="!isLoading">
+        <select class="form-select" formControlName="rideCostsType" placeholder="Versicherungsstatus" id="inputRideCostsType">
+          <option value="0">Inklusive</option>
+          <option value="1">Je Einsatz</option>
+          <option value="2">Je Kilometer</option>
+        </select>
+        <span class="input-group-text">EUR</span>
+        <input
+          type="number"
+          min="0"
+          [ngClass]="{
+            'is-valid': companyForm.controls['rideCosts'].valid && companyForm.controls['rideCosts'].touched,
+            'is-invalid': companyForm.controls['rideCosts'].invalid && companyForm.controls['rideCosts'].touched
+          }"
+          class="form-control"
+          formControlName="rideCosts"
+          id="inputRideCosts"
+        />
+      </div>
+    </div>
+
+    <button [disabled]="!companyForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      <span>Daten speichern</span>
+      <span *ngIf="isSaving">...</span>
+    </button>
+    <button type="button" [routerLink]="['/dashboard/employees']" class="btn btn-outline-secondary m-3">Verwerfen</button>
+  </form>
+</div>

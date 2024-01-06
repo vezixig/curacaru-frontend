@@ -12,6 +12,7 @@ import { Insurance } from '../models/insurance.model';
 import { Appointment } from '../models/appointment.model';
 import { DateTimeService } from './date-time.service';
 import { UserEmployee } from '../models/user-employee.model';
+import { Company } from '../models/company.model';
 
 @Injectable({
   providedIn: 'root',
@@ -84,6 +85,9 @@ export class ApiService {
   /** Gets the city name for the given zip code */
   getCityName = (zipCode: string) => this.httpClient.get(`${this.apiUrl}/address/city/${zipCode}`, { responseType: 'text' }).pipe(first());
 
+  /** Gets the company for the current user */
+  getCompany = () => this.httpClient.get<Company>(`${this.apiUrl}/company`).pipe(first());
+
   /** Gets the customer for the given id */
   getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`).pipe(first());
 
@@ -119,6 +123,9 @@ export class ApiService {
     const serializedData = JSON.stringify(appointment, this.customSerializer);
     return this.httpClient.put(`${this.apiUrl}/appointment`, serializedData, this.jsonHeader).pipe(first());
   }
+
+  /** Updates the company */
+  updateCompany = (company: Company) => this.httpClient.put(`${this.apiUrl}/company`, company).pipe(first());
 
   /** Updates the customer */
   updateCustomer = (customer: Customer) => this.httpClient.put(`${this.apiUrl}/customer`, customer).pipe(first());
