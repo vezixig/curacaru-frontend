@@ -27,16 +27,25 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   isNew: boolean = true;
   isSaving: boolean = false;
+  cityName = '';
 
   private insuranceId?: UUID;
   private getInsuranceSubscription?: Subscription;
   private postInsuranceSubscription?: Subscription;
   private updateInsuranceSubscription?: Subscription;
+  private changeZipCodeSubscription?: Subscription;
+  private getZipCodeSubscription?: Subscription;
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
     this.insuranceForm = this.formBuilder.group({
       name: ['', [Validators.required]],
       institutionCode: ['', [Validators.required, ValidateInstitutionCode]],
+      street: [''],
+      zipCode: [''],
+    });
+
+    this.changeZipCodeSubscription = this.insuranceForm.get('zipCode')?.valueChanges.subscribe((value) => {
+      this.handleZipCodeChange(value);
     });
   }
 
@@ -44,6 +53,7 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
     this.getInsuranceSubscription?.unsubscribe();
     this.postInsuranceSubscription?.unsubscribe();
     this.updateInsuranceSubscription?.unsubscribe();
+    this.changeZipCodeSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -51,6 +61,23 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
       this.isNew = true;
     } else {
       this.loadAppointment();
+    }
+  }
+
+  // Tries to get the name of the city for the entered zip code
+  handleZipCodeChange(zipCode: string) {
+    this.cityName = '';
+    if (zipCode.length == 5) {
+      this.getZipCodeSubscription?.unsubscribe();
+      this.getZipCodeSubscription = this.apiService.getCityName(zipCode).subscribe({
+        next: (result) => (this.cityName = result),
+        error: (error) => {
+          this.cityName = 'Unbekannte PLZ';
+          this.insuranceForm.get('zipCode')?.setErrors({ unknownZipCode: true });
+        },
+      });
+    } else {
+      this.insuranceForm.get('zipCode')?.setErrors({ invalidZipCode: true });
     }
   }
 
@@ -63,6 +90,8 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
         this.insuranceForm.patchValue({
           name: result.name,
           institutionCode: result.institutionCode,
+          street: result.street,
+          zipCode: result.zipCode,
         });
         this.isLoading = false;
       },
@@ -82,6 +111,9 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
     const insurance: Insurance = {
       id: this.insuranceId,
       name: this.insuranceForm.value.name,
+      street: this.insuranceForm.value.street,
+      zipCode: this.insuranceForm.value.zipCode,
+      city: '',
       institutionCode: this.insuranceForm.value.institutionCode,
     };
 

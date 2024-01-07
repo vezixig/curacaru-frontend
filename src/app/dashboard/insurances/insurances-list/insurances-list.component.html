@@ -6,12 +6,17 @@
       <tr>
         <th scope="col">Versicherung</th>
         <th scope="col">IK-Nummer</th>
+        <th scope="col">Straße</th>
+        <th scope="col">PLZ</th>
+        <th scope="col">Ort</th>
         <th class="text-center" scope="col">Aktion</th>
       </tr>
     </thead>
     <tbody>
       <ng-container *ngIf="isLoading$ | async">
         <tr *ngFor="let _ of [].constructor(3)">
+          <td><ngx-skeleton-loader /></td>
+          <td><ngx-skeleton-loader /></td>
           <td><ngx-skeleton-loader /></td>
           <td><ngx-skeleton-loader /></td>
           <td></td>
@@ -21,8 +26,11 @@
       <tr *ngFor="let insurance of insurances$ | async">
         <td>{{ insurance.name }}</td>
         <td>{{ insurance.institutionCode }}</td>
+        <td>{{ insurance.street }}</td>
+        <td>{{ insurance.zipCode }}</td>
+        <td>{{ insurance.city }}</td>
         <td class="text-center">
-          <div class="btn-group" role="group">
+          <div class="btn-group" role="group" *ngIf="insurance.companyId !== null">
             <button type="button" [routerLink]="['/dashboard/insurances', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Versicherung bearbeiten">
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
