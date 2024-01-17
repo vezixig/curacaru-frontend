@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 
@@ -6,7 +6,7 @@ import { AuthService } from '@auth0/auth0-angular';
   selector: 'cura-login',
   standalone: true,
   templateUrl: './login.component.html',
-  imports: [CommonModule],
+  imports: [],
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {

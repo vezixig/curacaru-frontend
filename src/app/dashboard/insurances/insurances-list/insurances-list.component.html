@@ -13,33 +13,39 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngIf="isLoading$ | async">
-        <tr *ngFor="let _ of [].constructor(3)">
-          <td><ngx-skeleton-loader /></td>
-          <td><ngx-skeleton-loader /></td>
-          <td><ngx-skeleton-loader /></td>
-          <td><ngx-skeleton-loader /></td>
-          <td></td>
-        </tr>
-      </ng-container>
+      @if (isLoading$ | async) {
+        @for (_ of [].constructor(3); track _) {
+          <tr>
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td><ngx-skeleton-loader /></td>
+            <td></td>
+          </tr>
+        }
+      }
 
-      <tr *ngFor="let insurance of insurances$ | async">
-        <td>{{ insurance.name }}</td>
-        <td>{{ insurance.institutionCode }}</td>
-        <td>{{ insurance.street }}</td>
-        <td>{{ insurance.zipCode }}</td>
-        <td>{{ insurance.city }}</td>
-        <td class="text-center">
-          <div class="btn-group" role="group" *ngIf="insurance.companyId !== null">
-            <button type="button" [routerLink]="['/dashboard/insurances', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Versicherung bearbeiten">
-              <fa-icon [icon]="faGear" [fixedWidth]="true" />
-            </button>
-            <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Versicherung löschen">
-              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-            </button>
-          </div>
-        </td>
-      </tr>
+      @for (insurance of insurances$ | async; track insurance) {
+        <tr>
+          <td>{{ insurance.name }}</td>
+          <td>{{ insurance.institutionCode }}</td>
+          <td>{{ insurance.street }}</td>
+          <td>{{ insurance.zipCode }}</td>
+          <td>{{ insurance.city }}</td>
+          <td class="text-center">
+            @if (insurance.companyId !== null) {
+              <div class="btn-group" role="group">
+                <button type="button" [routerLink]="['/dashboard/insurances', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Versicherung bearbeiten">
+                  <fa-icon [icon]="faGear" [fixedWidth]="true" />
+                </button>
+                <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Versicherung löschen">
+                  <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+                </button>
+              </div>
+            }
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

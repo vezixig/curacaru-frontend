@@ -18,10 +18,12 @@
           <span ngbDropdownItem
             >Angemeldet als:<br />
             {{ user?.firstName }} {{ user?.lastName }}</span
-          >
-          <span ngbDropdownItem *ngIf="user?.isManager" class="text-primary">Manager</span>
+            >
+            @if (user?.isManager) {
+              <span ngbDropdownItem class="text-primary">Manager</span>
+            }
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</nav>
+  </nav>

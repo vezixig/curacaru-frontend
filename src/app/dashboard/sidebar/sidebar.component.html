@@ -1,11 +1,13 @@
 <div class="d-flex flex-column flex-shrink-0 p-3 bg-white border" style="width: 280px; height: 100%">
   <ul class="nav nav-pills flex-column mb-auto">
-    <li *ngIf="isManager" class="nav-item">
+    @if (isManager) {
+    <li class="nav-item">
       <a class="nav-link" routerLink="/dashboard/employees" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faUsersGear" [fixedWidth]="true" />
         Mitarbeiter
       </a>
     </li>
+    }
     <li>
       <a class="nav-link" routerLink="/dashboard/customers" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faPersonCane" [fixedWidth]="true" />
@@ -18,32 +20,33 @@
         Termine
       </a>
     </li>
-    <!-- <li>
-      <a href="#" class="nav-link link-dark">
-        <fa-icon [icon]="faUserClock" [fixedWidth]="true" />
-        Arbeitszeiterfassung
-      </a>
-    </li>
     <li>
-      <a href="#" class="nav-link link-dark">
+      <a class="nav-link" routerLink="/dashboard/deployment" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faClipboard" [fixedWidth]="true" />
         Einsatznachweise
       </a>
-    </li> -->
+    </li>
+    <!-- <li>
+    <a href="#" class="nav-link link-dark">
+      <fa-icon [icon]="faUserClock" [fixedWidth]="true" />
+      Arbeitszeiterfassung
+    </a>
+  </li>-->
 
     <div clasS="my-2"></div>
-
-    <li *ngIf="isManager" class="nav-item">
+    @if(isManager) {
+    <li class="nav-item">
       <a class="nav-link" routerLink="/dashboard/company" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faPersonShelter" [fixedWidth]="true" />
         Unternehmensdaten
       </a>
     </li>
-    <li *ngIf="isManager" class="nav-item">
+    <li class="nav-item">
       <a class="nav-link" routerLink="/dashboard/insurances" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faBuilding" [fixedWidth]="true" />
         Versicherungen
       </a>
     </li>
+    }
   </ul>
 </div>

@@ -1,5 +1,6 @@
 import { UUID } from 'angular2-uuid';
 import { Insurance } from './insurance.model';
+import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 
 export interface Customer {
   associatedEmployeeId: UUID;
@@ -19,10 +20,4 @@ export interface Customer {
   phone: string;
   street: string;
   zipCode: string;
-}
-
-enum InsuranceStatus {
-  Statutory = 0,
-  Private = 1,
-  SelfPayment = 2,
 }

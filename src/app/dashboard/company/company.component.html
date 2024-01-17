@@ -4,16 +4,20 @@
     <!-- company name -->
     <div class="form-group">
       <label for="inputName">Name des Angebots</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
-      <input *ngIf="!isLoading" type="text" class="form-control" formControlName="name" id="inputName" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
+      <input type="text" class="form-control" formControlName="name" id="inputName" />
+      }
     </div>
 
     <!-- owner name -->
     <div class="form-group">
       <label for="inputOwnerName">Vor- und Nachname (nur bei Privatadresse)</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
       <input
-        *ngIf="!isLoading"
         type="text"
         [ngClass]="{
           'is-valid': companyForm.controls['ownerName'].valid && companyForm.controls['ownerName'].touched,
@@ -24,14 +28,16 @@
         id="inputOwnerName"
         placeholder="Namen eingeben"
       />
+      }
     </div>
 
     <!-- street -->
     <div class="form-group mb-2">
       <label for="inputStreet">Straße und Hausnummer</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
       <input
-        *ngIf="!isLoading"
         type="text"
         [ngClass]="{
           'is-valid': companyForm.controls['street'].valid && companyForm.controls['street'].touched,
@@ -42,14 +48,17 @@
         id="inputStreet"
         placeholder="Straße und Hausnummer eingeben"
       />
+      }
     </div>
 
     <!-- zip code -->
     <div class="form-group mb-2">
       <label for="inputZipCode">Postleitzahl</label>
 
-      <ngx-skeleton-loader *ngIf="isLoading" />
-      <div class="input-group" *ngIf="!isLoading">
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
+      <div class="input-group">
         <input
           type="text"
           [ngClass]="{
@@ -64,14 +73,16 @@
         />
         <span class="input-group-text">{{ cityName }}</span>
       </div>
+      }
     </div>
 
     <!-- service id -->
     <div class="form-group mb-2">
       <label for="inputserviceId">Angebots-ID</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
       <input
-        *ngIf="!isLoading"
         type="text"
         [ngClass]="{
           'is-valid': companyForm.controls['serviceId'].valid && companyForm.controls['serviceId'].touched,
@@ -82,14 +93,16 @@
         id="inputserviceId"
         placeholder="ID eingeben"
       />
+      }
     </div>
 
     <!-- Date of recognition -->
     <div class="form-group mb-2">
       <label for="inputRecognitionDate">Anerkennungsdatum</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
       <input
-        *ngIf="!isLoading"
         type="date"
         [ngClass]="{
           'is-valid': companyForm.controls['recognitionDate'].valid && companyForm.controls['recognitionDate'].touched,
@@ -100,14 +113,16 @@
         id="inputRecognitionDate"
         placeholder="Datum wählen"
       />
+      }
     </div>
 
     <!-- institution code -->
     <div class="form-group mb-2">
       <label for="inputInstitutionCode">IK-Nummer</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
       <input
-        *ngIf="!isLoading"
         maxlength="10"
         type="text"
         [ngClass]="{
@@ -119,14 +134,16 @@
         id="inputInstitutionCode"
         placeholder="ID eingeben"
       />
+      }
     </div>
 
     <!-- tax number -->
     <div class="form-group mb-2">
       <label for="inputTaxNumber">Steuernummer</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
       <input
-        *ngIf="!isLoading"
         maxlength="10"
         type="text"
         [ngClass]="{
@@ -138,13 +155,16 @@
         id="inputTaxNumber"
         placeholder="Steuernummer eingeben"
       />
+      }
     </div>
 
     <!-- banking info -->
     <div class="form-group mb-2">
       <label for="inputIban">Bankverbindung</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
-      <div class="input-group" *ngIf="!isLoading">
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
+      <div class="input-group">
         <input
           type="text"
           class="form-control"
@@ -168,16 +188,19 @@
           placeholder="BIC eingeben"
         />
       </div>
+      }
     </div>
 
     <!-- hour price -->
     <div class="form-group mb-2">
       <label for="inputPricePerHour">Preis der Betreuungsleistung in Euro pro Stunde</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      }
       <div class="input-group">
         <span class="input-group-text">EUR</span>
+        @if(!isLoading) {
         <input
-          *ngIf="!isLoading"
           min="0"
           maxlength="10"
           type="number"
@@ -190,17 +213,20 @@
           id="inputPricePerHour"
           placeholder="Preis eingeben"
         />
+        }
       </div>
     </div>
 
     <!-- employee wage -->
     <div class="form-group mb-2">
       <label for="inputEmployeeSalary">Stundenlohn für einen Mitarbeiter</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      }
       <div class="input-group">
         <span class="input-group-text">EUR</span>
+        @if(!isLoading) {
         <input
-          *ngIf="!isLoading"
           min="0"
           type="number"
           [ngClass]="{
@@ -212,14 +238,17 @@
           id="inputEmployeeSalary"
           placeholder="Stundenlohn eingeben"
         />
+        }
       </div>
     </div>
 
     <!-- ride fee -->
     <div class="form-group mb-2">
       <label for="inputRideCostsType">Anfahrtskosten</label>
-      <ngx-skeleton-loader *ngIf="isLoading" />
-      <div class="input-group" *ngIf="!isLoading">
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
+      <div class="input-group">
         <select class="form-select" formControlName="rideCostsType" placeholder="Versicherungsstatus" id="inputRideCostsType">
           <option value="0">Inklusive</option>
           <option value="1">Je Einsatz</option>
@@ -238,12 +267,17 @@
           id="inputRideCosts"
         />
       </div>
+      }
     </div>
 
     <button [disabled]="!companyForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
-      <span *ngIf="isSaving" class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      @if (isSaving) {
+      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      }
       <span>Daten speichern</span>
-      <span *ngIf="isSaving">...</span>
+      @if (isSaving) {
+      <span>...</span>
+      }
     </button>
     <button type="button" [routerLink]="['/dashboard/employees']" class="btn btn-outline-secondary m-3">Verwerfen</button>
   </form>

@@ -13,6 +13,8 @@ import { Appointment } from '../models/appointment.model';
 import { DateTimeService } from './date-time.service';
 import { UserEmployee } from '../models/user-employee.model';
 import { Company } from '../models/company.model';
+import { Deployment } from '@curacaru/models/deployment.model';
+import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -93,6 +95,13 @@ export class ApiService {
 
   /** Gets the list of customers from the API */
   getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`).pipe(first());
+
+  /** Gets a deployment report */
+  getDeploymentReport = (year: number, month: number, customerId: UUID, insuranceStatus: InsuranceStatus) =>
+    this.httpClient.get(`${this.apiUrl}/deployment/report/${year}/${month}/${customerId}/${insuranceStatus}`, { responseType: 'blob' }).pipe(first());
+
+  /** Gets the list of deployments for the current employee */
+  getDeployments = (year: number, month: number) => this.httpClient.get<Deployment[]>(`${this.apiUrl}/deployment/${year}/${month}`).pipe(first());
 
   /** Gets the employee for the given id */
   getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`).pipe(first());

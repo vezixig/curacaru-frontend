@@ -1,4 +1,5 @@
-<cura-dashboard *ngIf="isAuthenticated; else login" />
-<ng-template #login>
-  <cura-login />
-</ng-template>
+@if (isAuthenticated) {
+<cura-dashboard />
+} @else {
+<cura-login />
+}

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { LoginComponent } from './auth/login/login.component';
@@ -8,7 +8,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, DashboardComponent, LoginComponent],
+  imports: [DashboardComponent, LoginComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

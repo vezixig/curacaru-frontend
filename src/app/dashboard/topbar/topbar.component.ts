@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
@@ -12,7 +12,7 @@ import { UserService } from '../../services/user.service';
   selector: 'cura-topbar',
   standalone: true,
   templateUrl: './topbar.component.html',
-  imports: [CommonModule, NgbDropdownModule, FontAwesomeModule],
+  imports: [NgbDropdownModule, FontAwesomeModule],
 })
 export class TopbarComponent implements OnInit {
   faUser = faUser;

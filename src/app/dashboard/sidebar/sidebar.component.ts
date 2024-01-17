@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -10,7 +10,7 @@ import { UserService } from '../../services/user.service';
   selector: 'cura-sidebar',
   standalone: true,
   templateUrl: './sidebar.component.html',
-  imports: [CommonModule, FontAwesomeModule, RouterLink, RouterLinkActive],
+  imports: [FontAwesomeModule, RouterLink, RouterLinkActive],
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {

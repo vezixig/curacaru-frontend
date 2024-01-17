@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Employee } from '../../../models/employee.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,7 +13,7 @@ import { ApiService } from '../../../services/api.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
 @Component({
-  imports: [CommonModule, FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule],
+  imports: [FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule],
   providers: [ApiService],
   selector: 'cura-employee-list',
   standalone: true,
