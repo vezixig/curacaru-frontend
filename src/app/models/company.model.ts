@@ -21,4 +21,5 @@ enum RideCostsType {
   Inclusive,
   FlatRate,
   Kilometer,
+  None,
 }
