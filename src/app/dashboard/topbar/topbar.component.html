@@ -1,4 +1,4 @@
-<nav class="navbar bg-white" style="max-height: 60px; overflow: hidden">
+<nav class="navbar bg-white" style="max-height: 60px; min-height: 60px; overflow: hidden">
   <div class="container-fluid align-items-center">
     <p class="navbar-brand p-0 m-0" href="#">
       <img src="../assets/img/logo_text.png" alt="Logo" height="30" class="d-inline-block align-text-top" />
@@ -18,12 +18,12 @@
           <span ngbDropdownItem
             >Angemeldet als:<br />
             {{ user?.firstName }} {{ user?.lastName }}</span
-            >
-            @if (user?.isManager) {
-              <span ngbDropdownItem class="text-primary">Manager</span>
-            }
-          </div>
+          >
+          @if (user?.isManager) {
+          <span ngbDropdownItem class="text-primary">Manager</span>
+          }
         </div>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>

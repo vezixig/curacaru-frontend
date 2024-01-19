@@ -7,5 +7,16 @@ a:active {
 }
 
 a:hover {
-  color: #FF7F02;
+  color: #ff7f02;
+}
+
+.sidebar {
+  width: 280px;
+  height: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+.shadow-right {
+  box-shadow: 3px -3px 10px lightgrey;
 }
