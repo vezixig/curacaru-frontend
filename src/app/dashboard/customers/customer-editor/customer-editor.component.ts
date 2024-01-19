@@ -63,23 +63,24 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private userService: UserService, private toastr: ToastrService) {
     this.isManager = this.userService.user?.isManager ?? false;
     this.customerForm = this.formBuilder.group({
-      firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-      lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-      street: ['', [Validators.required, Validators.maxLength(150)]],
-      zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
-      insuranceId: [''],
-      insuredPersonNumber: ['', [ValidateInsuredPersonNumber]],
+      associatedEmployeeId: ['', [Validators.required]],
+      birthDate: ['', [Validators.required]],
+      careLevel: [1, [Validators.required]],
+      declarationsOfAssignment: [[]],
+      doClearanceCareBenefit: [false],
+      doClearanceReliefAmount: [false],
       emergencyContactName: [''],
       emergencyContactPhone: [''],
-      birthDate: ['', [Validators.required]],
-      phone: [''],
-      careLevel: [1, [Validators.required]],
+      firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      insuranceId: [''],
       insuranceStatus: ['', [Validators.required]],
+      insuredPersonNumber: ['', [ValidateInsuredPersonNumber]],
       isCareContractAvailable: [false],
-      declarationsOfAssignment: [[]],
-      associatedEmployeeId: ['', [Validators.required]],
-      doClearanceReliefAmount: [false],
-      doClearanceCareBenefit: [false],
+      lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      phone: [''],
+      salutation: [0],
+      street: ['', [Validators.required, Validators.maxLength(150)]],
+      zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
     });
 
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
@@ -162,21 +163,24 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       birthDate: this.customerForm.get('birthDate')?.value,
       careLevel: this.customerForm.get('careLevel')?.value,
       declarationsOfAssignment: this.customerForm.get('declarationsOfAssignment')?.value,
+      doClearanceCareBenefit: this.customerForm.get('doClearanceCareBenefit')?.value,
+      doClearanceReliefAmount: this.customerForm.get('doClearanceReliefAmount')?.value,
       emergencyContactName: this.customerForm.get('emergencyContactName')?.value,
       emergencyContactPhone: this.customerForm.get('emergencyContactPhone')?.value,
       firstName: this.customerForm.get('firstName')?.value,
       id: this.isNew ? undefined : this.customerId,
       insuranceId: this.customerForm.get('insuranceId')?.value,
-      insuranceStatus: parseInt(this.customerForm.get('insuranceStatus')?.value),
+      insuranceStatus: +this.customerForm.get('insuranceStatus')?.value,
       insuredPersonNumber: this.customerForm.get('insuredPersonNumber')?.value,
       isCareContractAvailable: this.customerForm.get('isCareContractAvailable')?.value,
       lastName: this.customerForm.get('lastName')?.value,
       phone: this.customerForm.get('phone')?.value,
+      salutation: +this.customerForm.get('salutation')?.value,
       street: this.customerForm.get('street')?.value,
       zipCode: this.customerForm.get('zipCode')?.value,
-      doClearanceReliefAmount: this.customerForm.get('doClearanceReliefAmount')?.value,
-      doClearanceCareBenefit: this.customerForm.get('doClearanceCareBenefit')?.value,
     };
+
+    console.log(customer);
 
     customer.insuranceId = customer.insuranceId === '' ? undefined : customer.insuranceId;
 
@@ -219,6 +223,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           isCareContractAvailable: result.isCareContractAvailable,
           lastName: result.lastName,
           phone: result.phone,
+          salutation: result.salutation,
           street: result.street,
           zipCode: result.zipCode,
           doClearanceReliefAmount: result.doClearanceReliefAmount,

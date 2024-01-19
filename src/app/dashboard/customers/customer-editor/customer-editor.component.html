@@ -28,12 +28,17 @@
       }
     </div>
 
+    <!-- salutation, first and lastname -->
     <div class="form-group mb-3">
-      <label for="inputFirstName">Vor- und Nachname</label>
+      <label for="selectSalutation">Anrede, Vor- und Nachname</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
       <div class="input-group">
+        <select class="form-select" id="selectSalutation" formControlName="salutation">
+          <option value="0">Frau</option>
+          <option value="1">Herr</option>
+        </select>
         <input
           type="text"
           class="form-control"

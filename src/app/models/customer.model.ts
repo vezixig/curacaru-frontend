@@ -1,6 +1,7 @@
 import { UUID } from 'angular2-uuid';
 import { Insurance } from './insurance.model';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
+import { Gender } from '@curacaru/enums/gender.enum';
 
 export interface Customer {
   associatedEmployeeId: UUID;
@@ -18,16 +19,18 @@ export interface Customer {
   isCareContractAvailable: boolean;
   lastName: string;
   phone: string;
+  /** The salutation of the customer based on the gender */
+  salutation: Gender;
   street: string;
   zipCode: string;
   /**
-   * Gets or sets a value indicating whether clearance can be done through the relief amount.
+   * A value indicating whether clearance can be done through the relief amount.
    * @see https://www.bundesgesundheitsministerium.de/entlastungsbetrag
    */
   doClearanceReliefAmount: boolean;
 
   /**
-   * Gets or sets a value indicating whether clearance can be done through care benefit in kind.
+   * A value indicating whether clearance can be done through care benefit in kind.
    * @see https://www.bundesgesundheitsministerium.de/pflegedienst-und-pflegesachleistungen
    */
   doClearanceCareBenefit: boolean;
