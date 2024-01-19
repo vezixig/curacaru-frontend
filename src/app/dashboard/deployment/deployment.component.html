@@ -13,20 +13,6 @@
         }
       </select>
     </div>
-    <div class="col">
-      <label for="monthSelect">Monat</label>
-      <select class="form-select" name="monthSelect" [(ngModel)]="selectedMonth" (change)="onDateChanged()">
-        @for(month of months; track month; let i = $index) {
-        <option [value]="i">
-          {{ month | date : "MMMM" }}
-        </option>
-        }
-      </select>
-    </div>
-    <div class="col">
-      <label for="yearInput">Jahr</label>
-      <input class="form-control" name="yearInput" type="number" [(ngModel)]="selectedYear" (change)="onDateChanged()" />
-    </div>
   </div>
 </form>
 

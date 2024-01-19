@@ -26,9 +26,6 @@ export class DeploymentComponent implements OnDestroy, OnInit {
   customers: CustomerListEntry[] = [];
   isLoading: boolean = true;
   selectedCustomerId?: number;
-  months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((o) => new Date(2000, o, 2));
-  selectedMonth = new Date().getMonth();
-  selectedYear = new Date().getFullYear();
   filteredDeployments: Deployment[] = [];
 
   private deployments: Deployment[] = [];
@@ -56,9 +53,8 @@ export class DeploymentComponent implements OnDestroy, OnInit {
   }
 
   onDateChanged = () => {
-    this.selectedYear = isNaN(this.selectedYear) ? new Date().getFullYear() : Math.round(this.selectedYear);
     this.isLoading = true;
-    this.getDeploymentsSubscription = this.apiService.getDeployments(this.selectedYear, +this.selectedMonth + 1).subscribe({
+    this.getDeploymentsSubscription = this.apiService.getDeployments().subscribe({
       next: (result) => {
         this.deployments = result;
         this.isLoading = false;
@@ -71,13 +67,13 @@ export class DeploymentComponent implements OnDestroy, OnInit {
   };
 
   onDownloadReport = (deployment: Deployment) => {
-    this.apiService.getDeploymentReport(this.selectedYear, +this.selectedMonth + 1, deployment.customerId, deployment.insuranceStatus).subscribe({
+    this.apiService.getDeploymentReport(deployment.customerId, deployment.insuranceStatus).subscribe({
       next: (result) => {
         const blob = new Blob([result], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `Einsatznachweis_${this.selectedYear}_${+this.selectedMonth + 1}.pdf`;
+        link.download = `Einsatznachweis - ${deployment.customerName}.pdf`;
         link.click();
       },
       error: (error) => {

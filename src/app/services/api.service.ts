@@ -97,11 +97,10 @@ export class ApiService {
   getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`).pipe(first());
 
   /** Gets a deployment report */
-  getDeploymentReport = (year: number, month: number, customerId: UUID, insuranceStatus: InsuranceStatus) =>
-    this.httpClient.get(`${this.apiUrl}/deployment/report/${year}/${month}/${customerId}/${insuranceStatus}`, { responseType: 'blob' }).pipe(first());
+  getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) => this.httpClient.get(`${this.apiUrl}/deployment/report/${customerId}/${insuranceStatus}`, { responseType: 'blob' }).pipe(first());
 
   /** Gets the list of deployments for the current employee */
-  getDeployments = (year: number, month: number) => this.httpClient.get<Deployment[]>(`${this.apiUrl}/deployment/${year}/${month}`).pipe(first());
+  getDeployments = () => this.httpClient.get<Deployment[]>(`${this.apiUrl}/deployment/`).pipe(first());
 
   /** Gets the employee for the given id */
   getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`).pipe(first());
