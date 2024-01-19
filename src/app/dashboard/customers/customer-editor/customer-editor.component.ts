@@ -78,6 +78,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       isCareContractAvailable: [false],
       declarationsOfAssignment: [[]],
       associatedEmployeeId: ['', [Validators.required]],
+      doClearanceReliefAmount: [false],
+      doClearanceCareBenefit: [false],
     });
 
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
@@ -172,6 +174,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       phone: this.customerForm.get('phone')?.value,
       street: this.customerForm.get('street')?.value,
       zipCode: this.customerForm.get('zipCode')?.value,
+      doClearanceReliefAmount: this.customerForm.get('doClearanceReliefAmount')?.value,
+      doClearanceCareBenefit: this.customerForm.get('doClearanceCareBenefit')?.value,
     };
 
     customer.insuranceId = customer.insuranceId === '' ? undefined : customer.insuranceId;
@@ -217,6 +221,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           phone: result.phone,
           street: result.street,
           zipCode: result.zipCode,
+          doClearanceReliefAmount: result.doClearanceReliefAmount,
+          doClearanceCareBenefit: result.doClearanceCareBenefit,
         });
 
         this.selectedInsurance = result.insurance;
@@ -249,13 +255,29 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  // If the care level is set to 0, the insurance status must be self payment
   private onCareLEvelChange(value: any): void {
+    // If the care level is set to 0, the insurance status must be self payment
     if (value == 0) {
       this.customerForm.get('insuranceStatus')?.setValue(2);
       this.customerForm.get('insuranceStatus')?.disable();
     } else if (this.isManager) {
       this.customerForm.get('insuranceStatus')?.enable();
+    }
+
+    // If the care level is less than 1, the customer can't be cleared through the relief amount
+    if (value >= 1) {
+      this.customerForm.get('doClearanceReliefAmount')?.enable();
+    } else {
+      this.customerForm.get('doClearanceReliefAmount')?.setValue(false);
+      this.customerForm.get('doClearanceReliefAmount')?.disable();
+    }
+
+    // If the care level is less than 2, the customer can't be cleared through the care benefit
+    if (value >= 2) {
+      this.customerForm.get('doClearanceCareBenefit')?.enable();
+    } else {
+      this.customerForm.get('doClearanceCareBenefit')?.setValue(false);
+      this.customerForm.get('doClearanceCareBenefit')?.disable();
     }
   }
 }
