@@ -8,7 +8,7 @@ import { AppointmentsEditorComponent } from '@curacaru/dashboard/appointments/ap
 import { InsurancesListComponent } from '@curacaru/dashboard/insurances/insurances-list/insurances-list.component';
 import { InsurancesEditorComponent } from '@curacaru/dashboard/insurances/insurances-editor/insurances-editor.component';
 import { CompanyComponent } from '@curacaru/dashboard/company/company.component';
-import { DeploymentComponent } from '@curacaru/dashboard/deployment/deployment.component';
+import { DocumentsComponent } from './dashboard/documents/documents.component';
 
 export const routes: Routes = [
   {
@@ -31,8 +31,8 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'dashboard/deployment',
-    component: DeploymentComponent,
+    path: 'dashboard/documents',
+    component: DocumentsComponent,
   },
   {
     path: 'dashboard/employees',

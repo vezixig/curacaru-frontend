@@ -1,10 +1,9 @@
-
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { UserService } from '@curacaru/services/user.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCalendar, faClipboard } from '@fortawesome/free-regular-svg-icons';
-import { faBuilding, faPersonCane, faPersonShelter, faUserClock, faUsersGear } from '@fortawesome/free-solid-svg-icons';
-import { UserService } from '../../services/user.service';
+import { faCalendar } from '@fortawesome/free-regular-svg-icons';
+import { faBuilding, faFile, faPersonCane, faPersonShelter, faUserClock, faUsersGear } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'cura-sidebar',
@@ -16,17 +15,17 @@ import { UserService } from '../../services/user.service';
 export class SidebarComponent implements OnInit {
   faBuilding = faBuilding;
   faCalendar = faCalendar;
-  faClipboard = faClipboard;
   faPersonCane = faPersonCane;
   faPersonShelter = faPersonShelter;
   faUserClock = faUserClock;
   faUsersGear = faUsersGear;
+  faFile = faFile;
 
   isManager: boolean = false;
 
-  constructor(private _userService: UserService) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.isManager = this._userService.user?.isManager ?? false;
+    this.isManager = this.userService.user?.isManager ?? false;
   }
 }

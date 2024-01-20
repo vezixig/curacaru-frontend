@@ -13,7 +13,7 @@ import { Appointment } from '../models/appointment.model';
 import { DateTimeService } from './date-time.service';
 import { UserEmployee } from '../models/user-employee.model';
 import { Company } from '../models/company.model';
-import { Deployment } from '@curacaru/models/deployment.model';
+import { MinimalCustomerListEntry } from '@curacaru/models/minimal-customer-list-entry.model';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 
 @Injectable({
@@ -97,10 +97,13 @@ export class ApiService {
   getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`).pipe(first());
 
   /** Gets a deployment report */
-  getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) => this.httpClient.get(`${this.apiUrl}/deployment/report/${customerId}/${insuranceStatus}`, { responseType: 'blob' }).pipe(first());
+  getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) => this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' }).pipe(first());
 
-  /** Gets the list of deployments for the current employee */
-  getDeployments = () => this.httpClient.get<Deployment[]>(`${this.apiUrl}/deployment/`).pipe(first());
+  /** Gets an assignment declaration document */
+  getAssignmentDeclaration = (customerId: UUID, year: number) => this.httpClient.get(`${this.apiUrl}/document/assignment-declaration/${customerId}/${year}`, { responseType: 'blob' }).pipe(first());
+
+  /** Gets the list of customers with only minimal info */
+  getMinimalCustomerList = () => this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`).pipe(first());
 
   /** Gets the employee for the given id */
   getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`).pipe(first());

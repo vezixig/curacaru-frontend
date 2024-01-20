@@ -1,0 +1,58 @@
+<div class="row">
+  <h4>Dokumente</h4>
+</div>
+
+<form class="mt-3">
+  <div class="row">
+    <div class="col">
+      <label for="dpFromDate">Kunde</label>
+      <select class="form-select" name="customerSelect" [(ngModel)]="selectedCustomerId" (change)="onCustomerChanged()">
+        <option></option>
+        @for (customer of customers; track customer) {
+        <option [value]="customer.customerId">{{ customer.customerName }}</option>
+        }
+      </select>
+    </div>
+    <div class="col">
+      <label for="dpFromDate">Jahr</label>
+      <input [(ngModel)]="year" name="yearInput" type="number" class="form-control" (change)="onYearChanged()" />
+    </div>
+  </div>
+</form>
+
+<table class="col-12 table mt-3 table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Kunde</th>
+      <th scope="col">Versicherungsstatus</th>
+      <th class="text-center" scope="col">Aktion</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @if (isLoading) { @for (_ of [].constructor(3); track _) {
+    <tr>
+      <td><ngx-skeleton-loader /></td>
+      <td><ngx-skeleton-loader /></td>
+      <td></td>
+    </tr>
+    } } @for (deployment of filteredCustomers; track deployment) {
+    <tr>
+      <td>{{ deployment.customerName }}</td>
+      <td>{{ deployment.insuranceStatus | insuranceStatus }}</td>
+      <td>
+        <button type="button" (click)="onDownloadDeploymentReport(deployment)" class="btn btn-outline-secondary btn-sm m-1" title="Einsatznachweis herunterladen">
+          <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          Einsatznachweis
+        </button>
+        @if (deployment.insuranceStatus === InsuranceStatus.Statutory) {
+        <button type="button" (click)="onDownloadAssignmentDeclaration(deployment)" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen">
+          <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          Abtretungserklärung
+        </button>
+        }
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>

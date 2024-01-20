@@ -41,7 +41,7 @@ export class CompanyComponent implements OnDestroy, OnInit {
       serviceId: ['', [Validators.required, Validators.maxLength(150)]],
       recognitionDate: ['', [Validators.required]],
       institutionCode: ['', [Validators.required, ValidateInstitutionCode]],
-      taxNumber: ['', [Validators.required]],
+      taxNumber: [''],
       iban: ['', [Validators.required]],
       bic: ['', [Validators.required]],
       pricePerHour: ['', [Validators.required, ValidateCurrency]],

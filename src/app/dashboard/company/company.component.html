@@ -144,7 +144,7 @@
       <ngx-skeleton-loader />
       } @else {
       <input
-        maxlength="10"
+        maxlength="13"
         type="text"
         [ngClass]="{
           'is-valid': companyForm.controls['taxNumber'].valid && companyForm.controls['taxNumber'].touched,
@@ -193,7 +193,7 @@
 
     <!-- hour price -->
     <div class="form-group mb-2">
-      <label for="inputPricePerHour">Preis der Betreuungsleistung in Euro pro Stunde</label>
+      <label for="inputPricePerHour">Stundenlohn Unternehmen</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       }
@@ -219,7 +219,7 @@
 
     <!-- employee wage -->
     <div class="form-group mb-2">
-      <label for="inputEmployeeSalary">Stundenlohn für einen Mitarbeiter</label>
+      <label for="inputEmployeeSalary">Stundenlohn Mitarbeiter</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       }

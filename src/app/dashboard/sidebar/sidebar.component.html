@@ -21,19 +21,15 @@
       </a>
     </li>
     <li>
-      <a class="nav-link" routerLink="/dashboard/deployment" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
-        <fa-icon [icon]="faClipboard" [fixedWidth]="true" />
-        Einsatznachweise
+      <a class="nav-link" routerLink="/dashboard/documents" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
+        <fa-icon [icon]="faFile" [fixedWidth]="true" />
+        Dokumente
       </a>
     </li>
-    <!-- <li>
-    <a href="#" class="nav-link link-dark">
-      <fa-icon [icon]="faUserClock" [fixedWidth]="true" />
-      Arbeitszeiterfassung
-    </a>
-  </li>-->
 
+    <!-- separator -->
     <div clasS="my-2"></div>
+
     @if(isManager) {
     <li class="nav-item">
       <a class="nav-link" routerLink="/dashboard/company" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
