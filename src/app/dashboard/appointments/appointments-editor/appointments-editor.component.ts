@@ -18,6 +18,7 @@ import { UserService } from '../../../services/user.service';
 import { UserEmployee } from '../../../models/user-employee.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ApiService } from '../../../services/api.service';
+import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, FormsModule, NgbDatepickerModule, NgbTimepickerModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
@@ -28,6 +29,7 @@ import { ApiService } from '../../../services/api.service';
 })
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
+  RideCostType = RideCostsType;
 
   appointmentForm: FormGroup;
   canFinish: boolean = false;
@@ -51,15 +53,16 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService, private userService: UserService) {
     this.user = this.userService.user;
     this.appointmentForm = this.formBuilder.group({
-      isSignedByEmployee: [false],
-      isSignedByCustomer: [false],
-      notes: [''],
-      date: ['', [Validators.required]],
-      timeStart: ['', [Validators.required]],
-      timeEnd: ['', [Validators.required]],
       customerId: ['', [Validators.required]],
+      date: ['', [Validators.required]],
+      distanceToCustomer: [0],
       employeeId: [this.user?.isManager ? '' : this.user?.id, [Validators.required]],
       employeeReplacementId: [''],
+      isSignedByCustomer: [false],
+      isSignedByEmployee: [false],
+      notes: [''],
+      timeEnd: ['', [Validators.required]],
+      timeStart: ['', [Validators.required]],
     });
 
     // only managers can change the employee
@@ -101,14 +104,15 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
         next: (result) => {
           this.appointmentForm.patchValue({
             customerId: result.customerId,
+            date: DateTimeService.toNgbDate(result.date),
+            distanceToCustomer: result.distanceToCustomer,
             employeeId: result.employeeId,
             employeeReplacementId: result.employeeReplacementId,
-            date: DateTimeService.toNgbDate(result.date),
-            timeStart: DateTimeService.toNgbTime(result.timeStart),
-            timeEnd: DateTimeService.toNgbTime(result.timeEnd),
-            isSignedByEmployee: result.isSignedByEmployee,
             isSignedByCustomer: result.isSignedByCustomer,
+            isSignedByEmployee: result.isSignedByEmployee,
             notes: result.notes,
+            timeEnd: DateTimeService.toNgbTime(result.timeEnd),
+            timeStart: DateTimeService.toNgbTime(result.timeStart),
           });
 
           if (result.isDone) {
@@ -161,17 +165,18 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
   onSave() {
     const appointment: Appointment = {
-      id: this.appointmentId,
-      employeeId: this.appointmentForm.get('employeeId')?.value,
-      employeeReplacementId: this.appointmentForm.get('employeeReplacementId')?.value,
       customerId: this.appointmentForm.get('customerId')?.value,
       date: DateTimeService.toDate(this.appointmentForm.get('date')?.value),
-      timeStart: DateTimeService.toTime(this.appointmentForm.get('timeStart')?.value),
-      timeEnd: DateTimeService.toTime(this.appointmentForm.get('timeEnd')?.value),
-      isSignedByEmployee: this.appointmentForm.get('isSignedByEmployee')?.value,
-      isSignedByCustomer: this.appointmentForm.get('isSignedByCustomer')?.value,
-      notes: this.appointmentForm.get('notes')?.value,
+      distanceToCustomer: +this.appointmentForm.get('distanceToCustomer')?.value,
+      employeeId: this.appointmentForm.get('employeeId')?.value,
+      employeeReplacementId: this.appointmentForm.get('employeeReplacementId')?.value,
+      id: this.appointmentId,
       isDone: false,
+      isSignedByCustomer: this.appointmentForm.get('isSignedByCustomer')?.value,
+      isSignedByEmployee: this.appointmentForm.get('isSignedByEmployee')?.value,
+      notes: this.appointmentForm.get('notes')?.value,
+      timeEnd: DateTimeService.toTime(this.appointmentForm.get('timeEnd')?.value),
+      timeStart: DateTimeService.toTime(this.appointmentForm.get('timeStart')?.value),
     };
     appointment.employeeReplacementId = appointment.employeeReplacementId == '' ? undefined : appointment.employeeReplacementId;
 

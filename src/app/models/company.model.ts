@@ -1,4 +1,4 @@
-import { UUID } from 'angular2-uuid';
+import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
 
 export interface Company {
   bic: string;
@@ -15,11 +15,4 @@ export interface Company {
   street: string;
   taxNumber: string;
   zipCode: string;
-}
-
-enum RideCostsType {
-  Inclusive,
-  FlatRate,
-  Kilometer,
-  None,
 }

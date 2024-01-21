@@ -1,6 +1,4 @@
 import { Time } from '@angular/common';
-import { Customer } from './customer.model';
-import { Employee } from './employee.model';
 import { UUID } from 'angular2-uuid';
 
 export interface Appointment {
@@ -15,4 +13,5 @@ export interface Appointment {
   notes: string;
   timeEnd: Time;
   timeStart: Time;
+  distanceToCustomer?: number;
 }

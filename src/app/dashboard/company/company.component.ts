@@ -11,6 +11,7 @@ import { Employee } from '../../models/employee.model';
 import { ValidateInstitutionCode } from '../../validators/institution-code.validator';
 import { ValidateCurrency } from '../../validators/currency-validator';
 import { Company } from '../../models/company.model';
+import { UserService } from '@curacaru/services/user.service';
 
 @Component({
   imports: [CommonModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule],
@@ -32,7 +33,7 @@ export class CompanyComponent implements OnDestroy, OnInit {
   private changeZipCodeSubscription?: Subscription;
   private changePricePerHourSubscription?: Subscription;
 
-  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService, private userService: UserService) {
     this.companyForm = this.formBuilder.group({
       name: [{ value: '', disabled: true }, [Validators.required, Validators.maxLength(150)]],
       ownerName: ['', [Validators.maxLength(150)]],
@@ -114,6 +115,9 @@ export class CompanyComponent implements OnDestroy, OnInit {
     this.updateEmployeeSubscription?.unsubscribe();
     this.updateEmployeeSubscription = this.apiService.updateCompany(company).subscribe({
       complete: () => {
+        if (this.userService.user) {
+          this.userService.user.companyRideCostType = company.rideCostsType;
+        }
         this.toastr.success('Änderungen am Unternehmen wurden gespeichert');
         this.LoadCompany();
         this.isSaving = false;
