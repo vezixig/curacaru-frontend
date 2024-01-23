@@ -25,7 +25,7 @@ export interface Customer {
   zipCode: string;
   /**
    * A value indicating whether clearance can be done through the relief amount.
-   * @see https://www.bundesgesundheitsministerium.de/entlastungsbetrag
+   * @see https://www.bundesgesundheitsministerium.de/entlastungsbetrags
    */
   doClearanceReliefAmount: boolean;
 
@@ -34,4 +34,10 @@ export interface Customer {
    * @see https://www.bundesgesundheitsministerium.de/pflegedienst-und-pflegesachleistungen
    */
   doClearanceCareBenefit: boolean;
+
+  /**
+   * A value indicating whether clearance can be done through preventive care.
+   * @see https://www.gesetze-im-internet.de/sgb_11/__39.html
+   */
+  doClearancePreventiveCare: boolean;
 }

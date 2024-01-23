@@ -69,6 +69,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       declarationsOfAssignment: [[]],
       doClearanceCareBenefit: [false],
       doClearanceReliefAmount: [false],
+      doClearancePreventiveCare: [false],
       emergencyContactName: [''],
       emergencyContactPhone: [''],
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
@@ -83,6 +84,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
     });
 
+    this.onCareLEvelChange(this.customerForm.get('careLevel')?.value);
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
 
     if (!this.isManager) {
@@ -165,6 +167,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       declarationsOfAssignment: this.customerForm.get('declarationsOfAssignment')?.value,
       doClearanceCareBenefit: this.customerForm.get('doClearanceCareBenefit')?.value,
       doClearanceReliefAmount: this.customerForm.get('doClearanceReliefAmount')?.value,
+      doClearancePreventiveCare: this.customerForm.get('doClearancePreventiveCare')?.value,
       emergencyContactName: this.customerForm.get('emergencyContactName')?.value,
       emergencyContactPhone: this.customerForm.get('emergencyContactPhone')?.value,
       firstName: this.customerForm.get('firstName')?.value,
@@ -213,6 +216,9 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           birthDate: result.birthDate,
           careLevel: result.careLevel,
           declarationsOfAssignment: result.declarationsOfAssignment,
+          doClearanceCareBenefit: result.doClearanceCareBenefit,
+          doClearancePreventiveCare: result.doClearancePreventiveCare,
+          doClearanceReliefAmount: result.doClearanceReliefAmount,
           emergencyContactName: result.emergencyContactName,
           emergencyContactPhone: result.emergencyContactPhone,
           firstName: result.firstName,
@@ -226,10 +232,9 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           salutation: result.salutation,
           street: result.street,
           zipCode: result.zipCode,
-          doClearanceReliefAmount: result.doClearanceReliefAmount,
-          doClearanceCareBenefit: result.doClearanceCareBenefit,
         });
 
+        this.onCareLEvelChange(result.careLevel);
         this.selectedInsurance = result.insurance;
         this.isLoading = false;
       },
@@ -277,12 +282,15 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       this.customerForm.get('doClearanceReliefAmount')?.disable();
     }
 
-    // If the care level is less than 2, the customer can't be cleared through the care benefit
+    // If the care level is less than 2, the customer can't be cleared through the care benefit or preventive care
     if (value >= 2) {
       this.customerForm.get('doClearanceCareBenefit')?.enable();
+      this.customerForm.get('doClearancePreventiveCare')?.enable();
     } else {
       this.customerForm.get('doClearanceCareBenefit')?.setValue(false);
       this.customerForm.get('doClearanceCareBenefit')?.disable();
+      this.customerForm.get('doClearancePreventiveCare')?.setValue(false);
+      this.customerForm.get('doClearancePreventiveCare')?.disable();
     }
   }
 }
