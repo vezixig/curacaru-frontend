@@ -3,11 +3,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { BehaviorSubject, Subscription, first } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ApiService } from '../../services/api.service';
-import { UUID } from 'angular2-uuid';
-import { Employee } from '../../models/employee.model';
 import { ValidateInstitutionCode } from '../../validators/institution-code.validator';
 import { ValidateCurrency } from '../../validators/currency-validator';
 import { Company } from '../../models/company.model';
@@ -52,7 +50,7 @@ export class CompanyComponent implements OnDestroy, OnInit {
     });
 
     this.changePricePerHourSubscription = this.companyForm.get('rideCostsType')?.valueChanges.subscribe((value) => {
-      if (+value === 0) {
+      if (+value === 0 || +value === 4) {
         this.companyForm.get('rideCosts')?.setValue('');
         this.companyForm.get('rideCosts')?.disable();
       } else {
