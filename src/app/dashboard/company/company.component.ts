@@ -114,7 +114,7 @@ export class CompanyComponent implements OnDestroy, OnInit {
     this.updateEmployeeSubscription = this.apiService.updateCompany(company).subscribe({
       complete: () => {
         if (this.userService.user) {
-          this.userService.user.companyRideCostType = company.rideCostsType;
+          this.userService.user.companyRideCostsType = company.rideCostsType;
         }
         this.toastr.success('Änderungen am Unternehmen wurden gespeichert');
         this.LoadCompany();

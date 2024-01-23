@@ -1,4 +1,3 @@
-// Import necessary modules
 import { Component } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { TopbarComponent } from './topbar/topbar.component';

@@ -183,8 +183,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       zipCode: this.customerForm.get('zipCode')?.value,
     };
 
-    console.log(customer);
-
     customer.insuranceId = customer.insuranceId === '' ? undefined : customer.insuranceId;
 
     this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);

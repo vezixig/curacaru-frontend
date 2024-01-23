@@ -31,7 +31,6 @@ export class SignupComponent {
   handleSignup(): void {
     this.apiService.signup(this.signupForm.value).subscribe({
       complete: () => {
-        console.log('Signup completed');
         this.signUpCompleted.emit();
       },
     });

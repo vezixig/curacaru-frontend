@@ -4,7 +4,7 @@ import { UUID } from 'angular2-uuid';
 export interface UserEmployee {
   companyName: string;
   companyId: UUID;
-  companyRideCostType: RideCostsType;
+  companyRideCostsType: RideCostsType;
   id: UUID;
   firstName: string;
   isManager: boolean;

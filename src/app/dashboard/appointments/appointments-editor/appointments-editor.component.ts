@@ -7,18 +7,13 @@ import { Subscription, map } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
-import { Appointment } from '../../../models/appointment.model';
 import { CommonModule } from '@angular/common';
-import { CustomerListEntry } from '../../../models/customer-list-entry.model';
-import { DateTimeService } from '../../../services/date-time.service';
-import { EmployeeBasic as EmployeeBase } from '../../../models/employee-basic.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
-import { UserService } from '../../../services/user.service';
-import { UserEmployee } from '../../../models/user-employee.model';
+import { GermanDateParserFormatter } from '@curacaru/i18n/date-formatter';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { ApiService } from '../../../services/api.service';
 import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
+import { Appointment, CustomerListEntry, EmployeeBasic, UserEmployee } from '@curacaru/models';
+import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, FormsModule, NgbDatepickerModule, NgbTimepickerModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule, NgbTypeaheadModule],
@@ -34,7 +29,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   appointmentForm: FormGroup;
   canFinish: boolean = false;
   customers: CustomerListEntry[] = [];
-  employees: EmployeeBase[] = [];
+  employees: EmployeeBasic[] = [];
   isDone: boolean = false;
   isFinishing: boolean = false;
   isLoading: boolean = false;
