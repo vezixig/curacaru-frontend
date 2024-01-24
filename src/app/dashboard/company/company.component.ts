@@ -50,7 +50,7 @@ export class CompanyComponent implements OnDestroy, OnInit {
     });
 
     this.changePricePerHourSubscription = this.companyForm.get('rideCostsType')?.valueChanges.subscribe((value) => {
-      if (+value === 0 || +value === 4) {
+      if (+value === 0 || +value === 3) {
         this.companyForm.get('rideCosts')?.setValue('');
         this.companyForm.get('rideCosts')?.disable();
       } else {

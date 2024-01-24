@@ -272,23 +272,26 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       this.customerForm.get('insuranceStatus')?.enable();
     }
 
-    // If the care level is less than 1, the customer can't be cleared through the relief amount
-    if (value >= 1) {
-      this.customerForm.get('doClearanceReliefAmount')?.enable();
-    } else {
-      this.customerForm.get('doClearanceReliefAmount')?.setValue(false);
-      this.customerForm.get('doClearanceReliefAmount')?.disable();
-    }
+    // Only managers can edit the customer
+    if (this.isManager) {
+      // If the care level is less than 1, the customer can't be cleared through the relief amount
+      if (value >= 1) {
+        this.customerForm.get('doClearanceReliefAmount')?.enable();
+      } else if (this.isManager) {
+        this.customerForm.get('doClearanceReliefAmount')?.setValue(false);
+        this.customerForm.get('doClearanceReliefAmount')?.disable();
+      }
 
-    // If the care level is less than 2, the customer can't be cleared through the care benefit or preventive care
-    if (value >= 2) {
-      this.customerForm.get('doClearanceCareBenefit')?.enable();
-      this.customerForm.get('doClearancePreventiveCare')?.enable();
-    } else {
-      this.customerForm.get('doClearanceCareBenefit')?.setValue(false);
-      this.customerForm.get('doClearanceCareBenefit')?.disable();
-      this.customerForm.get('doClearancePreventiveCare')?.setValue(false);
-      this.customerForm.get('doClearancePreventiveCare')?.disable();
+      // If the care level is less than 2, the customer can't be cleared through the care benefit or preventive care
+      if (value >= 2) {
+        this.customerForm.get('doClearanceCareBenefit')?.enable();
+        this.customerForm.get('doClearancePreventiveCare')?.enable();
+      } else {
+        this.customerForm.get('doClearanceCareBenefit')?.setValue(false);
+        this.customerForm.get('doClearanceCareBenefit')?.disable();
+        this.customerForm.get('doClearancePreventiveCare')?.setValue(false);
+        this.customerForm.get('doClearancePreventiveCare')?.disable();
+      }
     }
   }
 }
