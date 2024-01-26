@@ -22,7 +22,9 @@
 <div>
   <cura-topbar />
   <main style="height: calc(100vh - 60px)">
-    <cura-sidebar />
+    <div class="d-none d-lg-block d-flex flex-column flex-shrink-0 bg-white border shadow-right sidebar">
+      <cura-sidebar />
+    </div>
     <div class="w-100 bg-white rounded overflow-auto border-top">
       <div class="container-fluid p-4">
         <router-outlet></router-outlet>

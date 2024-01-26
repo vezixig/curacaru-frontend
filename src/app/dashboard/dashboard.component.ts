@@ -14,6 +14,7 @@ import { ApiService } from '../services/api.service';
   standalone: true,
   imports: [TopbarComponent, SidebarComponent, RouterOutlet, SignupComponent, HttpClientModule],
   templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
   providers: [ApiService],
 })
 export class DashboardComponent {
