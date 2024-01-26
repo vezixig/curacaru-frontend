@@ -1,7 +1,7 @@
 <div class="row">
   <h4>Mitarbeiterliste</h4>
   <Button type="button" [routerLink]="['/dashboard/employees/new']" class="btn btn-primary text-white btn-block">Mitarbeiter hinzufügen</Button>
-  <table class="col-12 table mt-3 table-striped">
+  <table class="d-none d-md-table col-12 table mt-3 table-striped">
     <thead>
       <tr>
         <th scope="col">Vorname</th>
@@ -13,38 +13,61 @@
       </tr>
     </thead>
     <tbody>
-      @if (isLoading) {
-        @for (_ of [].constructor(3); track _) {
-          <tr>
-            <td><ngx-skeleton-loader /></td>
-            <td><ngx-skeleton-loader /></td>
-            <td><ngx-skeleton-loader /></td>
-            <td><ngx-skeleton-loader /></td>
-            <td><ngx-skeleton-loader /></td>
-            <td></td>
-          </tr>
-        }
-      }
-
-      @for (employee of employees; track employee) {
-        <tr>
-          <td>{{ employee.firstName }}</td>
-          <td>{{ employee.lastName }}</td>
-          <td>{{ employee.phoneNumber }}</td>
-          <td>{{ employee.email }}</td>
-          <td>{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</td>
-          <td class="text-center">
-            <div class="btn-group" role="group">
-              <button type="button" [routerLink]="['/dashboard/employees', employee.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
-                <fa-icon [icon]="faGear" [fixedWidth]="true" />
-              </button>
-              <button type="button" (click)="handleDelete(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
-                <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-              </button>
-            </div>
-          </td>
-        </tr>
+      @if (isLoading) { @for (_ of [].constructor(3); track _) {
+      <tr>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td></td>
+      </tr>
+      } } @for (employee of employees; track employee) {
+      <tr>
+        <td>{{ employee.firstName }}</td>
+        <td>{{ employee.lastName }}</td>
+        <td>{{ employee.phoneNumber }}</td>
+        <td>{{ employee.email }}</td>
+        <td>{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <button type="button" [routerLink]="['/dashboard/employees', employee.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+              <fa-icon [icon]="faGear" [fixedWidth]="true" />
+            </button>
+            <button type="button" (click)="handleDelete(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+            </button>
+          </div>
+        </td>
+      </tr>
       }
     </tbody>
   </table>
+
+  <div class="d-md-none p-0">
+    @for (employee of employees; track employee) {
+    <div class="card my-2">
+      <div class="card-header d-flex">
+        <span class="lead text-truncate">{{ employee.firstName }} {{ employee.lastName }}</span>
+        <div class="btn-group ms-auto" role="group">
+          <button type="button" [routerLink]="['/dashboard/employees', employee.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+          <button type="button" (click)="handleDelete(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="card-text list-unstyled">
+          @if (employee.phoneNumber != '') {
+          <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ employee.phoneNumber }}</li>
+          }
+          <li><fa-icon [icon]="faEnvelope" [fixedWidth]="true" />{{ employee.email }}</li>
+          <li><fa-icon [icon]="faUser" [fixedWidth]="true" />{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</li>
+        </ul>
+      </div>
+    </div>
+    }
+  </div>
 </div>
