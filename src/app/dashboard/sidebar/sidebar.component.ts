@@ -27,6 +27,7 @@ export class SidebarComponent implements OnInit {
 
   constructor(private userService: UserService) {}
 
+  /** Closes the sidebar */
   close() {
     this.offcanvasService.dismiss();
   }
