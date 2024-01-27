@@ -3,7 +3,7 @@
   @if (isManager) {
   <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
   }
-  <table class="col-12 table mt-3 table-striped">
+  <table class="d-none d-md-table col-12 table mt-3 table-striped">
     <thead>
       <tr>
         <th scope="col">Vorname</th>
@@ -50,4 +50,31 @@
       }
     </tbody>
   </table>
+
+  <div class="d-md-none p-0">
+    @for (customer of customers; track customer) {
+    <div class="card my-2">
+      <div class="card-header d-flex">
+        <span class="lead text-truncate">{{ customer.firstName }} {{ customer.lastName }}</span>
+        <div class="btn-group ms-auto" role="group">
+          <button type="button" [routerLink]="['/dashboard/customers', customer.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+          <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="card-text list-unstyled">
+          @if (customer.phone != '') {
+          <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ customer.phone }}</li>
+          }
+          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ customer.zipCode }} {{ customer.city }}</li>
+          <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
+        </ul>
+      </div>
+    </div>
+    }
+  </div>
 </div>

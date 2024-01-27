@@ -1,9 +1,8 @@
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faGear, faHouse, faP, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
@@ -25,6 +24,9 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   customers: CustomerListEntry[] = [];
   faGear = faGear;
   faTrashCan = faTrashCan;
+  faPhone = faPhone;
+  faUser = faUser;
+  faHouse = faHouse;
   isManager: boolean = false;
   isLoading: boolean = true;
 

@@ -6,21 +6,22 @@ import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, first, firstValueFrom, mergeMap } from 'rxjs';
+import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, firstValueFrom, mergeMap } from 'rxjs';
 import { Customer } from '../../../models/customer.model';
 import { Insurance } from '../../../models/insurance.model';
 import { ApiService } from '../../../services/api.service';
 import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { ValidateInsuredPersonNumber as ValidateInsuredPersonNumber } from '../../../validators/insured-person-number.validator';
 import { UserService } from '../../../services/user.service';
+import { InputComponent } from '@curacaru/shared/input/input.component';
 
 @Component({
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule],
   providers: [ApiService],
   selector: 'cura-customer-editor',
   standalone: true,
   styleUrls: ['./customer-editor.component.scss'],
   templateUrl: './customer-editor.component.html',
+  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule, InputComponent],
 })
 export class CustomerEditorComponent implements OnInit, OnDestroy {
   cityName: string = '';

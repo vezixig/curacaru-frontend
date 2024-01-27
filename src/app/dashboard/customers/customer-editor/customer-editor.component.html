@@ -1,9 +1,5 @@
 <div class="row">
-  @if (isNew) {
-  <h4>Kunden hinzufügen</h4>
-  } @if (!isNew) {
-  <h4>Kunden bearbeiten</h4>
-  }
+  <h4 class="h-underline">Kunden {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
 
   <form (ngSubmit)="handleSave()" [formGroup]="customerForm">
     <div class="form-group mb-4">
@@ -29,7 +25,7 @@
     </div>
 
     <!-- salutation, first and lastname -->
-    <div class="form-group mb-3">
+    <div class="d-none d-md-block form-group mb-2">
       <label for="selectSalutation">Anrede, Vor- und Nachname</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
@@ -48,7 +44,7 @@
             'is-valid': customerForm.controls['firstName'].valid,
             'is-invalid': customerForm.controls['firstName'].invalid && customerForm.controls['firstName'].touched
           }"
-          placeholder="Vorname eingeben"
+          placeholder="Vornamen eingeben"
         />
         <input
           type="text"
@@ -59,32 +55,29 @@
           class="form-control"
           formControlName="lastName"
           id="inputLastName"
-          placeholder="Nachname eingeben"
+          placeholder="Nachnamen eingeben"
         />
       </div>
       }
     </div>
 
-    <div class="form-group mb-3">
-      <label for="inputStreet">Straße und Hausnummer</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <input
-        type="text"
-        [ngClass]="{
-          'is-valid': customerForm.controls['street'].valid,
-          'is-invalid': customerForm.controls['street'].invalid && customerForm.controls['street'].touched
-        }"
-        class="form-control"
-        formControlName="street"
-        id="inputStreet"
-        placeholder="Straße und Hausnummer eingeben"
-      />
-      }
+    <div class="d-md-none form-group mb-2">
+      <label for="selectSalutation">Anrede</label>
+      <select class="form-select" id="selectSalutation" formControlName="salutation">
+        <option value="0">Frau</option>
+        <option value="1">Herr</option>
+      </select>
     </div>
 
-    <div class="form-group mb-3">
+    <!-- name [mobile]-->
+    <cura-input class="d-md-none" key="firstName" [isLoading]="isLoading" label="Vorname" [form]="customerForm" placeholder="Vornamen eingeben" />
+    <cura-input class="d-md-none" key="lastName" [isLoading]="isLoading" label="Nachname" [form]="customerForm" placeholder="Nachnamen eingeben" />
+
+    <!-- street -->
+    <cura-input key="street" [isLoading]="isLoading" label="Straße und Hausnummer" [form]="customerForm" placeholder="Straße und Hausnummer eingeben" />
+
+    <!-- zip code and city-->
+    <div class="form-group mb-2">
       <label for="inputZipCode">Postleitzahl</label>
 
       @if (isLoading) {
@@ -108,47 +101,11 @@
       }
     </div>
 
-    <div class="form-group mb-3">
-      <label for="inputBirthDate">Geburtsdatum</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <input
-        type="date"
-        [ngClass]="{
-          'is-valid': customerForm.controls['birthDate'].valid,
-          'is-invalid': customerForm.controls['birthDate'].invalid && customerForm.controls['birthDate'].touched
-        }"
-        class="form-control"
-        formControlName="birthDate"
-        id="inputBirthDate"
-        placeholder="Datum wählen"
-      />
-      }
-    </div>
-
-    <div class="form-group mb-3">
-      <label for="inputPhone">Telefonnummer</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <input
-        type="text"
-        [ngClass]="{
-          'is-valid': customerForm.controls['phone'].valid,
-          'is-invalid': customerForm.controls['phone'].invalid && customerForm.controls['phone'].touched
-        }"
-        class="form-control"
-        formControlName="phone"
-        id="inputPhone"
-        mb-3
-        placeholder="Telefonnummer eingeben"
-      />
-      }
-    </div>
+    <cura-input key="birthDate" [isLoading]="isLoading" label="Geburtsdatum" [form]="customerForm" placeholder="Datum wählen" type="date" />
+    <cura-input key="phone" [isLoading]="isLoading" label="Telefonnummer" [form]="customerForm" placeholder="Telefonnummer eingeben" />
 
     <!-- Notfallkontakt -->
-    <div class="form-group mb-4">
+    <div class="form-group mb-2">
       <label for="inputEmergencyContactName">Notfallkontakt Name und Telefonnummer</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
@@ -161,7 +118,7 @@
     </div>
 
     <!-- Versicherung -->
-    <div class="form-group mb-3">
+    <div class="d-none d-md-block form-group mb-3">
       <label for="inputInsurance">Krankenkasse, Versichertennummer und Status</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
@@ -213,6 +170,47 @@
         </select>
       </div>
       }
+    </div>
+
+    <div class="d-md-none form-group mb-2">
+      <label for="inputInsurance">Versicherung</label>
+      <input
+        [disabled]="!isManager"
+        id="inputInsurance"
+        type="text"
+        class="form-control"
+        [(ngModel)]="selectedInsurance"
+        [inputFormatter]="insuranceFormatter"
+        [resultFormatter]="insuranceFormatter"
+        [ngClass]="{
+          'is-valid': customerForm.controls['insuranceId'].valid && customerForm.controls['insuranceId'].value != '' && customerForm.controls['insuranceId'].value != undefined,
+          'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
+        }"
+        [ngbTypeahead]="search"
+        placeholder="Krankenkasse"
+        [editable]="false"
+        [ngModelOptions]="{ standalone: true }"
+      />
+    </div>
+    <cura-input class="d-md-none" key="insuredPersonNumber" [isLoading]="isLoading" label="Versichertennummer" [form]="customerForm" placeholder="Telefonnummer eingeben" />
+
+    <div class="form-group mb-2 d-md-none">
+      <label for="inputInsuranceStatus">Versicherungsstatus</label>
+      <select
+        class="form-select"
+        formControlName="insuranceStatus"
+        placeholder="Versicherungsstatus"
+        id="inputInsuranceStatus"
+        placeholder="Telefonnummer eingeben"
+        [ngClass]="{
+          'is-valid': customerForm.controls['insuranceStatus'].valid,
+          'is-invalid': customerForm.controls['insuranceStatus'].invalid && customerForm.controls['insuranceStatus'].touched
+        }"
+      >
+        <option value="0">Gesetzlich</option>
+        <option value="1">Privat</option>
+        <option value="2">Selbstzahler</option>
+      </select>
     </div>
 
     <!-- Pflegegrad -->
