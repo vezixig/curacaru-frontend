@@ -1,0 +1,20 @@
+<div class="form-group mb-2" [formGroup]="form">
+  <label for="input">{{ label }}</label>
+  @if (isLoading) {
+  <ngx-skeleton-loader />
+  } @if (!isLoading) {
+  <input
+    [type]="type"
+    class="form-control"
+    [id]="'input' + key"
+    [ngClass]="{
+      'is-valid': form.controls[key].valid && form.controls[key].touched,
+      'is-invalid': form.controls[key].invalid && form.controls[key].touched
+    }"
+    [formControlName]="key"
+    [placeholder]="placeholder"
+  />
+  } @if (info != '') {
+  <small class="form-text text-muted">{{ info }}</small>
+  }
+</div>

@@ -1,109 +1,31 @@
 <div class="row">
-  @if (isNew) {
-    <h4>Mitarbeiter hinzufügen</h4>
-  }
-  @if (!isNew) {
-    <h4>Mitarbeiter bearbeiten</h4>
-  }
+  <h4 class="h-underline">Mitarbeiter {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
+
   <form (ngSubmit)="handleSave()" [formGroup]="employeeForm">
-    <div class="form-group">
-      <label for="inputEmail">E-Mail Adresse</label>
-      @if (isLoading) {
-        <ngx-skeleton-loader />
-      }
-      @if (!isLoading) {
-        <input
-          type="email"
-          class="form-control"
-          id="inputEmail"
-        [ngClass]="{
-          'is-valid': employeeForm.controls['email'].valid,
-          'is-invalid': employeeForm.controls['email'].invalid && employeeForm.controls['email'].touched
-        }"
-          formControlName="email"
-          aria-describedby="emailHelp"
-          placeholder="E-Mail Adresse eingeben"
-          />
-      }
-      <small id="emailHelp" class="form-text text-muted">Das Password wird automatisch an diese Adresse geschickt.</small>
-    </div>
-    <div class="form-group">
-      <label for="inputFirstName">Vorname</label>
-      @if (isLoading) {
-        <ngx-skeleton-loader />
-      }
-      @if (!isLoading) {
-        <input
-          type="text"
-          class="form-control"
-          formControlName="firstName"
-          id="inputFirstName"
-        [ngClass]="{
-          'is-valid': employeeForm.controls['firstName'].valid,
-          'is-invalid': employeeForm.controls['firstName'].invalid && employeeForm.controls['firstName'].touched
-        }"
-          placeholder="Vorname eingeben"
-          />
-      }
-    </div>
-    <div class="form-group">
-      <label for="inputLastName">Nachname</label>
-      @if (isLoading) {
-        <ngx-skeleton-loader />
-      }
-      @if (!isLoading) {
-        <input
-          type="text"
-        [ngClass]="{
-          'is-valid': employeeForm.controls['lastName'].valid,
-          'is-invalid': employeeForm.controls['lastName'].invalid && employeeForm.controls['lastName'].touched
-        }"
-          class="form-control"
-          formControlName="lastName"
-          id="inputLastName"
-          placeholder="Nachname eingeben"
-          />
-      }
-    </div>
-    <div class="form-group">
-      <label for="inputPhone">Telefonnummer</label>
-      @if (isLoading) {
-        <ngx-skeleton-loader />
-      }
-      @if (!isLoading) {
-        <input
-          type="text"
-          class="form-control"
-          id="inputPhone"
-        [ngClass]="{
-          'is-valid': employeeForm.controls['phone'].valid && employeeForm.controls['phone'].value != '',
-          'is-invalid': employeeForm.controls['phone'].invalid && employeeForm.controls['phone'].touched
-        }"
-          formControlName="phone"
-          placeholder="Telefonnummer eingeben"
-          />
-      }
-    </div>
+    <cura-input key="email" info="Das Password wird automatisch an diese Adresse geschickt." [isLoading]="isLoading" label="E-Mail Adresse" [form]="employeeForm" placeholder="E-Mail Adresse eingeben" type="email" />
+    <cura-input key="firstName" [isLoading]="isLoading" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
+    <cura-input key="lastName" [isLoading]="isLoading" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
+    <cura-input key="phone" [isLoading]="isLoading" label="Telefonnummer" [form]="employeeForm" placeholder="Telefonnummer eingeben" />
+
     <div class="form-group">
       <label for="exampleFormControlSelect1">Mitarbeiterrolle</label>
       @if (isLoading) {
-        <ngx-skeleton-loader />
-      }
-      @if (!isLoading) {
-        <select formControlName="role" class="form-control" id="exampleFormControlSelect1">
-          <option value="employee">Mitarbeiter</option>
-          <option value="manager">Manager</option>
-        </select>
+      <ngx-skeleton-loader />
+      } @if (!isLoading) {
+      <select formControlName="role" class="form-control" id="exampleFormControlSelect1">
+        <option value="employee">Mitarbeiter</option>
+        <option value="manager">Manager</option>
+      </select>
       }
     </div>
 
     <button [disabled]="!employeeForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
       @if (isSaving) {
-        <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
       }
       <span>Mitarbeiter {{ isNew ? "hinzufügen" : "speichern" }}</span>
       @if (isSaving) {
-        <span>...</span>
+      <span>...</span>
       }
     </button>
     <button type="button" [routerLink]="['/dashboard/employees']" class="btn btn-outline-secondary m-3">Verwerfen</button>

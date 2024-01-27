@@ -29,6 +29,11 @@ main {
   overflow-y: hidden;
 }
 
+.h-underline {
+  padding-bottom: 10px;
+  border-bottom: 2px solid $primary;
+}
+
 .gradient {
   /* fallback for old browsers */
   background: #ff7f02;

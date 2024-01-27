@@ -9,13 +9,14 @@ import { Subscription, first } from 'rxjs';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ApiService } from '../../../services/api.service';
 import { UUID } from 'angular2-uuid';
+import { InputComponent } from '../../../shared/input/input.component';
 
 @Component({
-  imports: [CommonModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule],
   selector: 'cura-employee-editor',
   providers: [ApiService],
   standalone: true,
   templateUrl: './employee-editor.component.html',
+  imports: [CommonModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule, InputComponent],
 })
 export class EmployeeEditorComponent implements OnInit, OnDestroy {
   employeeForm: FormGroup;
