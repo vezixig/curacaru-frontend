@@ -3,9 +3,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCalendar, faTrashCan } from '@fortawesome/free-regular-svg-icons';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
-import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faCheck, faGear, faHouse, faUserAlt } from '@fortawesome/free-solid-svg-icons';
+import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first, map } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
@@ -19,9 +19,10 @@ import { UserService } from '../../../services/user.service';
 import { ApiService } from '../../../services/api.service';
 import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { Appointment } from '@curacaru/models';
 
 @Component({
-  imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe],
+  imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe, NgbCollapseModule],
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   selector: 'cura-appointments-list',
   standalone: true,
@@ -30,8 +31,12 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 })
 export class AppointmentsListComponent implements OnDestroy, OnInit {
   faGear = faGear;
+  faHouse = faHouse;
+  faUser = faUser;
+  faUserSolid = faUserAlt;
   faTrashCan = faTrashCan;
   faCalendar = faCalendar;
+  faCheck = faCheck;
 
   appointments: AppointmentListEntry[] = [];
   customers: CustomerListEntry[] = [];
@@ -45,11 +50,13 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   selectedEmployee?: EmployeeBasic;
   selectedEmployeeId?: number;
   toDate: NgbDate | null = this.calendar.getToday();
+  isCollapsed = true;
 
   private deleteAppointmentSubscription?: Subscription;
   private getAppointmentsSubscription?: Subscription;
   private getEmployeeListSubscription?: Subscription;
   private getCustomerListSubscription?: Subscription;
+  private postFinishSubscription?: Subscription;
 
   constructor(private apiService: ApiService, private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private modalService: NgbModal, private toastr: ToastrService, private userService: UserService) {}
 
@@ -58,6 +65,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
     this.getAppointmentsSubscription?.unsubscribe();
     this.getCustomerListSubscription?.unsubscribe();
     this.getEmployeeListSubscription?.unsubscribe();
+    this.postFinishSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -110,7 +118,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
     modalRef.result.then(() => {
       this.deleteEmployee(appointment);
     });
-    modalRef.componentInstance.title = 'Kunden löschen';
+    modalRef.componentInstance.title = 'Termin löschen';
 
     const date = appointment.date.toLocaleDateString();
     const start = DateTimeService.toTimeString(appointment.timeStart, false);
@@ -145,6 +153,19 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
           this.isLoading = false;
         },
       });
+  }
+
+  onFinish(appointment: AppointmentListEntry) {
+    this.postFinishSubscription?.unsubscribe();
+    this.postFinishSubscription = this.apiService.finishAppointment(appointment.id!).subscribe({
+      complete: () => {
+        this.toastr.success('Termin wurde abgeschlossen');
+        appointment.isDone = true;
+      },
+      error: (error) => {
+        this.toastr.error(`Termin konnte nicht abgeschlossen werden: [${error.status}] ${error.error}`);
+      },
+    });
   }
 
   private deserializeDates(obj: any): any {

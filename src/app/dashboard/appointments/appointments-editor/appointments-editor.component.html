@@ -1,4 +1,4 @@
-<h4>Termin {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
+<h4 class="h-underline">Termin {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
 <form (ngSubmit)="onSave()" [formGroup]="appointmentForm">
   <!-- Customer -->
   <div class="form-group mb-4">
@@ -122,25 +122,27 @@
   </div>
 </div> -->
 
-  <button [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing" type="submit" class="btn btn-primary text-white" style="margin-left: 0 !important; margin-right: 1em">
-    @if (isSaving) {
-    <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+  <div class="row">
+    <button [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing" type="submit" class="col btn btn-primary text-white" style="margin-left: 0 !important; margin-right: 1em">
+      @if (isSaving) {
+      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      }
+      <span>Termin {{ isNew ? "anlegen" : "speichern" }}</span>
+      @if (isSaving) {
+      <span>...</span>
+      }
+    </button>
+    @if (!isNew && !isDone) {
+    <button [disabled]="isSaving || isFinishing || !canFinish" type="button" (click)="onFinish()" class="col btn btn-outline-success" style="margin-right: 1em">
+      @if (isFinishing) {
+      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      }
+      <span>Termin abschließen</span>
+      @if (isFinishing) {
+      <span>...</span>
+      }
+    </button>
     }
-    <span>Termin {{ isNew ? "anlegen" : "speichern" }}</span>
-    @if (isSaving) {
-    <span>...</span>
-    }
-  </button>
-  @if (!isNew && !isDone) {
-  <button [disabled]="isSaving || isFinishing || !canFinish" type="button" (click)="onFinish()" class="btn btn-outline-success" style="margin-right: 1em">
-    @if (isFinishing) {
-    <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-    }
-    <span>Termin abschließen</span>
-    @if (isFinishing) {
-    <span>...</span>
-    }
-  </button>
-  }
-  <button type="button" [routerLink]="['/dashboard/appointments']" class="btn btn-outline-secondary">Verwerfen</button>
+    <button type="button" [routerLink]="['/dashboard/appointments']" class="col btn btn-outline-secondary">Verwerfen</button>
+  </div>
 </form>

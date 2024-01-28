@@ -7,6 +7,7 @@ import { MinimalCustomerListEntry } from '@curacaru/models/minimal-customer-list
 import { InsuranceStatusPipe } from '@curacaru/pipes/insurance-status.pipe';
 import { ApiService } from '@curacaru/services/api.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBuilding } from '@fortawesome/free-regular-svg-icons';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
@@ -21,6 +22,7 @@ import { Subscription } from 'rxjs';
 })
 export class DocumentsComponent implements OnDestroy, OnInit {
   faDownload = faDownload;
+  faBuilding = faBuilding;
 
   customers: MinimalCustomerListEntry[] = [];
   isLoading: boolean = true;

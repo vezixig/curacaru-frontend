@@ -3,7 +3,7 @@
   @if (isManager) {
   <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
   }
-  <table class="d-none d-md-table col-12 table mt-3 table-striped">
+  <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
       <tr>
         <th scope="col">Vorname</th>
@@ -73,6 +73,7 @@
           <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ customer.zipCode }} {{ customer.city }}</li>
           <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
         </ul>
+        <a href="geo:37.786971,-122.399677">tst</a>
       </div>
     </div>
     }

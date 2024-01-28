@@ -1,89 +1,91 @@
-<h4>Versicherung {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
-<form (ngSubmit)="onSave()" [formGroup]="insuranceForm">
-  <div class="form-group">
-    <label for="inputName">Name</label>
-    @if (isLoading) {
-    <ngx-skeleton-loader />
-    } @else {
-    <input
-      type="text"
-      class="form-control"
-      formControlName="name"
-      id="inputName"
-      [ngClass]="{
-        'is-valid': insuranceForm.controls['name'].valid && insuranceForm.controls['name'].touched,
-        'is-invalid': insuranceForm.controls['name'].invalid && insuranceForm.controls['name'].touched
-      }"
-      placeholder="Name der Versicherung eingeben"
-    />
-    }
-  </div>
-
-  <div class="form-group">
-    <label for="inputInstitutionCode">Institutionskennzeichen</label>
-    @if (isLoading) {
-    <ngx-skeleton-loader />
-    } @else {
-    <input
-      type="text"
-      class="form-control"
-      formControlName="institutionCode"
-      maxlength="10"
-      id="inputInstitutionCode"
-      [ngClass]="{
-        'is-valid': insuranceForm.controls['institutionCode'].valid && insuranceForm.controls['institutionCode'].touched,
-        'is-invalid': insuranceForm.controls['institutionCode'].invalid && insuranceForm.controls['institutionCode'].touched
-      }"
-      placeholder="Institutionskennzeichen eingeben"
-    />
-    }
-  </div>
-
-  <!-- street -->
-  <div class="form-group">
-    <label for="inputStreet">Straße und Hausnummer</label>
-    @if (isLoading) {
-    <ngx-skeleton-loader />
-    } @else {
-    <input type="text" class="form-control" formControlName="street" id="inputStreet" placeholder="Straße mit Hausnummer eingeben" />
-    }
-  </div>
-
-  <!-- zip code -->
-  <div class="form-group mb-2">
-    <label for="inputZipCode">Postleitzahl</label>
-
-    @if (isLoading) {
-    <ngx-skeleton-loader />
-    } @else {
-    <div class="input-group">
+<div class="row">
+  <h4 class="h-underline">Versicherung {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
+  <form (ngSubmit)="onSave()" [formGroup]="insuranceForm">
+    <div class="form-group">
+      <label for="inputName">Name</label>
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
       <input
         type="text"
-        [ngClass]="{
-          'is-valid': insuranceForm.controls['zipCode'].valid && insuranceForm.controls['zipCode'].touched,
-          'is-invalid': insuranceForm.controls['zipCode'].invalid && insuranceForm.controls['zipCode'].touched
-        }"
-        maxlength="5"
         class="form-control"
-        formControlName="zipCode"
-        id="inputZipCode"
-        placeholder="PLZ eingeben"
+        formControlName="name"
+        id="inputName"
+        [ngClass]="{
+          'is-valid': insuranceForm.controls['name'].valid && insuranceForm.controls['name'].touched,
+          'is-invalid': insuranceForm.controls['name'].invalid && insuranceForm.controls['name'].touched
+        }"
+        placeholder="Name der Versicherung eingeben"
       />
-      <span class="input-group-text">{{ cityName }}</span>
+      }
     </div>
-    }
-  </div>
 
-  <div class="form-group">
-    <button [disabled]="!insuranceForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
-      @if (isSaving) {
-      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+    <div class="form-group">
+      <label for="inputInstitutionCode">Institutionskennzeichen</label>
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
+      <input
+        type="text"
+        class="form-control"
+        formControlName="institutionCode"
+        maxlength="10"
+        id="inputInstitutionCode"
+        [ngClass]="{
+          'is-valid': insuranceForm.controls['institutionCode'].valid && insuranceForm.controls['institutionCode'].touched,
+          'is-invalid': insuranceForm.controls['institutionCode'].invalid && insuranceForm.controls['institutionCode'].touched
+        }"
+        placeholder="Institutionskennzeichen eingeben"
+      />
       }
-      <span>Versicherung {{ isNew ? "anlegen" : "speichern" }}</span>
-      @if (isSaving) {
-      <span>...</span>
+    </div>
+
+    <!-- street -->
+    <div class="form-group">
+      <label for="inputStreet">Straße und Hausnummer</label>
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
+      <input type="text" class="form-control" formControlName="street" id="inputStreet" placeholder="Straße mit Hausnummer eingeben" />
       }
-    </button>
-    <button type="button" [routerLink]="['/dashboard/insurances']" class="btn btn-outline-secondary m-3">Verwerfen</button>
-  </div>
-</form>
+    </div>
+
+    <!-- zip code -->
+    <div class="form-group mb-2">
+      <label for="inputZipCode">Postleitzahl</label>
+
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @else {
+      <div class="input-group">
+        <input
+          type="text"
+          [ngClass]="{
+            'is-valid': insuranceForm.controls['zipCode'].valid && insuranceForm.controls['zipCode'].touched,
+            'is-invalid': insuranceForm.controls['zipCode'].invalid && insuranceForm.controls['zipCode'].touched
+          }"
+          maxlength="5"
+          class="form-control"
+          formControlName="zipCode"
+          id="inputZipCode"
+          placeholder="PLZ eingeben"
+        />
+        <span class="input-group-text">{{ cityName }}</span>
+      </div>
+      }
+    </div>
+
+    <div class="form-group">
+      <button [disabled]="!insuranceForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
+        @if (isSaving) {
+        <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        }
+        <span>Versicherung {{ isNew ? "anlegen" : "speichern" }}</span>
+        @if (isSaving) {
+        <span>...</span>
+        }
+      </button>
+      <button type="button" [routerLink]="['/dashboard/insurances']" class="btn btn-outline-secondary m-3">Verwerfen</button>
+    </div>
+  </form>
+</div>

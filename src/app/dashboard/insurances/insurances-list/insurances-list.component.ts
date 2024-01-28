@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { faGear, faHouse, faKey } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -22,6 +22,8 @@ import { Insurance } from '../../../models/insurance.model';
 })
 export class InsurancesListComponent implements OnDestroy, OnInit {
   faGear = faGear;
+  faKey = faKey;
+  faHouse = faHouse;
   faTrashCan = faTrashCan;
 
   private isLoading = new BehaviorSubject<boolean>(true);
