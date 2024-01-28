@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faCheck, faFileSignature, faGear, faHouse, faUserAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faFileSignature, faGear, faHouse, faLocationDot, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first, map } from 'rxjs';
@@ -19,10 +19,10 @@ import { UserService } from '../../../services/user.service';
 import { ApiService } from '../../../services/api.service';
 import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { Appointment } from '@curacaru/models';
+import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 
 @Component({
-  imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe, NgbCollapseModule],
+  imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe, ReplacePipe, NgbCollapseModule],
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   selector: 'cura-appointments-list',
   standalone: true,
@@ -38,6 +38,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   faCalendar = faCalendar;
   faCheck = faCheck;
   faFileSignature = faFileSignature;
+  faLocationDot = faLocationDot;
 
   appointments: AppointmentListEntry[] = [];
   customers: CustomerListEntry[] = [];
