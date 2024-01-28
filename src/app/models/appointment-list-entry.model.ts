@@ -2,30 +2,36 @@ import { Time } from '@angular/common';
 import { UUID } from 'angular2-uuid';
 
 export interface AppointmentListEntry {
-  /** Gets or sets the city the appointment is taking place. */
+  /** The city the appointment is taking place. */
   city: string;
 
-  /** Gets or sets the name of the customer. */
+  /** The name of the customer. */
   customerName: string;
 
-  /** Gets or sets the date of the appointment. */
+  /** The date of the appointment. */
   date: Date;
 
-  /** Gets or sets the name of the employee. */
+  /** The name of the employee. */
   employeeName: string;
 
-  /** Gets or sets the name of the employee replacement. */
+  /** The name of the employee replacement. */
   employeeReplacementName?: string;
 
-  /** Gets or sets the id of the appointment. */
+  /** The id of the appointment. */
   id: UUID;
 
-  /** Gets or sets a value indicating whether the appointment is done. */
+  /** A value indicating whether the appointment is done. */
   isDone: boolean;
 
-  /** Gets or sets the end time of the appointment. */
+  /** The street the appointment is taking place. */
+  street: string;
+
+  /** The end time of the appointment. */
   timeEnd: Time;
 
-  /** Gets or sets the start time of the appointment. */
+  /** The start time of the appointment. */
   timeStart: Time;
+
+  /** The zip code of the city. */
+  zipCode: string;
 }
