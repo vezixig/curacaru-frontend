@@ -35,6 +35,12 @@ export interface AppointmentListEntry {
   /** The zip code of the city. */
   zipCode: string;
 
+  /** The latitude of the appointment's location. */
   latitude: number;
+
+  /** The longitude of the appointment's location. */
   longitude: number;
+
+  /** The phone number of the customer. */
+  phone: string;
 }

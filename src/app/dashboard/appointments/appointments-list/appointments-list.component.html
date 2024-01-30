@@ -121,14 +121,21 @@
 
   <div class="d-md-none p-0">
     @for (appointment of appointments; track appointment) {
-    <div class="card my-2">
-      <div class="card-header d-flex align-items-center">
-        <img class="me-2" width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" />
-        <span class="lead text-truncate">{{ appointment.date | date : "dd.MM.yyyy" }} {{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</span>
-        <div class="btn-group ms-auto" role="group">
+    <div class="card my-3">
+      <div class="card-header d-flex align-content-start p-2">
+        <img class="me-2" width="10" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" />
+        <span class="text-truncate">
+          <span class="fw-light"> {{ appointment.date | date : "dd.MM.yyyy" }}<br /></span>
+          <span class="fw-bold">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</span>
+        </span>
+        <div class="btn-group ms-auto d-inline" role="group" style="opacity: 0.7">
           @if (appointment.latitude != 0 && appointment.longitude != 0) {
-          <a href="geo:{{ appointment.latitude }},{{ appointment.longitude }}?q={{ appointment.street | replace : ' ' : '+' }}+{{ appointment.zipCode }}" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+          <a href="geo:{{ appointment.latitude }},{{ appointment.longitude }}?q={{ appointment.street | replace : ' ' : '+' }}+{{ appointment.zipCode }}" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
             <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
+          </a>
+          } @if (appointment.phone != '') {
+          <a href="tel:{{ appointment.phone | replace : ' ' : '' }}" class="btn btn-outline-secondary btn-sm" title="Kunden anrufen">
+            <fa-icon [icon]="faPhone" [fixedWidth]="true" />
           </a>
           }
           <button type="button" [routerLink]="['/dashboard/appointments', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
@@ -147,6 +154,9 @@
           }
           <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ appointment.employeeName }}</li>
           <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ appointment.street }} - {{ appointment.zipCode }} {{ appointment.city }}</li>
+          @if (appointment.phone != '') {
+          <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ appointment.phone }}</li>
+          }
         </ul>
       </div>
       @if (!appointment.isDone) {
