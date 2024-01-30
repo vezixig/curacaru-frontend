@@ -291,15 +291,21 @@
       </div>
     </div>
 
-    <button [disabled]="!customerForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
-      @if (isSaving) {
-      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-      }
-      <span>Kunden {{ isNew ? "hinzufügen" : "speichern" }}</span>
-      @if (isSaving) {
-      <span>...</span>
-      }
-    </button>
-    <button type="button" [routerLink]="['/dashboard/customers']" class="btn btn-outline-secondary m-3">Verwerfen</button>
+    <div class="row g-2 mt-2">
+      <div class="col">
+        <button [disabled]="!customerForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary form-control text-white">
+          @if (isSaving) {
+          <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+          }
+          <span>Kunden {{ isNew ? "hinzufügen" : "speichern" }}</span>
+          @if (isSaving) {
+          <span>...</span>
+          }
+        </button>
+      </div>
+      <div class="col">
+        <button type="button" [routerLink]="['/dashboard/customers']" class="form-control btn btn-outline-secondary">Verwerfen</button>
+      </div>
+    </div>
   </form>
 </div>

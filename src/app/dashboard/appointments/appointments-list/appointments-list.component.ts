@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faCheck, faFileSignature, faGear, faHouse, faLocationDot, faUserAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleInfo, faFileSignature, faGear, faHouse, faLocationDot, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, first, map } from 'rxjs';
@@ -39,6 +39,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   faCheck = faCheck;
   faFileSignature = faFileSignature;
   faLocationDot = faLocationDot;
+  faCircleInfo = faCircleInfo;
 
   appointments: AppointmentListEntry[] = [];
   customers: CustomerListEntry[] = [];

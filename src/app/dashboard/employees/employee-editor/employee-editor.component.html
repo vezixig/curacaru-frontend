@@ -1,7 +1,7 @@
-<div class="row">
-  <h4 class="h-underline">Mitarbeiter {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
+<form (ngSubmit)="handleSave()" [formGroup]="employeeForm">
+  <div class="row">
+    <h4 class="h-underline">Mitarbeiter {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
 
-  <form (ngSubmit)="handleSave()" [formGroup]="employeeForm">
     <cura-input key="email" info="Das Password wird automatisch an diese Adresse geschickt." [isLoading]="isLoading" label="E-Mail Adresse" [form]="employeeForm" placeholder="E-Mail Adresse eingeben" type="email" />
     <cura-input key="firstName" [isLoading]="isLoading" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
     <cura-input key="lastName" [isLoading]="isLoading" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
@@ -18,16 +18,22 @@
       </select>
       }
     </div>
+  </div>
 
-    <button [disabled]="!employeeForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
-      @if (isSaving) {
-      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-      }
-      <span>Mitarbeiter {{ isNew ? "hinzufügen" : "speichern" }}</span>
-      @if (isSaving) {
-      <span>...</span>
-      }
-    </button>
-    <button type="button" [routerLink]="['/dashboard/employees']" class="btn btn-outline-secondary m-3">Verwerfen</button>
-  </form>
-</div>
+  <div class="row g-2 mt-2">
+    <div class="col">
+      <button [disabled]="!employeeForm.valid || isLoading || isSaving" type="submit" class="form-control btn btn-primary text-white">
+        @if (isSaving) {
+        <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        }
+        <span>Mitarbeiter {{ isNew ? "hinzufügen" : "speichern" }}</span>
+        @if (isSaving) {
+        <span>...</span>
+        }
+      </button>
+    </div>
+    <div class="col">
+      <button type="button" [routerLink]="['/dashboard/employees']" class="form-control btn btn-outline-secondary">Verwerfen</button>
+    </div>
+  </div>
+</form>

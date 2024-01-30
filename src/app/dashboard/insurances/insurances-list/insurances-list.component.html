@@ -67,7 +67,7 @@
           @if (insurance.institutionCode != '') {
           <li><fa-icon [icon]="faKey" [fixedWidth]="true" /> {{ insurance.institutionCode }}</li>
           }
-          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ insurance.street }} {{ insurance.zipCode }} {{ insurance.city }}</li>
+          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ insurance.street }} - {{ insurance.zipCode }} {{ insurance.city }}</li>
         </ul>
       </div>
     </div>

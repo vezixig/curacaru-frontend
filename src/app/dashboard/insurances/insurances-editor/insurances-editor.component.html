@@ -1,6 +1,6 @@
-<div class="row">
-  <h4 class="h-underline">Versicherung {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
-  <form (ngSubmit)="onSave()" [formGroup]="insuranceForm">
+<form (ngSubmit)="onSave()" [formGroup]="insuranceForm">
+  <div class="row">
+    <h4 class="h-underline">Versicherung {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
     <div class="form-group">
       <label for="inputName">Name</label>
       @if (isLoading) {
@@ -74,9 +74,11 @@
       </div>
       }
     </div>
+  </div>
 
-    <div class="form-group">
-      <button [disabled]="!insuranceForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary text-white">
+  <div class="row g-2 mt-2">
+    <div class="col">
+      <button [disabled]="!insuranceForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary form-control text-white h-100">
         @if (isSaving) {
         <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
         }
@@ -85,7 +87,9 @@
         <span>...</span>
         }
       </button>
-      <button type="button" [routerLink]="['/dashboard/insurances']" class="btn btn-outline-secondary m-3">Verwerfen</button>
     </div>
-  </form>
-</div>
+    <div class="col">
+      <button type="button" [routerLink]="['/dashboard/insurances']" class="btn btn-outline-secondary form-control h-100">Verwerfen</button>
+    </div>
+  </div>
+</form>

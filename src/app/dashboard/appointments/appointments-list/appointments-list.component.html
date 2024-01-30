@@ -101,9 +101,11 @@
         <td class="text-center"><img width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" /></td>
         <td>
           <div class="btn-group" role="group">
+            @if (appointment.street != '' && appointment.zipCode != '') {
             <a href="https://www.google.com/maps/search/?api=1&query={{ appointment.street | replace : ' ' : '+' }}+{{ appointment.zipCode }}" target="_blank" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
               <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
             </a>
+            }
             <button type="button" [routerLink]="['/dashboard/appointments', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Termin bearbeiten">
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
@@ -124,9 +126,11 @@
         <img class="me-2" width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" />
         <span class="lead text-truncate">{{ appointment.date | date : "dd.MM.yyyy" }} {{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</span>
         <div class="btn-group ms-auto" role="group">
-          <a href="geo:{{ appointment.latitude }},{{ appointment.longitude }}" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+          @if (appointment.latitude != 0 && appointment.longitude != 0) {
+          <a href="geo:{{ appointment.latitude }},{{ appointment.longitude }}?q={{ appointment.street | replace : ' ' : '+' }}+{{ appointment.zipCode }}" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
             <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
           </a>
+          }
           <button type="button" [routerLink]="['/dashboard/appointments', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
@@ -161,4 +165,8 @@
     </div>
     }
   </div>
+
+  @if (appointments.length == 0) {
+  <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Termine gefunden.</div>
+  }
 </div>
