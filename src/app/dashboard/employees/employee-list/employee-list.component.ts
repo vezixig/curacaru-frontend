@@ -10,9 +10,10 @@ import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../../services/api.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 
 @Component({
-  imports: [FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule],
+  imports: [FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule, ReplacePipe],
   providers: [ApiService],
   selector: 'cura-employee-list',
   standalone: true,

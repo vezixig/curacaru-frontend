@@ -51,6 +51,11 @@
       <div class="card-header d-flex">
         <span class="lead text-truncate">{{ employee.firstName }} {{ employee.lastName }}</span>
         <div class="btn-group ms-auto" role="group">
+          @if (employee.phoneNumber != '') {
+          <a href="tel:{{ employee.phoneNumber | replace : ' ' : '' }}" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter anrufen">
+            <fa-icon [icon]="faPhone" [fixedWidth]="true" />
+          </a>
+          }
           <button type="button" [routerLink]="['/dashboard/employees', employee.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>

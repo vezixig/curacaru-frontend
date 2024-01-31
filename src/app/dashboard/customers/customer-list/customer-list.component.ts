@@ -2,31 +2,33 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faGear, faHouse, faP, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faGear, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription, first } from 'rxjs';
-import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
-import { CustomerListEntry } from '../../../models/customer-list-entry.model';
-import { ApiService } from '../../../services/api.service';
-import { UserService } from '../../../services/user.service';
-import { UserEmployee } from '../../../models/user-employee.model';
+import { Subscription } from 'rxjs';
+import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
+import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
+import { ApiService } from '@curacaru/services/api.service';
+import { UserService } from '@curacaru/services/user.service';
+import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 
 @Component({
-  imports: [FontAwesomeModule, NgxSkeletonLoaderModule, RouterModule],
+  imports: [FontAwesomeModule, NgxSkeletonLoaderModule, ReplacePipe, RouterModule],
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
   templateUrl: './customer-list.component.html',
 })
 export class CustomerListComponent implements OnDestroy, OnInit {
-  customers: CustomerListEntry[] = [];
   faGear = faGear;
-  faTrashCan = faTrashCan;
-  faPhone = faPhone;
-  faUser = faUser;
   faHouse = faHouse;
+  faLocationDot = faLocationDot;
+  faPhone = faPhone;
+  faTrashCan = faTrashCan;
+  faUser = faUser;
+
+  customers: CustomerListEntry[] = [];
   isManager: boolean = false;
   isLoading: boolean = true;
 

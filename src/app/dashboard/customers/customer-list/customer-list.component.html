@@ -57,6 +57,15 @@
       <div class="card-header d-flex">
         <span class="lead text-truncate">{{ customer.firstName }} {{ customer.lastName }}</span>
         <div class="btn-group ms-auto" role="group">
+          @if (customer.latitude != 0 && customer.longitude != 0) {
+          <a href="geo:{{ customer.latitude }},{{ customer.longitude }}?q={{ customer.street | replace : ' ' : '+' }}+{{ customer.zipCode }}" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
+            <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
+          </a>
+          } @if (customer.phone != '') {
+          <a href="tel:{{ customer.phone | replace : ' ' : '' }}" class="btn btn-outline-secondary btn-sm" title="Kunden anrufen">
+            <fa-icon [icon]="faPhone" [fixedWidth]="true" />
+          </a>
+          }
           <button type="button" [routerLink]="['/dashboard/customers', customer.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
@@ -70,7 +79,7 @@
           @if (customer.phone != '') {
           <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ customer.phone }}</li>
           }
-          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ customer.zipCode }} {{ customer.city }}</li>
+          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" />{{ customer.street }} - {{ customer.zipCode }} {{ customer.city }}</li>
           <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
         </ul>
       </div>
