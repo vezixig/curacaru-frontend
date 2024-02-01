@@ -5,7 +5,7 @@
   } @if (!isLoading) {
   <input
     [type]="type"
-    class="form-control"
+    class="form-control text-start"
     [id]="'input' + key"
     [ngClass]="{
       'is-valid': form.controls[key].valid && form.controls[key].touched,

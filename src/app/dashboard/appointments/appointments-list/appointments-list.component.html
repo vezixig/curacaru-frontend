@@ -2,67 +2,57 @@
   <h4>Termine</h4>
   <button type="button" [routerLink]="['/dashboard/appointments/new']" class="btn btn-primary text-white btn-block mb-3">Termin hinzufügen</button>
 
-  <div class="container-fluid p-0">
-    <div class="row">
-      <div class="col-sm-12 col-md-5 col-xl-4">
-        <div class="form-group">
-          <label for="dpFromDate">Datum</label>
-          <div class="input-group">
-            <div class="dp-hidden position-absolute">
-              <input
-                name="datepicker"
-                class="form-control"
-                ngbDatepicker
-                #datepicker="ngbDatepicker"
-                [autoClose]="'outside'"
-                (dateSelect)="onDateSelection($event)"
-                (closed)="onSelectionChanged()"
-                [displayMonths]="1"
-                [dayTemplate]="t"
-                outsideDays="hidden"
-                [startDate]="fromDate!"
-                tabindex="-1"
-              />
-              <ng-template #t let-date let-focused="focused">
-                <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)" [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date" (mouseleave)="hoveredDate = null">
-                  {{ date.day }}
-                </span>
-              </ng-template>
-            </div>
-            <input (change)="onSelectionChanged()" #dpFromDate class="form-control" placeholder="dd.mm.yyyy" name="dpFromDate" [value]="formatter.format(fromDate)" (input)="fromDate = validateInput(fromDate, dpFromDate.value)" />
-            <input (change)="onSelectionChanged()" #dpToDate class="form-control" placeholder="dd.mm.yyyy" name="dpToDate" [value]="formatter.format(toDate)" (input)="toDate = validateInput(toDate, dpToDate.value)" />
-            <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button"><fa-icon [icon]="faCalendar" [fixedWidth]="true" /></button>
-          </div>
-        </div>
+  <div class="form-group">
+    <label for="dpFromDate">Datum</label>
+    <div class="input-group">
+      <div class="dp-hidden position-absolute">
+        <input
+          name="datepicker"
+          class="form-control"
+          ngbDatepicker
+          #datepicker="ngbDatepicker"
+          [autoClose]="'outside'"
+          (dateSelect)="onDateSelection($event)"
+          (closed)="onSelectionChanged()"
+          [displayMonths]="1"
+          [dayTemplate]="t"
+          outsideDays="hidden"
+          [startDate]="fromDate!"
+          tabindex="-1"
+        />
+        <ng-template #t let-date let-focused="focused">
+          <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)" [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date" (mouseleave)="hoveredDate = null">
+            {{ date.day }}
+          </span>
+        </ng-template>
       </div>
-
-      <div class="col-xs-12 col-sm-12 col-md">
-        <div class="form-group">
-          <label for="dpFromDate">Kunde</label>
-          <select class="form-select" name="customerSelect" [(ngModel)]="selectedCustomerId" (change)="onSelectionChanged()">
-            <option></option>
-            @for (customer of customers; track customer) {
-            <option [value]="customer.id">{{ customer.firstName }} {{ customer.lastName }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      @if (isManager) {
-      <div class="col-xs-12 col-sm-12 col-md">
-        <div class="form-group">
-          <label for="dpFromDate">Mitarbeiter</label>
-          <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
-            <option></option>
-            @for (employee of employees; track employee) {
-            <option [value]="employee.id">{{ employee.name }}</option>
-            }
-          </select>
-        </div>
-      </div>
-      }
+      <input (change)="onSelectionChanged()" #dpFromDate class="form-control" placeholder="dd.mm.yyyy" name="dpFromDate" [value]="formatter.format(fromDate)" (input)="fromDate = validateInput(fromDate, dpFromDate.value)" />
+      <input (change)="onSelectionChanged()" #dpToDate class="form-control" placeholder="dd.mm.yyyy" name="dpToDate" [value]="formatter.format(toDate)" (input)="toDate = validateInput(toDate, dpToDate.value)" />
+      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button"><fa-icon [icon]="faCalendar" [fixedWidth]="true" /></button>
     </div>
   </div>
+
+  <div class="form-group">
+    <label for="dpFromDate">Kunde</label>
+    <select class="form-select" name="customerSelect" [(ngModel)]="selectedCustomerId" (change)="onSelectionChanged()">
+      <option></option>
+      @for (customer of customers; track customer) {
+      <option [value]="customer.id">{{ customer.firstName }} {{ customer.lastName }}</option>
+      }
+    </select>
+  </div>
+
+  @if (isManager) {
+  <div class="form-group">
+    <label for="dpFromDate">Mitarbeiter</label>
+    <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
+      <option></option>
+      @for (employee of employees; track employee) {
+      <option [value]="employee.id">{{ employee.name }}</option>
+      }
+    </select>
+  </div>
+  }
 
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>

@@ -1,7 +1,18 @@
 <div class="row">
   <h4>Kundenliste</h4>
   @if (isManager) {
-  <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block">Kunden hinzufügen</Button>
+  <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block mb-3">Kunden hinzufügen</Button>
+
+  <!-- employee filter -->
+  <div class="form-group">
+    <label for="dpFromDate">Mitarbeiter</label>
+    <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
+      <option></option>
+      @for (employee of employees; track employee) {
+      <option [value]="employee.id">{{ employee.name }}</option>
+      }
+    </select>
+  </div>
   }
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
@@ -26,7 +37,7 @@
         <td><ngx-skeleton-loader /></td>
         <td></td>
       </tr>
-      } } @for (customer of customers; track customer) {
+      } } @for (customer of filteredCustomers; track customer) {
       <tr>
         <td>{{ customer.firstName }}</td>
         <td>{{ customer.lastName }}</td>
@@ -52,8 +63,8 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (customer of customers; track customer) {
-    <div class="card my-2">
+    @for (customer of filteredCustomers; track customer) {
+    <div class="card my-3">
       <div class="card-header d-flex">
         <span class="lead text-truncate">{{ customer.firstName }} {{ customer.lastName }}</span>
         <div class="btn-group ms-auto" role="group">
@@ -86,4 +97,8 @@
     </div>
     }
   </div>
+
+  @if (filteredCustomers.length == 0) {
+  <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Kunden gefunden.</div>
+  }
 </div>
