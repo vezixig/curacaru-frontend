@@ -3,7 +3,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router, RouterModule } from '@angular/router';
-import { Subscription, map } from 'rxjs';
+import { Subscription, forkJoin, map } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
@@ -66,9 +66,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       this.appointmentForm.get('employeeReplacementId')?.disable();
     }
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
-
-    this.loadEmployeeList();
-    this.loadCustomerList();
   }
 
   ngOnDestroy() {
@@ -81,17 +78,29 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    if (this.router.url.endsWith('new')) {
-      this.isNew = true;
-    } else {
-      this.loadAppointment();
-    }
+    this.isNew = this.router.url.endsWith('new');
+    this.isLoading = true;
+
+    forkJoin({ customers: this.apiService.getCustomerList(), employees: this.apiService.getEmployeeBaseList() }).subscribe({
+      next: (result) => {
+        this.employees = result.employees;
+        this.customers = result.customers;
+      },
+      complete: () => {
+        if (!this.isNew) {
+          this.loadAppointment();
+        } else {
+          this.isLoading = false;
+        }
+      },
+      error: (error) => this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`),
+    });
   }
 
   loadAppointment() {
-    this.isLoading = true;
     this.isNew = false;
     this.appointmentId = this.router.url.split('/').pop() ?? '';
+
     this.getAppointmentSubscription = this.apiService
       .getAppointment(this.appointmentId)
       .pipe(map((result) => this.deserializeDates(result)))
@@ -208,20 +217,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
         this.toastr.error(`Termin konnte nicht angelegt werden: [${error.status}] ${error.error}`);
         this.isSaving = false;
       },
-    });
-  }
-
-  private loadCustomerList() {
-    this.getCustomerListSubscription = this.apiService.getCustomerList().subscribe({
-      next: (result) => (this.customers = result),
-      error: (error) => this.toastr.error(`Kundenliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`),
-    });
-  }
-
-  private loadEmployeeList() {
-    this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
-      next: (result) => (this.employees = result),
-      error: (error) => this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`),
     });
   }
 
