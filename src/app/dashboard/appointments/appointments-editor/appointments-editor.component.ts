@@ -3,7 +3,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router, RouterModule } from '@angular/router';
-import { Subscription, forkJoin, map } from 'rxjs';
+import { Subject, Subscription, forkJoin, map, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
@@ -37,10 +37,9 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   isSaving: boolean = false;
   user?: UserEmployee;
 
+  private $onDestroy = new Subject();
+
   private appointmentId?: UUID;
-  private getAppointmentSubscription?: Subscription;
-  private getCustomerListSubscription?: Subscription;
-  private getEmployeeListSubscription?: Subscription;
   private postAppointmentSubscription?: Subscription;
   private postFinishSubscription?: Subscription;
   private updateAppointmentSubscription?: Subscription;
@@ -69,41 +68,45 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.getAppointmentSubscription?.unsubscribe();
-    this.getEmployeeListSubscription?.unsubscribe();
-    this.getCustomerListSubscription?.unsubscribe();
-    this.postAppointmentSubscription?.unsubscribe();
-    this.postFinishSubscription?.unsubscribe();
-    this.updateAppointmentSubscription?.unsubscribe();
+    this.$onDestroy.next(true);
+    this.$onDestroy.complete();
   }
 
   ngOnInit() {
     this.isNew = this.router.url.endsWith('new');
     this.isLoading = true;
 
-    forkJoin({ customers: this.apiService.getCustomerList(), employees: this.apiService.getEmployeeBaseList() }).subscribe({
-      next: (result) => {
-        this.employees = result.employees;
-        this.customers = result.customers;
-      },
-      complete: () => {
-        if (!this.isNew) {
-          this.loadAppointment();
-        } else {
-          this.isLoading = false;
-        }
-      },
-      error: (error) => this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`),
-    });
+    forkJoin({
+      customers: this.apiService.getCustomerList(),
+      employees: this.apiService.getEmployeeBaseList(),
+    })
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        next: (result) => {
+          this.employees = result.employees;
+          this.customers = result.customers;
+        },
+        complete: () => {
+          if (!this.isNew) {
+            this.loadAppointment();
+          } else {
+            this.isLoading = false;
+          }
+        },
+        error: (error) => this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`),
+      });
   }
 
   loadAppointment() {
     this.isNew = false;
     this.appointmentId = this.router.url.split('/').pop() ?? '';
 
-    this.getAppointmentSubscription = this.apiService
+    this.apiService
       .getAppointment(this.appointmentId)
-      .pipe(map((result) => this.deserializeDates(result)))
+      .pipe(
+        takeUntil(this.$onDestroy),
+        map((result) => this.deserializeDates(result))
+      )
       .subscribe({
         next: (result) => {
           this.appointmentForm.patchValue({

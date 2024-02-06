@@ -6,7 +6,7 @@ import { faCircleInfo, faGear, faHouse, faLocationDot, faPhone } from '@fortawes
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
 import { ApiService } from '@curacaru/services/api.service';
@@ -51,31 +51,21 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     this.isLoading = true;
     this.isManager = this.userService.user?.isManager ?? false;
 
-    this.apiService
-      .getEmployeeBaseList()
+    forkJoin({
+      customers: this.apiService.getCustomerList(),
+      employees: this.apiService.getEmployeeBaseList(),
+    })
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
         next: (result) => {
-          this.employees = result;
+          this.employees = result.employees;
+          this.customers = result.customers;
+        },
+        complete: () => {
           this.filterCustomers();
-        },
-        error: (error) => {
-          this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-        },
-      });
-
-    this.apiService
-      .getCustomerList()
-      .pipe(takeUntil(this.$onDestroy))
-      .subscribe({
-        next: (result) => {
-          this.customers = result;
           this.isLoading = false;
         },
-        error: (error) => {
-          this.toastr.error(`Kundenliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-          this.isLoading = false;
-        },
+        error: (error) => this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`),
       });
   }
 
