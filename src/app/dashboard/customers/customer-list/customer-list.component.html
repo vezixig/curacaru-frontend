@@ -69,7 +69,7 @@
         <span class="lead text-truncate">{{ customer.firstName }} {{ customer.lastName }}</span>
         <div class="btn-group ms-auto" role="group">
           @if (customer.latitude != 0 && customer.longitude != 0) {
-          <a href="geo:{{ customer.latitude }},{{ customer.longitude }}?q={{ customer.street | replace : ' ' : '+' }}+{{ customer.zipCode }}" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
+          <a (click)="onCustomerAddressClick(customer)" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
             <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
           </a>
           } @if (customer.phone != '') {
@@ -90,7 +90,7 @@
           @if (customer.phone != '') {
           <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ customer.phone }}</li>
           }
-          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" />{{ customer.street }} - {{ customer.zipCode }} {{ customer.city }}</li>
+          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ customer.street }} - {{ customer.zipCode }} {{ customer.city }}</li>
           <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
         </ul>
       </div>

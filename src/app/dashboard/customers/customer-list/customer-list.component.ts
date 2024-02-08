@@ -9,11 +9,10 @@ import { ToastrService } from 'ngx-toastr';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
-import { ApiService } from '@curacaru/services/api.service';
-import { UserService } from '@curacaru/services/user.service';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { EmployeeBasic } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
+import { ApiService, LocationService, UserService } from '@curacaru/services';
 
 @Component({
   imports: [FontAwesomeModule, NgxSkeletonLoaderModule, ReplacePipe, RouterModule, FormsModule],
@@ -40,7 +39,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   private $onDestroy = new Subject();
   private customers: CustomerListEntry[] = [];
 
-  constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService, private userService: UserService) {}
+  constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService, private userService: UserService, private locationService: LocationService) {}
 
   ngOnDestroy(): void {
     this.$onDestroy.next(true);
@@ -68,6 +67,8 @@ export class CustomerListComponent implements OnDestroy, OnInit {
         error: (error) => this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`),
       });
   }
+
+  onCustomerAddressClick = (customer: CustomerListEntry) => this.locationService.openLocationLink(`${customer.street} ${customer.zipCode} ${customer.city}`);
 
   onSelectionChanged = () => this.filterCustomers();
 

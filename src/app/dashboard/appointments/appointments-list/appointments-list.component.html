@@ -92,7 +92,7 @@
         <td>
           <div class="btn-group" role="group">
             @if (appointment.street != '' && appointment.zipCode != '') {
-            <a href="https://www.google.com/maps/search/?api=1&query={{ appointment.street | replace : ' ' : '+' }}+{{ appointment.zipCode }}" target="_blank" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+            <a (click)="onOpenAppointmentLocation(appointment)" target="_blank" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
               <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
             </a>
             }
@@ -120,7 +120,7 @@
         </span>
         <div class="btn-group ms-auto d-inline" role="group" style="opacity: 0.7">
           @if (appointment.latitude != 0 && appointment.longitude != 0) {
-          <a href="geo:{{ appointment.latitude }},{{ appointment.longitude }}?q={{ appointment.street | replace : ' ' : '+' }}+{{ appointment.zipCode }}" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
+          <a (click)="onOpenAppointmentLocation(appointment)" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
             <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
           </a>
           } @if (appointment.phone != '') {

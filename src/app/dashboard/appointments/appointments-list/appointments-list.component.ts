@@ -7,19 +7,17 @@ import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-ic
 import { faCheck, faCircleInfo, faFileSignature, faGear, faHouse, faLocationDot, faPhone, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription, first, map } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
 import { Customer } from '../../../models/customer.model';
 import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { TimeFormatPipe } from '../../../pipes/time.pipe';
-import { DateTimeService } from '../../../services/date-time.service';
-import { UserService } from '../../../services/user.service';
-import { ApiService } from '../../../services/api.service';
 import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
+import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe, ReplacePipe, NgbCollapseModule],
@@ -62,7 +60,15 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   private getCustomerListSubscription?: Subscription;
   private postFinishSubscription?: Subscription;
 
-  constructor(private apiService: ApiService, private calendar: NgbCalendar, public formatter: NgbDateParserFormatter, private modalService: NgbModal, private toastr: ToastrService, private userService: UserService) {}
+  constructor(
+    private apiService: ApiService,
+    private calendar: NgbCalendar,
+    public formatter: NgbDateParserFormatter,
+    private locationService: LocationService,
+    private modalService: NgbModal,
+    private toastr: ToastrService,
+    private userService: UserService
+  ) {}
 
   ngOnDestroy(): void {
     this.deleteAppointmentSubscription?.unsubscribe();
@@ -99,6 +105,8 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
       },
     });
   }
+
+  onOpenAppointmentLocation = (appointment: AppointmentListEntry) => this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
 
   isHovered = (date: NgbDate) => this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
   isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate) && date.before(this.toDate);
