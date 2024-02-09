@@ -92,7 +92,7 @@
         <td>
           <div class="btn-group" role="group">
             @if (appointment.street != '' && appointment.zipCode != '') {
-            <a (click)="onOpenAppointmentLocation(appointment)" target="_blank" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+            <a (click)="onOpenAppointmentLocation(appointment)" target="_blank" class="btn btn-outline-secondary btn-sm" title="Navigation zum Termin">
               <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
             </a>
             }

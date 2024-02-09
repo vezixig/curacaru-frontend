@@ -224,6 +224,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   private onCustomerChanged(customerId: number): void {
+    if (this.isLoading) return;
     const employeeId = this.customers.find((e) => e.id === customerId)?.associatedEmployeeId ?? null;
     this.appointmentForm.get('employeeId')?.setValue(employeeId);
   }
