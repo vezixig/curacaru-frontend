@@ -193,7 +193,7 @@
         [ngModelOptions]="{ standalone: true }"
       />
     </div>
-    <cura-input class="d-md-none" key="insuredPersonNumber" [isLoading]="isLoading" label="Versichertennummer" [form]="customerForm" placeholder="Telefonnummer eingeben" />
+    <cura-input class="d-md-none" key="insuredPersonNumber" [isLoading]="isLoading" label="Versichertennummer" [form]="customerForm" placeholder="Versichertennummer eingeben" />
 
     <div class="form-group mb-2 d-md-none">
       <label for="inputInsuranceStatus">Versicherungsstatus</label>
@@ -277,6 +277,10 @@
 
     <div class="form-group">
       <label>Abrechnungsoptionen</label>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" formControlName="doClearanceSelfPayment" id="checkDoClearanceSelfPayment" />
+        <label class="form-check-label" for="checkDoClearanceSelfPayment"> Selbstzahler</label>
+      </div>
       <div class="form-check">
         <input class="form-check-input" type="checkbox" formControlName="doClearanceReliefAmount" id="checkDoClearanceReliefAmount" />
         <label class="form-check-label" for="checkDoClearanceReliefAmount"> Entlastungsbetrag §45b SGB XI</label>

@@ -40,4 +40,9 @@ export interface Customer {
    * @see https://www.gesetze-im-internet.de/sgb_11/__39.html
    */
   doClearancePreventiveCare: boolean;
+
+  /**
+   * A value indicating whether clearance can be done through self-payment.
+   */
+  doClearanceSelfPayment: boolean;
 }
