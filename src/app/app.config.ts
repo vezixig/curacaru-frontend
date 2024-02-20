@@ -1,4 +1,4 @@
-import { ApplicationConfig, LOCALE_ID, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, DEFAULT_CURRENCY_CODE, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
@@ -11,6 +11,7 @@ import { ApiService } from './services/api.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'de-DE' },
+    { provide: DEFAULT_CURRENCY_CODE, useValue: 'EUR' },
     provideRouter(routes),
     {
       provide: HTTP_INTERCEPTORS,

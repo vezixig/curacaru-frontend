@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserService } from '@curacaru/services/user.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
-import { faBuilding, faFile, faPersonCane, faPersonShelter, faUserClock, faUsersGear } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faCoins, faFile, faMoneyBill, faPersonCane, faPersonShelter, faUserClock, faUsersGear } from '@fortawesome/free-solid-svg-icons';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -13,7 +13,7 @@ import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
   imports: [FontAwesomeModule, RouterLink, RouterLinkActive],
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent {
   faBuilding = faBuilding;
   faCalendar = faCalendar;
   faPersonCane = faPersonCane;
@@ -21,18 +21,15 @@ export class SidebarComponent implements OnInit {
   faUserClock = faUserClock;
   faUsersGear = faUsersGear;
   faFile = faFile;
+  faCoins = faCoins;
+
   private offcanvasService = inject(NgbOffcanvas);
+  private userService = inject(UserService);
 
-  isManager: boolean = false;
-
-  constructor(private userService: UserService) {}
+  isManager: boolean = this.userService.user?.isManager ?? false;
 
   /** Closes the sidebar */
   close() {
     this.offcanvasService.dismiss();
-  }
-
-  ngOnInit(): void {
-    this.isManager = this.userService.user?.isManager ?? false;
   }
 }

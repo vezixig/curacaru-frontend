@@ -10,6 +10,14 @@ export const routes: Routes = [
       { path: ':id', loadComponent: () => import('@curacaru/dashboard/appointments/appointments-editor/appointments-editor.component').then((o) => o.AppointmentsEditorComponent) },
     ],
   },
+  {
+    path: 'dashboard/budgets',
+    children: [
+      { path: '', redirectTo: 'list', pathMatch: 'full' },
+      { path: 'list', loadComponent: () => import('@curacaru/dashboard/budgets/budgets-list/budgets-list.component').then((o) => o.BudgetListComponent) },
+      { path: ':id', loadComponent: () => import('@curacaru/dashboard/budgets/budgets-editor/budgets-editor.component').then((o) => o.BudgetsEditorComponent) },
+    ],
+  },
   { path: 'dashboard/company', loadComponent: () => import('@curacaru/dashboard/company/company.component').then((o) => o.CompanyComponent), pathMatch: 'full' },
   {
     path: 'dashboard/customers',

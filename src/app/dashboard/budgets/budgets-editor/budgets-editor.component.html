@@ -1,0 +1,124 @@
+<form (ngSubmit)="onSave()" [formGroup]="budgetForm">
+  <div class="row">
+    <h4 class="h-underline">Budget bearbeiten</h4>
+
+    <cura-input key="customerName" [isLoading]="isLoading" label="Patient" [form]="budgetForm" />
+
+    <div ngbAccordion [closeOthers]="true">
+      @if (showReliefAmount) {
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Entlastungsbetrag §45b SGB XI</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <cura-input (change)="onReliefAmountChange()" prefix="EUR" key="reliefAmount" [isLoading]="isLoading" label="Aktuelles Budget" [form]="budgetForm" />
+
+              <div class="form-group mb-2">
+                <label for="inputPricePerHour">Stundenlohn Unternehmen, verbleibende Stunden</label>
+                <div class="input-group">
+                  <span class="input-group-text">EUR</span>
+                  <input class="form-control" formControlName="pricePerHour" id="inputPricePerHour" />
+                  <input class="form-control" formControlName="reliefAmountRemainingHours" id="inputReliefAmountRemainingHours" />
+                </div>
+              </div>
+
+              <div class="form-group mb-2">
+                <label for="inputPricePerHour">Gültigkeit bis, Restbudget</label>
+                <div class="input-group">
+                  <span class="input-group-text">30.06.{{ nextYear }}</span>
+                  <span class="input-group-text">EUR</span>
+                  <input class="form-control" formControlName="reliefAmountCurrentYear" id="inputReliefAmountCurrentYear" />
+                </div>
+              </div>
+              @if (showLastYear) {
+              <div class="form-group mb-2">
+                <div class="input-group">
+                  <span class="input-group-text">30.06.{{ currentYear }}</span>
+                  <span class="input-group-text">EUR</span>
+                  <input class="form-control" formControlName="reliefAmountPreviousYear" id="inputReliefAmountPreviousYear" />
+                </div>
+              </div>
+              }
+
+              <div class="form-group mb-2">
+                <label for="inputPricePerHour">Nächste Erhöhung, Budget</label>
+                <div class="input-group">
+                  <span class="input-group-text">monatlich</span>
+                  <span class="input-group-text">EUR</span>
+                  <input class="form-control" formControlName="reliefAmountRaise" id="inputReliefAmountCurrentYear" />
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      } @if (showCareBenefit) {
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>..Pflegesachleistungen §36 SGB XI (max. 40%)</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>
+              <cura-input (change)="onCareBenefitChange()" prefix="EUR" key="careBenefitAmount" [isLoading]="isLoading" label="Aktuelles Budget" [form]="budgetForm" />
+
+              <div class="form-group mb-2">
+                <label for="inputPricePerHour">Stundenlohn Unternehmen, verbleibende Stunden</label>
+                <div class="input-group">
+                  <span class="input-group-text">EUR</span>
+                  <input class="form-control" formControlName="pricePerHour" id="inputPricePerHour" />
+                  <input class="form-control" formControlName="careBenefitRemainingHours" id="inputCareBenefitRemainingHours" />
+                </div>
+              </div>
+
+              <div class="form-group mb-2">
+                <label for="inputPricePerHour">Gültigkeit bis, Restbudget</label>
+                <div class="input-group">
+                  <span class="input-group-text">{{ endOfMonth }}</span>
+                  <span class="input-group-text">EUR</span>
+                  <input class="form-control" formControlName="careBenefitRemaining" id="inputCareBenefitAmount" />
+                </div>
+              </div>
+
+              <div class="form-group mb-2">
+                <label for="inputPricePerHour">Nächste Erhöhung, Budget</label>
+                <div class="input-group">
+                  <span class="input-group-text">monatlich</span>
+                  <span class="input-group-text">EUR</span>
+                  <input class="form-control" formControlName="careBenefitRaise" id="inputCareBenefitRaise" />
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      }
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Verhinderungspflege §39 SGB XI</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>Content for the first item</ng-template>
+          </div>
+        </div>
+      </div>
+      <div ngbAccordionItem>
+        <h2 ngbAccordionHeader>
+          <button ngbAccordionButton>Selbstzahler</button>
+        </h2>
+        <div ngbAccordionCollapse>
+          <div ngbAccordionBody>
+            <ng-template>Content for the first item</ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <button type="button" [routerLink]="['/dashboard/budgets']" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
+    </div>
+  </div>
+</form>
