@@ -272,6 +272,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     if (value == 0) {
       this.customerForm.get('insuranceStatus')?.setValue(2);
       this.customerForm.get('insuranceStatus')?.disable();
+      this.customerForm.get('doClearanceSelfPayment')?.setValue(true);
+      this.customerForm.get('doClearanceSelfPayment')?.disable();
     } else if (this.isManager) {
       this.customerForm.get('insuranceStatus')?.enable();
     }
@@ -281,6 +283,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       // If the care level is less than 1, the customer can't be cleared through the relief amount
       if (value >= 1) {
         this.customerForm.get('doClearanceReliefAmount')?.enable();
+        this.customerForm.get('doClearanceSelfPayment')?.enable();
       } else if (this.isManager) {
         this.customerForm.get('doClearanceReliefAmount')?.setValue(false);
         this.customerForm.get('doClearanceReliefAmount')?.disable();
