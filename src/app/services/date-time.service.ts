@@ -7,6 +7,8 @@ import { NgbTime } from '../models/ngbtime';
   providedIn: 'root',
 })
 export class DateTimeService {
+  private static dateFormat = new Intl.DateTimeFormat('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
   static toNgbTime(timeStart: Time | string): NgbTime {
     if (typeof timeStart === 'string') {
       const timeParts = timeStart.split(':');
@@ -41,6 +43,10 @@ export class DateTimeService {
 
   static toTimeString(time: Time, includeSeconds = true) {
     return `${time.hours.toString().padStart(2, '0')}:${time.minutes.toString().padStart(2, '0')}` + (includeSeconds ? ':00' : '');
+  }
+
+  static toLocalDateString(date: Date) {
+    return this.dateFormat.format(date);
   }
 
   /**

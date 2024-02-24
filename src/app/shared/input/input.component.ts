@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, input } from '@angular/core';
+import { Component, EventEmitter, Input, Output, input } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
@@ -17,4 +17,7 @@ export class InputComponent {
   @Input() type: string = 'text';
   @Input() placeholder: string = '';
   @Input() info: string = '';
+  @Input() prefix: string = '';
+
+  @Output() change = new EventEmitter();
 }

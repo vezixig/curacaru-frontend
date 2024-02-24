@@ -3,17 +3,23 @@
   @if (isLoading) {
   <ngx-skeleton-loader />
   } @if (!isLoading) {
-  <input
-    [type]="type"
-    class="form-control text-start"
-    [id]="'input' + key"
-    [ngClass]="{
-      'is-valid': form.controls[key].valid && form.controls[key].touched,
-      'is-invalid': form.controls[key].invalid && form.controls[key].touched
-    }"
-    [formControlName]="key"
-    [placeholder]="placeholder"
-  />
+  <div class="input-group">
+    @if (prefix != '') {
+    <span class="input-group-text">EUR</span>
+    }
+    <input
+      (change)="change.emit($event)"
+      [type]="type"
+      class="form-control text-start"
+      [id]="'input' + key"
+      [ngClass]="{
+        'is-valid': form.controls[key].valid && form.controls[key].touched,
+        'is-invalid': form.controls[key].invalid && form.controls[key].touched
+      }"
+      [formControlName]="key"
+      [placeholder]="placeholder"
+    />
+  </div>
   } @if (info != '') {
   <small class="form-text text-muted">{{ info }}</small>
   }
