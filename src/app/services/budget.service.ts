@@ -4,11 +4,14 @@ import { BudgetListEntry } from '@curacaru/models/budget-list-entry.model';
 import { environment } from '../../environments/environment';
 import { Budget } from '@curacaru/models/budget.model';
 import { UUID } from 'angular2-uuid';
+import { BudgetUpdate } from '@curacaru/models/BudgetUpdate';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BudgetService {
+  putBudget = (customerId: UUID, budget: BudgetUpdate) => this.httpClient.put(`${this.apiUrl}/budgets/${customerId}`, budget);
+
   private apiUrl = environment.auth0.api.serverUrl;
 
   constructor(private httpClient: HttpClient) {}

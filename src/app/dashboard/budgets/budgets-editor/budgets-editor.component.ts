@@ -1,17 +1,18 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
 import { Budget } from '@curacaru/models/budget.model';
 import { BudgetService } from '@curacaru/services/budget.service';
-import { ToastrService } from 'ngx-toastr';
-import { Subject, takeUntil } from 'rxjs';
-import { InputComponent } from '@curacaru/shared/input/input.component';
-import { UUID } from 'angular2-uuid';
-import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
-import { StringCurrencyPipe } from '@curacaru/pipes/string-currency.pipe';
-import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { DecimalPipe } from '@angular/common';
+import { BudgetUpdate } from '@curacaru/models/BudgetUpdate';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { DateTimeService } from '@curacaru/services';
+import { DecimalPipe } from '@angular/common';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { InputComponent } from '@curacaru/shared/input/input.component';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { Router, RouterModule } from '@angular/router';
+import { StringCurrencyPipe } from '@curacaru/pipes/string-currency.pipe';
+import { Subject, takeUntil } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { UUID } from 'angular2-uuid';
 
 @Component({
   imports: [ReactiveFormsModule, FormsModule, RouterModule, InputComponent, NgbAccordionModule, NgxSkeletonLoaderModule],
@@ -24,13 +25,13 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
   /** properties */
   budget: Budget | undefined;
   budgetForm: FormGroup;
-  isLoading = true;
-  showLastYear = new Date().getMonth() <= 6;
   currentYear = new Date().getFullYear();
-  nextYear = new Date().getFullYear() + 1;
-  showReliefAmount = false;
-  showCareBenefit = false;
   endOfMonth = DateTimeService.toLocalDateString(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
+  endOfYear = DateTimeService.toLocalDateString(new Date(new Date().getFullYear(), 11, 31));
+  isLoading = true;
+  nextYear = new Date().getFullYear() + 1;
+  showLastYear = new Date().getMonth() <= 6;
+  isSaving = false;
 
   /** injected services */
   private budgetService = inject(BudgetService);
@@ -46,39 +47,31 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
 
   constructor() {
     this.budgetForm = this.formBuilder.group({
-      customerName: [{ value: '', disabled: true }],
       careBenefitAmount: ['0,00'],
+      careBenefitRaise: [{ value: 0, disabled: true }],
       careBenefitRemaining: [{ value: 0, disabled: true }],
       careBenefitRemainingHours: [{ value: 0, disabled: true }],
-      careBenefitRaise: [{ value: 0, disabled: true }],
-      reliefAmount: ['0,00'],
-      reliefAmountRemainingHours: [{ value: 0, disabled: true }],
-      reliefAmountPreviousYear: [{ value: 0, disabled: true }],
-      reliefAmountCurrentYear: [{ value: 0, disabled: true }],
-      reliefAmountRaise: [{ value: 0, disabled: true }],
+      customerName: [{ value: '', disabled: true }],
+      preventiveCareAmount: ['0,00'],
+      preventiveCareRemaining: [{ value: 0, disabled: true }],
+      preventiveCareRemainingHours: [{ value: 0, disabled: true }],
+      preventiveCareRaise: [{ value: 0, disabled: true }],
       pricePerHour: [{ value: 0, disabled: true }],
+      reliefAmount: ['0,00'],
+      reliefAmountCurrentYear: [{ value: 0, disabled: true }],
+      reliefAmountPreviousYear: [{ value: 0, disabled: true }],
+      reliefAmountRaise: [{ value: 0, disabled: true }],
+      reliefAmountRemainingHours: [{ value: 0, disabled: true }],
+      selfPayAmount: ['0,00'],
+      selfPayRaise: ['0,00'],
+      selfPayRemaining: [{ value: 0, disabled: true }],
+      selfPayRemainingHours: [{ value: 0, disabled: true }],
     });
 
-    this.budgetForm
-      .get('reliefAmount')
-      ?.valueChanges.pipe(takeUntil(this.$onDestroy))
-      .subscribe((value) => {
-        this.budgetForm.patchValue({ reliefAmount: this.stringCurrencyPipe.transform(value) }, { emitEvent: false });
-      });
-  }
-
-  onCareBenefitChange() {
-    let careBenefitAmount = this.stringCurrencyPipe.finishEditing(this.budgetForm.get('careBenefitAmount')?.value);
-    let remainingHours = Math.floor(parseFloat(careBenefitAmount.replace(',', '.')) / (this.budget?.pricePerHour ?? 1));
-
-    this.budgetForm.patchValue({ careBenefitAmount: careBenefitAmount, careBenefitRemainingHours: remainingHours }, { emitEvent: false });
-  }
-
-  onReliefAmountChange() {
-    let reliefAmount = this.stringCurrencyPipe.finishEditing(this.budgetForm.get('reliefAmount')?.value);
-    let remainingHours = Math.floor(parseFloat(reliefAmount.replace(',', '.')) / (this.budget?.pricePerHour ?? 1));
-
-    this.budgetForm.patchValue({ reliefAmount: reliefAmount, reliefAmountRemainingHours: remainingHours }, { emitEvent: false });
+    this.subscribeToBudgetChanges('reliefAmount');
+    this.subscribeToBudgetChanges('careBenefitAmount');
+    this.subscribeToBudgetChanges('preventiveCareAmount');
+    this.subscribeToBudgetChanges('selfPayAmount');
   }
 
   ngOnDestroy(): void {
@@ -96,7 +89,35 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
     this.loadBudget();
   }
 
-  onSave() {}
+  onBudgetChange(amountField: string, remainingHoursField: string) {
+    const amount = this.stringCurrencyPipe.finishEditing(this.budgetForm.get(amountField)?.value);
+    const remainingHours = Math.floor(parseFloat(amount.replace(',', '.')) / (this.budget?.pricePerHour ?? 1));
+    this.budgetForm.patchValue({ [amountField]: amount, [remainingHoursField]: remainingHours }, { emitEvent: false });
+  }
+
+  onSave() {
+    const budget: BudgetUpdate = {
+      careBenefitAmount: parseFloat(this.budgetForm.get('careBenefitAmount')?.value.replace(',', '.')),
+      id: this.budget?.id!,
+      preventiveCareAmount: parseFloat(this.budgetForm.get('preventiveCareAmount')?.value.replace(',', '.')),
+      reliefAmount: parseFloat(this.budgetForm.get('reliefAmount')?.value.replace(',', '.')),
+      selfPayAmount: parseFloat(this.budgetForm.get('selfPayAmount')?.value.replace(',', '.')),
+      selfPayRaise: parseFloat(this.budgetForm.get('selfPayRaise')?.value.replace(',', '.')),
+    };
+
+    this.budgetService
+      .putBudget(this.budget!.customerId, budget)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Budget wurde gespeichert');
+          this.router.navigate(['/dashboard/budgets']);
+        },
+        error: (error) => {
+          this.toastr.error(`Budget konnte nicht gespeichert werden: [${error.status}] ${error.error}`);
+        },
+      });
+  }
 
   private loadBudget() {
     this.isLoading = true;
@@ -105,7 +126,6 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
         next: (next) => {
-          console.log(next);
           this.budget = next;
           this.TransferBudgetToForm(this.budget);
           this.isLoading = false;
@@ -117,22 +137,36 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
       });
   }
 
+  private subscribeToBudgetChanges(field: string) {
+    this.budgetForm
+      .get(field)
+      ?.valueChanges.pipe(takeUntil(this.$onDestroy))
+      .subscribe((value) => {
+        this.budgetForm.patchValue({ [field]: this.stringCurrencyPipe.transform(value) }, { emitEvent: false });
+      });
+  }
+
   private TransferBudgetToForm(budget: Budget) {
     this.budgetForm.patchValue({
-      careBenefitAmount: budget.careBenefitAmount,
-      careBenefitRemaining: budget.careBenefitAmount,
+      careBenefitAmount: this.decimalPipe.transform(budget.careBenefitAmount, '1.2-2', 'de-DE'),
       careBenefitRaise: this.decimalPipe.transform(budget.careBenefitRaise ?? 0, '1.2-2', 'de-DE'),
+      careBenefitRemaining: budget.careBenefitAmount,
       careBenefitRemainingHours: Math.floor(budget.careBenefitAmount / budget.pricePerHour),
       customerName: budget.customerName,
+      preventiveCareAmount: this.decimalPipe.transform(budget.preventiveCareAmount, '1.2-2', 'de-DE'),
+      preventiveCareRemaining: this.decimalPipe.transform(budget.preventiveCareAmount, '1.2-2', 'de-DE'),
+      preventiveCareRemainingHours: Math.floor(budget.preventiveCareAmount / budget.pricePerHour),
       pricePerHour: this.decimalPipe.transform(budget.pricePerHour, '1.2-2', 'de-DE'),
-      reliefAmount: budget.reliefAmount,
-      reliefAmountRemainingHours: Math.floor(budget.reliefAmount / budget.pricePerHour),
-      reliefAmountPreviousYear: this.decimalPipe.transform(budget.reliefAmountPreviousYear ?? 0, '1.2-2', 'de-DE'),
+      reliefAmount: this.decimalPipe.transform(budget.reliefAmount, '1.2-2', 'de-DE'),
       reliefAmountCurrentYear: this.decimalPipe.transform(budget.reliefAmountCurrentYear ?? 0, '1.2-2', 'de-DE'),
+      reliefAmountPreviousYear: this.decimalPipe.transform(budget.reliefAmountPreviousYear ?? 0, '1.2-2', 'de-DE'),
       reliefAmountRaise: this.decimalPipe.transform(budget.reliefAmountRaise ?? 0, '1.2-2', 'de-DE'),
+      reliefAmountRemainingHours: Math.floor(budget.reliefAmount / budget.pricePerHour),
+      preventiveCareRaise: this.decimalPipe.transform(budget.preventiveCareRaise ?? 0, '1.2-2', 'de-DE'),
+      selfPayAmount: this.decimalPipe.transform(budget.selfPayAmount, '1.2-2', 'de-DE'),
+      selfPayRaise: this.decimalPipe.transform(budget.selfPayRaise ?? 0, '1.2-2', 'de-DE'),
+      selfPayRemaining: this.decimalPipe.transform(budget.selfPayAmount ?? 0, '1.2-2', 'de-DE'),
+      selfPayRemainingHours: Math.floor(budget.selfPayAmount / budget.pricePerHour),
     });
-
-    this.showReliefAmount = budget.doClearanceReliefAmount;
-    this.showCareBenefit = budget.doClearanceCareBenefit;
   }
 }

@@ -1,6 +1,7 @@
 import { UUID } from 'angular2-uuid';
 
 export interface Budget {
+  preventiveCareRaise: number;
   careBenefitAmount: number;
   careBenefitRaise: number;
   customerId: UUID;
@@ -16,4 +17,6 @@ export interface Budget {
   reliefAmountCurrentYear?: number;
   reliefAmountPreviousYear?: number;
   reliefAmountRaise?: number;
+  selfPayAmount: number;
+  selfPayRaise: number;
 }
