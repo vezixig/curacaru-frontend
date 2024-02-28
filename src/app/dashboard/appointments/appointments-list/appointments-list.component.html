@@ -21,14 +21,39 @@
           tabindex="-1"
         />
         <ng-template #t let-date let-focused="focused">
-          <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)" [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date" (mouseleave)="hoveredDate = null">
+          <span
+            class="custom-day"
+            [class.focused]="focused"
+            [class.range]="isRange(date)"
+            [class.faded]="isHovered(date) || isInside(date)"
+            (mouseenter)="hoveredDate = date"
+            (mouseleave)="hoveredDate = null"
+          >
             {{ date.day }}
           </span>
         </ng-template>
       </div>
-      <input (change)="onSelectionChanged()" #dpFromDate class="form-control" placeholder="dd.mm.yyyy" name="dpFromDate" [value]="formatter.format(fromDate)" (input)="fromDate = validateInput(fromDate, dpFromDate.value)" />
-      <input (change)="onSelectionChanged()" #dpToDate class="form-control" placeholder="dd.mm.yyyy" name="dpToDate" [value]="formatter.format(toDate)" (input)="toDate = validateInput(toDate, dpToDate.value)" />
-      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button"><fa-icon [icon]="faCalendar" [fixedWidth]="true" /></button>
+      <input
+        (change)="onSelectionChanged()"
+        #dpFromDate
+        class="form-control"
+        placeholder="dd.mm.yyyy"
+        name="dpFromDate"
+        [value]="formatter.format(fromDate)"
+        (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
+      />
+      <input
+        (change)="onSelectionChanged()"
+        #dpToDate
+        class="form-control"
+        placeholder="dd.mm.yyyy"
+        name="dpToDate"
+        [value]="formatter.format(toDate)"
+        (input)="toDate = validateInput(toDate, dpToDate.value)"
+      />
+      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
+        <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
+      </button>
     </div>
   </div>
 
@@ -88,15 +113,27 @@
         <td>{{ appointment.city }}</td>
         <td>{{ appointment.employeeName }}</td>
         <td>{{ appointment.employeeReplacementName }}</td>
-        <td class="text-center"><img width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" /></td>
+        <td class="text-center">
+          <img width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" />
+        </td>
         <td>
           <div class="btn-group" role="group">
             @if (appointment.street != '' && appointment.zipCode != '') {
-            <a (click)="onOpenAppointmentLocation(appointment)" target="_blank" class="btn btn-outline-secondary btn-sm" title="Navigation zum Termin">
+            <a
+              (click)="onOpenAppointmentLocation(appointment)"
+              target="_blank"
+              class="btn btn-outline-secondary btn-sm"
+              title="Navigation zum Termin"
+            >
               <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
             </a>
             }
-            <button type="button" [routerLink]="['/dashboard/appointments', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Termin bearbeiten">
+            <button
+              type="button"
+              [routerLink]="['/dashboard/appointments', appointment.id]"
+              class="btn btn-outline-secondary btn-sm"
+              title="Termin bearbeiten"
+            >
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
             <button type="button" (click)="onDelete(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin löschen">
@@ -128,7 +165,12 @@
             <fa-icon [icon]="faPhone" [fixedWidth]="true" />
           </a>
           }
-          <button type="button" [routerLink]="['/dashboard/appointments', appointment.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+          <button
+            type="button"
+            [routerLink]="['/dashboard/appointments', appointment.id]"
+            class="btn btn-outline-secondary btn-sm"
+            title="Mitarbeiter bearbeiten"
+          >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
           <button type="button" (click)="onDelete(appointment)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
@@ -159,14 +201,16 @@
           <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
           Kunde
         </button> -->
-        <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin abschließen"><fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen</button>
+        <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin abschließen">
+          <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen
+        </button>
       </div>
       }
     </div>
     }
   </div>
 
-  @if (appointments.length == 0) {
+  @if (appointments.length == 0 && !isLoading) {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Termine gefunden.</div>
   }
 </div>

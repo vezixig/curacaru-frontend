@@ -91,7 +91,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     this.appointmentForm.get('distanceToCustomer')?.valueChanges.subscribe(() => this.calculatePrice());
     this.appointmentForm.get('timeEnd')?.valueChanges.subscribe(() => this.calculatePrice());
     this.appointmentForm.get('timeStart')?.valueChanges.subscribe(() => this.calculatePrice());
-    this.appointmentForm.get('customerId')?.valueChanges.subscribe(() => this.calculatePrice());
   }
 
   selectedClearanceType?: ClearanceType;
@@ -105,6 +104,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   private calculatePrice() {
+    console.log('calculatePrice');
     const timeStartValue = this.appointmentForm.get('timeStart')?.value;
     const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
 
@@ -310,6 +310,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       .subscribe((customer) => {
         this.selectedCustomer = customer;
         this.appointmentForm.get('employeeId')?.setValue(customer.associatedEmployeeId);
+        this.calculatePrice();
       });
   }
 
