@@ -70,7 +70,7 @@
         <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
           <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
         </button>
-        <input class="form-control" placeholder="tt.mm.jjjj" name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker" />
+        <input class="form-control" [minDate]="minDate" placeholder="tt.mm.jjjj" name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker" />
       </div>
       }
     </div>

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, Subscription, forkJoin, map, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
@@ -49,6 +49,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   isNew: boolean = true;
   isSaving: boolean = false;
+  minDate = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 1, 1);
   selectedCustomer?: CustomerBudget;
   user?: UserEmployee;
 
@@ -71,7 +72,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     this.user = this.userService.user;
     this.appointmentForm = this.formBuilder.group({
       customerId: ['', [Validators.required]],
-      date: ['', [Validators.required]],
+      date: ['', { Validators: Validators.required, updateOn: 'blur' }],
       distanceToCustomer: [0],
       clearanceType: [null, [Validators.required]],
       employeeId: [this.user?.isManager ? '' : this.user?.id, [Validators.required]],
@@ -90,6 +91,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     }
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
     this.appointmentForm.get('distanceToCustomer')?.valueChanges.subscribe(() => this.calculatePrice());
+    this.appointmentForm.get('date')?.valueChanges.subscribe((value) => this.onDateChanged(value));
     this.appointmentForm.get('timeEnd')?.valueChanges.subscribe(() => this.calculatePrice());
     this.appointmentForm.get('timeStart')?.valueChanges.subscribe(() => this.calculatePrice());
   }
@@ -102,53 +104,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
   onClearanceTypeChanged() {
     this.calculatePrice();
-  }
-
-  private calculatePrice() {
-    const timeStartValue = this.appointmentForm.get('timeStart')?.value;
-    const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
-
-    if (this.selectedCustomer != null && timeStartValue != null && timeStartValue != '' && timeEndValue != null && timeEndValue != '') {
-      // calculate appointment price
-      const timeEnd = DateTimeService.toTime(timeEndValue);
-      const timeStart = DateTimeService.toTime(timeStartValue);
-
-      const hours = (timeEnd.hours * 60 + timeEnd.minutes - timeStart.hours * 60 + timeStart.minutes) / 60;
-
-      let rideCosts = 0;
-      if (this.companyPrices?.rideCostsType === RideCostsType.FlatRate) {
-        rideCosts = this.companyPrices?.rideCosts;
-      } else if (this.companyPrices?.rideCostsType === RideCostsType.Kilometer) {
-        rideCosts = this.companyPrices?.rideCosts * this.appointmentForm.get('distanceToCustomer')?.value;
-      }
-
-      const price = (this.companyPrices?.pricePerHour ?? 0) * hours + rideCosts;
-
-      // check budgets
-      let clearanceType = this.selectedClearanceType;
-      this.canClearCareBenefit = this.selectedCustomer.careBenefitAmount >= price;
-      this.canClearPreventiveCare = this.selectedCustomer.preventiveCareAmount >= price;
-      this.canClearReliefAmount = this.selectedCustomer.reliefAmount >= price;
-      this.canClearSelfPayment = this.selectedCustomer.selfPayAmount >= price;
-
-      switch (clearanceType) {
-        case ClearanceType.careBenefit:
-          clearanceType = this.canClearCareBenefit ? clearanceType : undefined;
-          break;
-        case ClearanceType.preventiveCare:
-          clearanceType = this.canClearPreventiveCare ? clearanceType : undefined;
-          break;
-        case ClearanceType.reliefAmount:
-          clearanceType = this.canClearReliefAmount ? clearanceType : undefined;
-          break;
-        case ClearanceType.selfPayment:
-          clearanceType = this.canClearSelfPayment ? clearanceType : undefined;
-          break;
-      }
-
-      this.selectedClearanceType = clearanceType;
-      this.appointmentForm.get('clearanceType')?.setValue(clearanceType);
-    }
   }
 
   ngOnDestroy() {
@@ -173,10 +128,10 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.companyPrices = result.companyPrices;
         },
         complete: () => {
-          if (!this.isNew) {
-            this.loadAppointment();
-          } else {
+          if (this.isNew) {
             this.isLoading = false;
+          } else {
+            this.loadAppointment();
           }
         },
         error: (error) => this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`),
@@ -230,6 +185,53 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           }
         },
       });
+  }
+
+  private calculatePrice() {
+    const timeStartValue = this.appointmentForm.get('timeStart')?.value;
+    const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
+
+    if (this.selectedCustomer != null && timeStartValue != null && timeStartValue != '' && timeEndValue != null && timeEndValue != '') {
+      // calculate appointment price
+      const timeEnd = DateTimeService.toTime(timeEndValue);
+      const timeStart = DateTimeService.toTime(timeStartValue);
+
+      const hours = (timeEnd.hours * 60 + timeEnd.minutes - timeStart.hours * 60 + timeStart.minutes) / 60;
+
+      let rideCosts = 0;
+      if (this.companyPrices?.rideCostsType === RideCostsType.FlatRate) {
+        rideCosts = this.companyPrices?.rideCosts;
+      } else if (this.companyPrices?.rideCostsType === RideCostsType.Kilometer) {
+        rideCosts = this.companyPrices?.rideCosts * this.appointmentForm.get('distanceToCustomer')?.value;
+      }
+
+      const price = (this.companyPrices?.pricePerHour ?? 0) * hours + rideCosts;
+
+      // check budgets
+      let clearanceType = this.selectedClearanceType;
+      this.canClearCareBenefit = this.selectedCustomer.careBenefitAmount >= price;
+      this.canClearPreventiveCare = this.selectedCustomer.preventiveCareAmount >= price;
+      this.canClearReliefAmount = this.selectedCustomer.reliefAmount >= price;
+      this.canClearSelfPayment = this.selectedCustomer.selfPayAmount >= price;
+
+      switch (clearanceType) {
+        case ClearanceType.careBenefit:
+          clearanceType = this.canClearCareBenefit ? clearanceType : undefined;
+          break;
+        case ClearanceType.preventiveCare:
+          clearanceType = this.canClearPreventiveCare ? clearanceType : undefined;
+          break;
+        case ClearanceType.reliefAmount:
+          clearanceType = this.canClearReliefAmount ? clearanceType : undefined;
+          break;
+        case ClearanceType.selfPayment:
+          clearanceType = this.canClearSelfPayment ? clearanceType : undefined;
+          break;
+      }
+
+      this.selectedClearanceType = clearanceType;
+      this.appointmentForm.get('clearanceType')?.setValue(clearanceType);
+    }
   }
 
   private deserializeDates(obj: any): Appointment {
@@ -344,6 +346,14 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
         this.appointmentForm.get('employeeId')?.setValue(customer.associatedEmployeeId);
         this.calculatePrice();
       });
+  }
+
+  private onDateChanged(date: NgbDate) {
+    console.log(date);
+    if (this.minDate.after(date)) {
+      this.toastr.info('Termin kann nicht vor dem aktuellen Monat liegen');
+      this.appointmentForm.get('date')?.setValue(this.minDate);
+    }
   }
 
   private UpdateAppointment(appointment: Appointment) {
