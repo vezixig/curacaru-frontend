@@ -12,7 +12,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { GermanDateParserFormatter } from '@curacaru/i18n/date-formatter';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
-import { Appointment, Customer, EmployeeBasic, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
+import { Appointment, EmployeeBasic, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
@@ -59,6 +59,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   private postFinishSubscription?: Subscription;
   private updateAppointmentSubscription?: Subscription;
   private companyPrices?: CompanyPrices;
+  private existingAppointment?: Appointment;
 
   constructor(
     private apiService: ApiService,
@@ -104,7 +105,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   private calculatePrice() {
-    console.log('calculatePrice');
     const timeStartValue = this.appointmentForm.get('timeStart')?.value;
     const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
 
@@ -127,16 +127,24 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       // check budgets
       let clearanceType = this.selectedClearanceType;
       this.canClearCareBenefit = this.selectedCustomer.careBenefitAmount >= price;
-      clearanceType = clearanceType == ClearanceType.careBenefit && !this.canClearCareBenefit ? undefined : clearanceType;
-
       this.canClearPreventiveCare = this.selectedCustomer.preventiveCareAmount >= price;
-      clearanceType = clearanceType == ClearanceType.preventiveCare && !this.canClearPreventiveCare ? undefined : clearanceType;
-
       this.canClearReliefAmount = this.selectedCustomer.reliefAmount >= price;
-      clearanceType = clearanceType == ClearanceType.reliefAmount && !this.canClearReliefAmount ? undefined : clearanceType;
-
       this.canClearSelfPayment = this.selectedCustomer.selfPayAmount >= price;
-      clearanceType = clearanceType == ClearanceType.selfPayment && !this.canClearSelfPayment ? undefined : clearanceType;
+
+      switch (clearanceType) {
+        case ClearanceType.careBenefit:
+          clearanceType = this.canClearCareBenefit ? clearanceType : undefined;
+          break;
+        case ClearanceType.preventiveCare:
+          clearanceType = this.canClearPreventiveCare ? clearanceType : undefined;
+          break;
+        case ClearanceType.reliefAmount:
+          clearanceType = this.canClearReliefAmount ? clearanceType : undefined;
+          break;
+        case ClearanceType.selfPayment:
+          clearanceType = this.canClearSelfPayment ? clearanceType : undefined;
+          break;
+      }
 
       this.selectedClearanceType = clearanceType;
       this.appointmentForm.get('clearanceType')?.setValue(clearanceType);
@@ -189,6 +197,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
         next: (result) => {
           this.appointmentForm.patchValue({
             customerId: result.customerId,
+            clearanceType: result.clearanceType,
             date: DateTimeService.toNgbDate(result.date),
             distanceToCustomer: result.distanceToCustomer,
             employeeId: result.employeeId,
@@ -203,9 +212,13 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           if (result.isDone) {
             this.appointmentForm.disable();
           }
+
+          this.existingAppointment = result;
+          this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
           this.canFinish = !result.isDone; // && result.isSignedByCustomer && result.isSignedByEmployee;
           this.isLoading = false;
+          this.onCustomerChanged(result.customerId);
         },
         error: (error) => {
           if (error.status === 404) {
@@ -250,6 +263,9 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
   onSave() {
     const appointment: Appointment = {
+      clearanceType: this.appointmentForm.get('clearanceType')?.value,
+      costs: 0,
+      costsLastYearBudget: 0,
       customerId: this.appointmentForm.get('customerId')?.value,
       date: DateTimeService.toDate(this.appointmentForm.get('date')?.value),
       distanceToCustomer: +this.appointmentForm.get('distanceToCustomer')?.value,
@@ -301,13 +317,29 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  private onCustomerChanged(customerId: number): void {
+  private onCustomerChanged(customerId: UUID): void {
     if (this.isLoading) return;
 
     this.apiService
       .getCustomerWithBudget(customerId)
       .pipe(takeUntil(this.$onDestroy))
       .subscribe((customer) => {
+        if (!this.isNew) {
+          switch (this.existingAppointment?.clearanceType) {
+            case ClearanceType.careBenefit:
+              customer.careBenefitAmount += this.existingAppointment?.costs ?? 0;
+              break;
+            case ClearanceType.preventiveCare:
+              customer.preventiveCareAmount += this.existingAppointment?.costs ?? 0;
+              break;
+            case ClearanceType.selfPayment:
+              customer.selfPayAmount += this.existingAppointment?.costs ?? 0;
+              break;
+            case ClearanceType.reliefAmount:
+              customer.reliefAmount += (this.existingAppointment?.costs ?? 0) + (this.existingAppointment?.costsLastYearBudget ?? 0);
+              break;
+          }
+        }
         this.selectedCustomer = customer;
         this.appointmentForm.get('employeeId')?.setValue(customer.associatedEmployeeId);
         this.calculatePrice();
