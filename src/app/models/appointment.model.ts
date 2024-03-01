@@ -1,9 +1,12 @@
 import { Time } from '@angular/common';
+import { ClearanceType } from '@curacaru/enums/clearance-type';
 import { UUID } from 'angular2-uuid';
 
 export interface Appointment {
+  clearanceType: ClearanceType;
   customerId: UUID;
   date: Date;
+  distanceToCustomer?: number;
   employeeId: UUID;
   employeeReplacementId?: UUID;
   id?: UUID;
@@ -13,5 +16,6 @@ export interface Appointment {
   notes: string;
   timeEnd: Time;
   timeStart: Time;
-  distanceToCustomer?: number;
+  costs: number;
+  costsLastYearBudget: number;
 }

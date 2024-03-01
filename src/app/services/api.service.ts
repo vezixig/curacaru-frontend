@@ -1,6 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { first } from 'rxjs';
 import { Employee } from '../models/employee.model';
 import { UUID } from 'angular2-uuid';
 import { environment } from '../../environments/environment';
@@ -15,6 +14,8 @@ import { UserEmployee } from '../models/user-employee.model';
 import { Company } from '../models/company.model';
 import { MinimalCustomerListEntry } from '@curacaru/models/minimal-customer-list-entry.model';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
+import { CustomerBudget } from '@curacaru/models/customer-budget.model';
+import { CompanyPrices } from '@curacaru/models/company-prices.model';
 
 @Injectable({
   providedIn: 'root',
@@ -47,75 +48,81 @@ export class ApiService {
   /** Creates a new appointment */
   createAppointment(appointment: Appointment) {
     const serializedData = JSON.stringify(appointment, this.customSerializer);
-    return this.httpClient.post(`${this.apiUrl}/appointment/new`, serializedData, this.jsonHeader).pipe(first());
+    return this.httpClient.post(`${this.apiUrl}/appointment/new`, serializedData, this.jsonHeader);
   }
 
   /** Creates a new customer */
-  createCustomer = (customer: Customer) => this.httpClient.post(`${this.apiUrl}/customer/new`, customer).pipe(first());
+  createCustomer = (customer: Customer) => this.httpClient.post(`${this.apiUrl}/customer/new`, customer);
 
   /** Creates a new employee */
-  createEmployee = (employee: Employee) => this.httpClient.post(`${this.apiUrl}/employee/new`, employee).pipe(first());
+  createEmployee = (employee: Employee) => this.httpClient.post(`${this.apiUrl}/employee/new`, employee);
 
   /** Creates a new insurance */
-  createInsurance = (insurance: Insurance) => this.httpClient.post(`${this.apiUrl}/insurance/new`, insurance).pipe(first());
+  createInsurance = (insurance: Insurance) => this.httpClient.post(`${this.apiUrl}/insurance/new`, insurance);
 
   /** Deletes the appointment with the given id */
-  deleteAppointment = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/appointment/${id}`).pipe(first());
+  deleteAppointment = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/appointment/${id}`);
 
   /** Delete the customer with the given id */
-  deleteCustomer = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/customer/${id}`).pipe(first());
+  deleteCustomer = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/customer/${id}`);
 
   /** Deletes the insurance with the given id */
-  deleteInsurance = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/insurance/${id}`).pipe(first());
+  deleteInsurance = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/insurance/${id}`);
 
   /**
    * Gets the employee with the given ID from the API
    * @param id The id of the employee to delete
    * @returns An observable that completes when the request is done
    */
-  deleteEmployee = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/employee/${id}`).pipe(first());
+  deleteEmployee = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/employee/${id}`);
 
   /** Finishes the appointment with the given id */
-  finishAppointment = (id: UUID) => this.httpClient.post(`${this.apiUrl}/appointment/${id}/finish`, {}).pipe(first());
+  finishAppointment = (id: UUID) => this.httpClient.post(`${this.apiUrl}/appointment/${id}/finish`, {});
 
   /** Gets the appointment for the given id */
-  getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`).pipe(first());
+  getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`);
 
   /** Gets the list of appointments from the API filtered by the query */
-  getAppointmentList = (query: string) => this.httpClient.get<AppointmentListEntry[]>(`${this.apiUrl}/appointment/list${query}`).pipe(first());
+  getAppointmentList = (query: string) => this.httpClient.get<AppointmentListEntry[]>(`${this.apiUrl}/appointment/list${query}`);
 
   /** Gets the city name for the given zip code */
-  getCityName = (zipCode: string) => this.httpClient.get(`${this.apiUrl}/address/city/${zipCode}`, { responseType: 'text' }).pipe(first());
+  getCityName = (zipCode: string) => this.httpClient.get(`${this.apiUrl}/address/city/${zipCode}`, { responseType: 'text' });
 
   /** Gets the company for the current user */
-  getCompany = () => this.httpClient.get<Company>(`${this.apiUrl}/company`).pipe(first());
+  getCompany = () => this.httpClient.get<Company>(`${this.apiUrl}/company`);
+
+  /** Gets the company for the current user */
+  getCompanyPrices = () => this.httpClient.get<CompanyPrices>(`${this.apiUrl}/company/prices`);
 
   /** Gets the customer for the given id */
-  getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`).pipe(first());
+  getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`);
 
   /** Gets the list of customers from the API */
-  getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`).pipe(first());
+  getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`);
 
   /** Gets a deployment report */
-  getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) => this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' }).pipe(first());
+  getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) => this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' });
 
   /** Gets an assignment declaration document */
-  getAssignmentDeclaration = (customerId: UUID, year: number) => this.httpClient.get(`${this.apiUrl}/document/assignment-declaration/${customerId}/${year}`, { responseType: 'blob' }).pipe(first());
+  getAssignmentDeclaration = (customerId: UUID, year: number) => this.httpClient.get(`${this.apiUrl}/document/assignment-declaration/${customerId}/${year}`, { responseType: 'blob' });
 
   /** Gets the list of customers with only minimal info */
-  getMinimalCustomerList = () => this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`).pipe(first());
+  getMinimalCustomerList = () => this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`);
+
+  /** Gets the list of customers with only minimal info */
+  getCustomerWithBudget = (customerId: UUID) => this.httpClient.get<CustomerBudget>(`${this.apiUrl}/customer/${customerId}/budget`);
 
   /** Gets the employee for the given id */
-  getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`).pipe(first());
+  getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`);
 
   /** Gets the list of employees from the API. */
-  getEmployeeList = () => this.httpClient.get<Employee[]>(`${this.apiUrl}/employee/list`).pipe(first());
+  getEmployeeList = () => this.httpClient.get<Employee[]>(`${this.apiUrl}/employee/list`);
 
   /**
    * Gets the list of employees wit only basic information from the API
    * @returns A list of employees
    */
-  getEmployeeBaseList = () => this.httpClient.get<EmployeeBasic[]>(`${this.apiUrl}/employee/baselist`).pipe(first());
+  getEmployeeBaseList = () => this.httpClient.get<EmployeeBasic[]>(`${this.apiUrl}/employee/baselist`);
 
   /** Gets the insurance for the given id */
   getInsurance = (id: UUID) => this.httpClient.get<Insurance>(`${this.apiUrl}/insurance/${id}`);
@@ -127,26 +134,26 @@ export class ApiService {
   getInsuranceList = () => this.httpClient.get<Insurance[]>(`${this.apiUrl}/insurance/list`);
 
   /** Gets the employee of the current user */
-  getUser = () => this.httpClient.get<UserEmployee>(`${this.apiUrl}/employee`).pipe(first());
+  getUser = () => this.httpClient.get<UserEmployee>(`${this.apiUrl}/employee`);
 
   /** Updates the appointment */
   updateAppointment(appointment: Appointment) {
     const serializedData = JSON.stringify(appointment, this.customSerializer);
-    return this.httpClient.put(`${this.apiUrl}/appointment`, serializedData, this.jsonHeader).pipe(first());
+    return this.httpClient.put(`${this.apiUrl}/appointment`, serializedData, this.jsonHeader);
   }
 
   /** Updates the company */
-  updateCompany = (company: Company) => this.httpClient.put(`${this.apiUrl}/company`, company).pipe(first());
+  updateCompany = (company: Company) => this.httpClient.put(`${this.apiUrl}/company`, company);
 
   /** Updates the customer */
-  updateCustomer = (customer: Customer) => this.httpClient.put(`${this.apiUrl}/customer`, customer).pipe(first());
+  updateCustomer = (customer: Customer) => this.httpClient.put(`${this.apiUrl}/customer`, customer);
 
   /** Updates the employee */
-  updateEmployee = (employee: Employee) => this.httpClient.put<Employee>(`${this.apiUrl}/employee`, employee).pipe(first());
+  updateEmployee = (employee: Employee) => this.httpClient.put<Employee>(`${this.apiUrl}/employee`, employee);
 
   /** Updates the insurance */
-  updateInsurance = (insurance: Insurance) => this.httpClient.put<Insurance>(`${this.apiUrl}/insurance`, insurance).pipe(first());
+  updateInsurance = (insurance: Insurance) => this.httpClient.put<Insurance>(`${this.apiUrl}/insurance`, insurance);
 
   /** SignUp for a new user with company */
-  signup = (data: any) => this.httpClient.post(`${this.apiUrl}/signup`, data).pipe(first());
+  signup = (data: any) => this.httpClient.post(`${this.apiUrl}/signup`, data);
 }

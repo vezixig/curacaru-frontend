@@ -51,6 +51,7 @@ export class DashboardComponent {
           this.hasCompany = false;
           this.isLoading = false;
         } else {
+          console.log(error);
           this.isLoading = false;
           this.error = error;
         }

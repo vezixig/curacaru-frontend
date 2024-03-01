@@ -18,6 +18,10 @@ export class AppComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
+    this.authService.error$.subscribe((error) => {
+      console.error(error);
+      this.isAuthenticated = false;
+    });
     this.authService.isAuthenticated$.subscribe((next) => {
       this.isAuthenticated = next;
       var url = this.router.url === '/' ? '/dashboard' : this.router.url;
