@@ -17,7 +17,7 @@
         }"
       >
         @for (customer of customers; track customer) {
-        <option [value]="customer.id">{{ customer.firstName }} {{ customer.lastName }}</option>
+        <option [value]="customer.customerId">{{ customer.customerName }}</option>
         }
       </select>
       }
@@ -109,6 +109,78 @@
     </div>
     }
 
+    <!-- used budget -->
+    <div class="form-group mb-2">
+      <label for="inputDistanceToCustomer">Abrechnungsoptionen:</label>
+      @if(selectedCustomer == null) {
+      <p class="fw-lighter">Bitte zunächst einen Kunden auswählen.</p>
+      } @if(selectedCustomer?.doClearanceReliefAmount) {
+      <div class="form-check">
+        <input
+          (change)="onClearanceTypeChanged()"
+          [(ngModel)]="selectedClearanceType"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-check-input"
+          id="radioReliefAmount"
+          name="clearanceType"
+          type="radio"
+          [value]="clearanceType.reliefAmount"
+          [disabled]="!canClearReliefAmount"
+        />
+        <label class="form-check-label" for="radioReliefAmount"> Entlastungsbetrag §45b SGB XI</label>
+      </div>
+      } @if(selectedCustomer?.doClearanceCareBenefit) {
+      <div class="form-check">
+        <input
+          (change)="onClearanceTypeChanged()"
+          [(ngModel)]="selectedClearanceType"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-check-input"
+          id="radioCareBenefit"
+          name="clearanceType"
+          type="radio"
+          [value]="clearanceType.careBenefit"
+          [disabled]="!canClearCareBenefit"
+        />
+        <label class="form-check-label" for="radioCareBenefit"> ..% Pflegesachleistungen §36 SGB XI (max. 40%)</label>
+      </div>
+      } @if(selectedCustomer?.doClearancePreventiveCare) {
+      <div class="form-check">
+        <input
+          (change)="onClearanceTypeChanged()"
+          [(ngModel)]="selectedClearanceType"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-check-input"
+          id="radioPreventiveCare"
+          name="clearanceType"
+          type="radio"
+          [value]="clearanceType.preventiveCare"
+          [disabled]="!canClearPreventiveCare"
+        />
+        <label class="form-check-label" for="radioPreventiveCare"> Verhinderungspflege § 39 SGB XI</label>
+      </div>
+      } @if(selectedCustomer?.doClearanceSelfPayment) {
+      <div class="form-check">
+        <input
+          (change)="onClearanceTypeChanged()"
+          [(ngModel)]="selectedClearanceType"
+          [ngModelOptions]="{ standalone: true }"
+          class="form-check-input"
+          id="radioSelfPayment"
+          name="clearanceType"
+          type="radio"
+          [value]="clearanceType.selfPayment"
+          [disabled]="!canClearSelfPayment"
+        />
+        <label class="form-check-label" for="radioSelfPayment"> Selbstzahler</label>
+      </div>
+      } @if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
+      <div class="alert alert-warning mt-2" role="alert">
+        Das Budget für diesen Monat ist bereits aufgebraucht, weshalb der Termin leider nicht angelegt werden kann.
+      </div>
+      }
+    </div>
+
     <!-- Signatures -->
     <!-- <div class="form-group mb-4">
   <label for="inputNotes">Unterschriften:</label>
@@ -127,7 +199,11 @@
 
   <div class="row g-2 mt-2">
     <div class="col">
-      <button [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing" type="submit" class="form-control btn btn-primary text-white h-100">
+      <button
+        [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing"
+        type="submit"
+        class="form-control btn btn-primary text-white h-100"
+      >
         @if (isSaving) {
         <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
         }
@@ -139,7 +215,12 @@
     </div>
     @if (!isNew && !isDone) {
     <div class="col">
-      <button [disabled]="isSaving || isFinishing || !canFinish" type="button" (click)="onFinish()" class="form-control btn btn-outline-success h-100">
+      <button
+        [disabled]="isSaving || isFinishing || !canFinish"
+        type="button"
+        (click)="onFinish()"
+        class="form-control btn btn-outline-success h-100"
+      >
         @if (isFinishing) {
         <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
         }

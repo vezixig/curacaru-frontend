@@ -2,6 +2,24 @@
   <h4 class="h-underline">Budgets</h4>
 </div>
 
+<!-- <form class="mt-3">
+  <div class="row">
+    <div class="col">
+      <label for="dpFromDate">Kunde</label>
+      <select class="form-select" name="customerSelect" [(ngModel)]="selectedCustomerId" (change)="onCustomerChanged()">
+        <option></option>
+        @for (customer of customers; track customer) {
+        <option [value]="customer.customerId">{{ customer.customerName }}</option>
+        }
+      </select>
+    </div>
+    <div class="col">
+      <label for="dpFromDate">Jahr</label>
+      <input [(ngModel)]="year" name="yearInput" type="number" class="form-control" (change)="onYearChanged()" />
+    </div>
+  </div>
+</form> -->
+
 <table class="d-none d-md-table col-12 table mt-3 table-striped">
   <thead>
     <tr>
@@ -26,7 +44,12 @@
       <td class="text-end">{{ budget.totalAmount | currency }}</td>
       <td class="text-end">{{ budget.remainingHours | number : "1.2-2" }}</td>
       <td>
-        <button type="button" [routerLink]="['/dashboard/budgets', budget.customerId]" class="btn btn-outline-secondary btn-sm" title="Budget bearbeiten">
+        <button
+          type="button"
+          [routerLink]="['/dashboard/budgets', budget.customerId]"
+          class="btn btn-outline-secondary btn-sm"
+          title="Termin bearbeiten"
+        >
           <fa-icon [icon]="faGear" [fixedWidth]="true" />
         </button>
       </td>
@@ -41,7 +64,12 @@
     <div class="card-header d-flex">
       <span class="lead text-truncate">{{ budget.customerName }}</span>
       <div class="btn-group ms-auto" role="group">
-        <button type="button" [routerLink]="['/dashboard/budgets', budget.customerId]" class="btn btn-outline-secondary btn-sm" title="Budget bearbeiten">
+        <button
+          type="button"
+          [routerLink]="['/dashboard/budgets', budget.customerId]"
+          class="btn btn-outline-secondary btn-sm"
+          title="Budget bearbeiten"
+        >
           <fa-icon [icon]="faGear" [fixedWidth]="true" />
         </button>
       </div>

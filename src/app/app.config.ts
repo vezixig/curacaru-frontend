@@ -21,6 +21,8 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       AuthModule.forRoot({
         ...environment.auth0,
+        useRefreshTokens: true,
+        cacheLocation: 'localstorage',
         authorizationParams: {
           redirect_uri: environment.auth0.callbackUri,
           audience: environment.auth0.authorizationParams.audience,
