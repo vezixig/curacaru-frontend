@@ -4,7 +4,8 @@ import { RouterModule } from '@angular/router';
 import { BudgetListEntry } from '@curacaru/models/budget-list-entry.model';
 import { BudgetService } from '@curacaru/services/budget.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { faClock } from '@fortawesome/free-regular-svg-icons';
+import { faGear, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -17,6 +18,8 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class BudgetListComponent implements OnInit, OnDestroy {
   faGear = faGear;
+  faMoney = faMoneyBill;
+  faClock = faClock;
 
   isLoading = true;
   budgetList: BudgetListEntry[] = [];
