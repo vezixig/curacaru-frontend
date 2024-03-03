@@ -50,7 +50,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   hasBudgetError = false;
   isDone = false;
   isExpired = false;
-  isFinishing = false;
+  isChangingStatus = false;
   isLoading = false;
   isNew = true;
   isPlanning = false;
@@ -67,7 +67,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   private existingAppointment?: Appointment;
   private nextMonth = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 2, 1);
   private postAppointmentSubscription?: Subscription;
-  private postFinishSubscription?: Subscription;
   private updateAppointmentSubscription?: Subscription;
 
   constructor(
@@ -182,7 +181,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.existingAppointment = result;
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
-          this.canFinish = !result.isDone; // && result.isSignedByCustomer && result.isSignedByEmployee;
+          this.canFinish = !result.isDone && result.date <= this.today; // && result.isSignedByCustomer && result.isSignedByEmployee;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId);
           this.calculatePrice();
@@ -266,18 +265,37 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   onFinish() {
-    this.isFinishing = true;
-    this.postFinishSubscription?.unsubscribe();
-    this.postFinishSubscription = this.apiService.finishAppointment(this.appointmentId!).subscribe({
-      complete: () => {
-        this.toastr.success('Termin wurde abgeschlossen');
-        this.router.navigate(['/dashboard/appointments']);
-      },
-      error: (error) => {
-        this.toastr.error(`Termin konnte nicht abgeschlossen werden: [${error.status}] ${error.error}`);
-        this.isFinishing = false;
-      },
-    });
+    this.isChangingStatus = true;
+    this.apiService
+      .finishAppointment(this.appointmentId!)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        complete: () => {
+          this.toastr.success('Termin wurde abgeschlossen');
+          this.router.navigate(['/dashboard/appointments']);
+        },
+        error: (error) => {
+          this.toastr.error(`Termin konnte nicht abgeschlossen werden: [${error.status}] ${error.error}`);
+          this.isChangingStatus = false;
+        },
+      });
+  }
+
+  onReopen() {
+    this.isChangingStatus = true;
+    this.apiService
+      .reopenAppointment(this.appointmentId!)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        complete: () => {
+          this.toastr.success('Termin wurde wieder geöffnet');
+          this.router.navigate(['/dashboard/appointments']);
+        },
+        error: (error) => {
+          this.toastr.error(`Termin konnte nicht wieder geöffnet werden: [${error.status}] ${error.error}`);
+          this.isChangingStatus = false;
+        },
+      });
   }
 
   onSave() {

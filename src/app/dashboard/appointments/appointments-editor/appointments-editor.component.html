@@ -209,7 +209,7 @@
   <div class="row g-2 mt-2">
     <div class="col">
       <button
-        [disabled]="!appointmentForm.valid || isLoading || isSaving || isFinishing"
+        [disabled]="!appointmentForm.valid || isLoading || isSaving || isChangingStatus"
         type="submit"
         class="form-control btn btn-primary text-white h-100"
       >
@@ -222,19 +222,31 @@
         }
       </button>
     </div>
-    @if (!isNew && !isDone && appointmentForm.controls['date'].value < today) {
+    @if (!isNew && !isDone && canFinish) {
     <div class="col">
       <button
-        [disabled]="isSaving || isFinishing || !canFinish"
+        [disabled]="isSaving || isChangingStatus || !canFinish"
         type="button"
         (click)="onFinish()"
         class="form-control btn btn-outline-success h-100"
       >
-        @if (isFinishing) {
+        @if (isChangingStatus) {
         <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
         }
         <span>Termin abschließen</span>
-        @if (isFinishing) {
+        @if (isChangingStatus) {
+        <span>...</span>
+        }
+      </button>
+    </div>
+    } @if (!isNew && isDone) {
+    <div class="col">
+      <button [disabled]="isSaving || isChangingStatus" type="button" (click)="onReopen()" class="form-control btn btn-outline-warning h-100">
+        @if (isChangingStatus) {
+        <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        }
+        <span>Termin öffnen</span>
+        @if (isChangingStatus) {
         <span>...</span>
         }
       </button>

@@ -79,6 +79,9 @@ export class ApiService {
   /** Finishes the appointment with the given id */
   finishAppointment = (id: UUID) => this.httpClient.post(`${this.apiUrl}/appointment/${id}/finish`, {});
 
+  /** Reopens the appointment with the given id */
+  reopenAppointment = (id: UUID) => this.httpClient.post(`${this.apiUrl}/appointment/${id}/reopen`, {});
+
   /** Gets the appointment for the given id */
   getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`);
 
@@ -101,10 +104,12 @@ export class ApiService {
   getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`);
 
   /** Gets a deployment report */
-  getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) => this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' });
+  getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) =>
+    this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' });
 
   /** Gets an assignment declaration document */
-  getAssignmentDeclaration = (customerId: UUID, year: number) => this.httpClient.get(`${this.apiUrl}/document/assignment-declaration/${customerId}/${year}`, { responseType: 'blob' });
+  getAssignmentDeclaration = (customerId: UUID, year: number) =>
+    this.httpClient.get(`${this.apiUrl}/document/assignment-declaration/${customerId}/${year}`, { responseType: 'blob' });
 
   /** Gets the list of customers with only minimal info */
   getMinimalCustomerList = () => this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`);
