@@ -3,15 +3,15 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { FormGroup, Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { faCircleRight } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../services/api.service';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'cura-signup',
   standalone: true,
   templateUrl: './signup.component.html',
   providers: [ApiService],
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
+  imports: [CommonModule, NgOptimizedImage, ReactiveFormsModule, FontAwesomeModule],
   styleUrl: './signup.component.scss',
 })
 export class SignupComponent {

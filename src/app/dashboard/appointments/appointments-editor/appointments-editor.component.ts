@@ -45,6 +45,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
   appointmentForm: FormGroup;
   canFinish = false;
+  canOpen = false;
   customers: MinimalCustomerListEntry[] = [];
   employees: EmployeeBasic[] = [];
   hasBudgetError = false;
@@ -63,6 +64,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   private $onDestroy = new Subject();
 
   private appointmentId?: UUID;
+
   private companyPrices?: CompanyPrices;
   private existingAppointment?: Appointment;
   private nextMonth = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 2, 1);
@@ -181,7 +183,8 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.existingAppointment = result;
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
-          this.canFinish = !result.isDone && result.date <= this.today; // && result.isSignedByCustomer && result.isSignedByEmployee;
+          this.canFinish = !this.isNew && !result.isDone && result.date <= this.today;
+          this.canOpen = !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId);
           this.calculatePrice();

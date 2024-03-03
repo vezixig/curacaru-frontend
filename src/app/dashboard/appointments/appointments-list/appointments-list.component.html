@@ -182,13 +182,15 @@
             type="button"
             [routerLink]="['/dashboard/appointments', appointment.id]"
             class="btn btn-outline-secondary btn-sm"
-            title="Mitarbeiter bearbeiten"
+            title="Termin bearbeiten"
           >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
-          <button type="button" (click)="onDelete(appointment)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+          @if (!appointment.isDone && appointment.date > beginOfCurrentMonth) {
+          <button type="button" (click)="onDelete(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin löschen">
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </button>
+          }
         </div>
       </div>
       <div class="card-body">
@@ -204,18 +206,16 @@
           }
         </ul>
       </div>
-      @if (!appointment.isDone && !appointment.isPlanned && !appointment.hasBudgetError && appointment.date < today) {
+      @if (!appointment.isDone && !appointment.isPlanned && !appointment.hasBudgetError && appointment.date <= today) {
       <div class="card-footer">
-        <!-- <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm me-2" title="Termin abschließen">
-          <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
-          Mitarbeiter
-        </button>
-        <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm me-2" title="Termin abschließen">
-          <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
-          Kunde
-        </button> -->
         <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin abschließen">
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen
+        </button>
+      </div>
+      } @if (isManager && appointment.isDone && appointment.date >= beginOfCurrentMonth) {
+      <div class="card-footer">
+        <button type="button" (click)="onReopen(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin wieder öffnen">
+          <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Öffnen
         </button>
       </div>
       }

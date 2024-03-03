@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -7,7 +7,7 @@ import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-ic
 import { faCheck, faCircleInfo, faFileSignature, faGear, faHouse, faLocationDot, faPhone, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription, map } from 'rxjs';
+import { Subject, map, takeUntil } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
@@ -38,6 +38,16 @@ import { ApiService, DateTimeService, LocationService, UserService } from '@cura
   templateUrl: './appointments-list.component.html',
 })
 export class AppointmentsListComponent implements OnDestroy, OnInit {
+  /** injections */
+  private apiService = inject(ApiService);
+  private calendar = inject(NgbCalendar);
+  public formatter = inject(NgbDateParserFormatter);
+  private locationService = inject(LocationService);
+  private modalService = inject(NgbModal);
+  private toastr = inject(ToastrService);
+  private userService = inject(UserService);
+
+  /** relays  */
   faCalendar = faCalendar;
   faCheck = faCheck;
   faCircleInfo = faCircleInfo;
@@ -49,7 +59,9 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   faTrashCan = faTrashCan;
   faUser = faUser;
   faUserSolid = faUserAlt;
+  beginOfCurrentMonth = DateTimeService.beginOfCurrentMonth;
 
+  /** properties  */
   appointments: AppointmentListEntry[] = [];
   customers: CustomerListEntry[] = [];
   employees: EmployeeBasic[] = [];
@@ -65,28 +77,12 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   isCollapsed = true;
   today = new Date();
 
-  private deleteAppointmentSubscription?: Subscription;
-  private getAppointmentsSubscription?: Subscription;
-  private getEmployeeListSubscription?: Subscription;
-  private getCustomerListSubscription?: Subscription;
-  private postFinishSubscription?: Subscription;
-
-  constructor(
-    private apiService: ApiService,
-    private calendar: NgbCalendar,
-    public formatter: NgbDateParserFormatter,
-    private locationService: LocationService,
-    private modalService: NgbModal,
-    private toastr: ToastrService,
-    private userService: UserService
-  ) {}
+  /** fields  */
+  private $onDestroy = new Subject();
 
   ngOnDestroy(): void {
-    this.deleteAppointmentSubscription?.unsubscribe();
-    this.getAppointmentsSubscription?.unsubscribe();
-    this.getCustomerListSubscription?.unsubscribe();
-    this.getEmployeeListSubscription?.unsubscribe();
-    this.postFinishSubscription?.unsubscribe();
+    this.$onDestroy.next(true);
+    this.$onDestroy.complete();
   }
 
   ngOnInit(): void {
@@ -98,23 +94,29 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
     this.isLoading = true;
     this.loadAppointments();
 
-    this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
-      next: (result) => {
-        this.employees = result;
-      },
-      error: (error) => {
-        this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-      },
-    });
+    this.apiService
+      .getEmployeeBaseList()
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        next: (result) => {
+          this.employees = result;
+        },
+        error: (error) => {
+          this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
+        },
+      });
 
-    this.getCustomerListSubscription = this.apiService.getCustomerList().subscribe({
-      next: (result) => {
-        this.customers = result;
-      },
-      error: (error) => {
-        this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-      },
-    });
+    this.apiService
+      .getCustomerList()
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        next: (result) => {
+          this.customers = result;
+        },
+        error: (error) => {
+          this.toastr.error(`Kundenliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
+        },
+      });
   }
 
   onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
@@ -163,9 +165,9 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
     uri += this.selectedCustomerId ? `customerId=${this.selectedCustomerId}&` : '';
     uri = uri.slice(0, -1);
 
-    this.getAppointmentsSubscription?.unsubscribe();
-    this.getAppointmentsSubscription = this.apiService
+    this.apiService
       .getAppointmentList(uri)
+      .pipe(takeUntil(this.$onDestroy))
       .pipe(map((result) => result.map((entry) => this.deserializeDates(entry))))
       .subscribe({
         next: (result) => {
@@ -180,16 +182,33 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   }
 
   onFinish(appointment: AppointmentListEntry) {
-    this.postFinishSubscription?.unsubscribe();
-    this.postFinishSubscription = this.apiService.finishAppointment(appointment.id!).subscribe({
-      complete: () => {
-        this.toastr.success('Termin wurde abgeschlossen');
-        appointment.isDone = true;
-      },
-      error: (error) => {
-        this.toastr.error(`Termin konnte nicht abgeschlossen werden: [${error.status}] ${error.error}`);
-      },
-    });
+    this.apiService
+      .finishAppointment(appointment.id!)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        complete: () => {
+          this.toastr.success('Termin wurde abgeschlossen');
+          appointment.isDone = true;
+        },
+        error: (error) => {
+          this.toastr.error(`Termin konnte nicht abgeschlossen werden: [${error.status}] ${error.error}`);
+        },
+      });
+  }
+
+  onReopen(appointment: AppointmentListEntry) {
+    this.apiService
+      .reopenAppointment(appointment.id)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        complete: () => {
+          this.toastr.success('Termin wurde wieder geöffnet');
+          appointment.isDone = false;
+        },
+        error: (error) => {
+          this.toastr.error(`Termin konnte nicht wieder geöffnet werden: [${error.status}] ${error.error}`);
+        },
+      });
   }
 
   private deserializeDates(obj: any): any {
@@ -207,15 +226,17 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   }
 
   private deleteEmployee(appointment: AppointmentListEntry) {
-    this.deleteAppointmentSubscription?.unsubscribe();
-    this.deleteAppointmentSubscription = this.apiService.deleteAppointment(appointment.id).subscribe({
-      complete: () => {
-        this.toastr.success(`Der Termin wurde gelöscht.`);
-        this.appointments = this.appointments.filter((e) => e.id !== appointment.id);
-      },
-      error: (error) => {
-        this.toastr.error(`Termin konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
-      },
-    });
+    this.apiService
+      .deleteAppointment(appointment.id)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        complete: () => {
+          this.toastr.success(`Der Termin wurde gelöscht.`);
+          this.appointments = this.appointments.filter((e) => e.id !== appointment.id);
+        },
+        error: (error) => {
+          this.toastr.error(`Termin konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
+        },
+      });
   }
 }

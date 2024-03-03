@@ -49,6 +49,8 @@ export class DateTimeService {
     return this.dateFormat.format(date);
   }
 
+  static beginOfCurrentMonth: Date = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
   /**
    * Gets the dates for Monday and Sunday of week the given date is in.
    * @param date The date to get the start and end of the week from.

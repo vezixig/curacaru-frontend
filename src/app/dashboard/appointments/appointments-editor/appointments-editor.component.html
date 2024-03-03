@@ -222,7 +222,7 @@
         }
       </button>
     </div>
-    @if (!isNew && !isDone && canFinish) {
+    @if (canFinish) {
     <div class="col">
       <button
         [disabled]="isSaving || isChangingStatus || !canFinish"
@@ -239,7 +239,7 @@
         }
       </button>
     </div>
-    } @if (!isNew && isDone) {
+    } @if (canOpen) {
     <div class="col">
       <button [disabled]="isSaving || isChangingStatus" type="button" (click)="onReopen()" class="form-control btn btn-outline-warning h-100">
         @if (isChangingStatus) {
