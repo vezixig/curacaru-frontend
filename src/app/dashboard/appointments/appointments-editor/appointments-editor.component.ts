@@ -57,6 +57,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   isSaving = false;
   minDate = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 1, 1);
   selectedCustomer?: CustomerBudget;
+  today = new Date();
   user?: UserEmployee;
 
   private $onDestroy = new Subject();

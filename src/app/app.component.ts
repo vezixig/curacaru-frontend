@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { LoginComponent } from './auth/login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -24,8 +24,9 @@ export class AppComponent implements OnInit {
     });
     this.authService.isAuthenticated$.subscribe((next) => {
       this.isAuthenticated = next;
-      var url = this.router.url === '/' ? '/dashboard' : this.router.url;
-      if (next) this.router.navigate([url]);
+      var route = location.href.split('/').splice(3).join('/');
+      route = route === '' ? '/dashboard' : route;
+      if (next) this.router.navigate([route]);
     });
   }
 }

@@ -37,4 +37,10 @@ export interface AppointmentListEntry {
 
   /** The phone number of the customer. */
   phone: string;
+
+  /** A value indicating if the planned appointment couldn't be processed. */
+  hasBudgetError: boolean;
+
+  /** A value indicating whether the appointment is planned for the future. */
+  isPlanned: boolean;
 }

@@ -20,7 +20,17 @@ import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
 
 @Component({
-  imports: [CommonModule, FontAwesomeModule, RouterModule, NgbDatepickerModule, NgxSkeletonLoaderModule, FormsModule, TimeFormatPipe, ReplacePipe, NgbCollapseModule],
+  imports: [
+    CommonModule,
+    FontAwesomeModule,
+    RouterModule,
+    NgbDatepickerModule,
+    NgxSkeletonLoaderModule,
+    FormsModule,
+    TimeFormatPipe,
+    ReplacePipe,
+    NgbCollapseModule,
+  ],
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   selector: 'cura-appointments-list',
   standalone: true,
@@ -53,6 +63,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   selectedEmployeeId?: number;
   toDate: NgbDate | null = this.calendar.getToday();
   isCollapsed = true;
+  today = new Date();
 
   private deleteAppointmentSubscription?: Subscription;
   private getAppointmentsSubscription?: Subscription;
@@ -106,7 +117,8 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
     });
   }
 
-  onOpenAppointmentLocation = (appointment: AppointmentListEntry) => this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
+  onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
+    this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
 
   isHovered = (date: NgbDate) => this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
   isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate) && date.before(this.toDate);

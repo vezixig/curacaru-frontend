@@ -222,7 +222,7 @@
         }
       </button>
     </div>
-    @if (!isNew && !isDone) {
+    @if (!isNew && !isDone && appointmentForm.controls['date'].value < today) {
     <div class="col">
       <button
         [disabled]="isSaving || isFinishing || !canFinish"

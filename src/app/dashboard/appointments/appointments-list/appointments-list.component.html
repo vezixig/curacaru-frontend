@@ -114,7 +114,14 @@
         <td>{{ appointment.employeeName }}</td>
         <td>{{ appointment.employeeReplacementName }}</td>
         <td class="text-center">
-          <img width="16" height="16" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" style="border-radius: 8px" />
+          <img
+            width="16"
+            height="16"
+            [class.bg-secondary]="appointment.hasBudgetError || appointment.isPlanned"
+            [class.bg-success]="!(appointment.hasBudgetError || appointment.isPlanned) && appointment.isDone"
+            [class.bg-danger]="!(appointment.hasBudgetError || appointment.isPlanned) && !appointment.isDone"
+            style="border-radius: 8px"
+          />
         </td>
         <td>
           <div class="btn-group" role="group">
@@ -150,7 +157,13 @@
     @for (appointment of appointments; track appointment) {
     <div class="card my-3">
       <div class="card-header d-flex align-content-start p-2">
-        <img class="me-2" width="10" [class.bg-success]="appointment.isDone" [class.bg-danger]="!appointment.isDone" />
+        <img
+          class="me-2"
+          width="10"
+          [class.bg-secondary]="appointment.hasBudgetError || appointment.isPlanned"
+          [class.bg-success]="!(appointment.hasBudgetError || appointment.isPlanned) && appointment.isDone"
+          [class.bg-danger]="!(appointment.hasBudgetError || appointment.isPlanned) && !appointment.isDone"
+        />
         <span class="text-truncate">
           <span class="fw-light"> {{ appointment.date | date : "dd.MM.yyyy" }}<br /></span>
           <span class="fw-bold">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</span>
@@ -191,7 +204,7 @@
           }
         </ul>
       </div>
-      @if (!appointment.isDone) {
+      @if (!appointment.isDone && !appointment.isPlanned && !appointment.hasBudgetError && appointment.date < today) {
       <div class="card-footer">
         <!-- <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm me-2" title="Termin abschließen">
           <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
