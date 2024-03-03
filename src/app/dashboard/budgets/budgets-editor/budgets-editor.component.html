@@ -14,7 +14,14 @@
         <div ngbAccordionCollapse>
           <div ngbAccordionBody>
             <ng-template>
-              <cura-input (change)="onBudgetChange('reliefAmount', 'reliefAmountRemainingHours')" prefix="EUR" key="reliefAmount" [isLoading]="isLoading" label="Aktuelles Budget" [form]="budgetForm" />
+              <cura-input
+                (change)="onBudgetChange('reliefAmount', 'reliefAmountRemainingHours')"
+                prefix="EUR"
+                key="reliefAmount"
+                [isLoading]="isLoading"
+                label="Aktuelles Budget"
+                [form]="budgetForm"
+              />
 
               <div class="form-group mb-2">
                 <label for="inputPricePerHour">Stundenlohn Unternehmen, verbleibende Stunden</label>
@@ -64,7 +71,14 @@
         <div ngbAccordionCollapse>
           <div ngbAccordionBody>
             <ng-template>
-              <cura-input (change)="onBudgetChange('careBenefitAmount', 'careBenefitRemainingHours')" prefix="EUR" key="careBenefitAmount" [isLoading]="isLoading" label="Aktuelles Budget" [form]="budgetForm" />
+              <cura-input
+                (change)="onBudgetChange('careBenefitAmount', 'careBenefitRemainingHours')"
+                prefix="EUR"
+                key="careBenefitAmount"
+                [isLoading]="isLoading"
+                label="Aktuelles Budget"
+                [form]="budgetForm"
+              />
 
               <div class="form-group mb-2">
                 <label for="inputPricePerHour">Stundenlohn Unternehmen, verbleibende Stunden</label>
@@ -106,7 +120,14 @@
         <div ngbAccordionCollapse>
           <div ngbAccordionBody>
             <ng-template>
-              <cura-input (change)="onBudgetChange('preventiveCareAmount', 'preventiveCareRemainingHours')" prefix="EUR" key="preventiveCareAmount" [isLoading]="isLoading" label="Aktuelles Budget" [form]="budgetForm" />
+              <cura-input
+                (change)="onBudgetChange('preventiveCareAmount', 'preventiveCareRemainingHours')"
+                prefix="EUR"
+                key="preventiveCareAmount"
+                [isLoading]="isLoading"
+                label="Aktuelles Budget"
+                [form]="budgetForm"
+              />
 
               <div class="form-group mb-2">
                 <label for="inputPricePerHour">Stundenlohn Unternehmen, verbleibende Stunden</label>
@@ -149,7 +170,14 @@
         <div ngbAccordionCollapse>
           <div ngbAccordionBody>
             <ng-template>
-              <cura-input (change)="onBudgetChange('selfPayAmount', 'selfPayRemainingHours')" prefix="EUR" key="selfPayAmount" [isLoading]="isLoading" label="Aktuelles Budget" [form]="budgetForm" />
+              <cura-input
+                (change)="onBudgetChange('selfPayAmount', 'selfPayRemainingHours')"
+                prefix="EUR"
+                key="selfPayAmount"
+                [isLoading]="isLoading"
+                label="Aktuelles Budget"
+                [form]="budgetForm"
+              />
 
               <div class="form-group mb-2">
                 <label for="inputPricePerHour">Stundenlohn Unternehmen, verbleibende Stunden</label>
@@ -182,6 +210,12 @@
         </div>
       </div>
       }
+    </div>
+  </div>
+
+  <div class="row g-2 mt-2">
+    <div class="alert alert-secondary mt-2" role="alert">
+      <fa-icon [icon]="faCircleInfo" /> Bei der Berechnung der Reststunden werden keine Anfahrtskosten berücksichtigt.
     </div>
   </div>
 

@@ -13,15 +13,20 @@ import { StringCurrencyPipe } from '@curacaru/pipes/string-currency.pipe';
 import { Subject, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
-  imports: [ReactiveFormsModule, FormsModule, RouterModule, InputComponent, NgbAccordionModule, NgxSkeletonLoaderModule],
+  imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, RouterModule, InputComponent, NgbAccordionModule, NgxSkeletonLoaderModule],
   providers: [BudgetService, StringCurrencyPipe, DecimalPipe],
   selector: 'cura-budget-editor',
   standalone: true,
   templateUrl: './budgets-editor.component.html',
 })
 export class BudgetsEditorComponent implements OnDestroy, OnInit {
+  /** relays */
+  faCircleInfo = faCircleInfo;
+
   /** properties */
   budget: Budget | undefined;
   budgetForm: FormGroup;
