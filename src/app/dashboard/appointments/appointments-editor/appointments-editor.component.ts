@@ -17,6 +17,7 @@ import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
 import { ClearanceType } from '@curacaru/enums/clearance-type';
+import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   imports: [
@@ -37,18 +38,23 @@ import { ClearanceType } from '@curacaru/enums/clearance-type';
 })
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
+  faCircleInfo = faCircleInfo;
+  faCircleExclamation = faCircleExclamation;
   RideCostType = RideCostsType;
   clearanceType = ClearanceType;
 
   appointmentForm: FormGroup;
-  canFinish: boolean = false;
+  canFinish = false;
   customers: MinimalCustomerListEntry[] = [];
   employees: EmployeeBasic[] = [];
-  isDone: boolean = false;
-  isFinishing: boolean = false;
-  isLoading: boolean = false;
-  isNew: boolean = true;
-  isSaving: boolean = false;
+  hasBudgetError = false;
+  isDone = false;
+  isExpired = false;
+  isFinishing = false;
+  isLoading = false;
+  isNew = true;
+  isPlanning = false;
+  isSaving = false;
   minDate = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 1, 1);
   selectedCustomer?: CustomerBudget;
   user?: UserEmployee;
@@ -56,11 +62,12 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   private $onDestroy = new Subject();
 
   private appointmentId?: UUID;
+  private companyPrices?: CompanyPrices;
+  private existingAppointment?: Appointment;
+  private nextMonth = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 2, 1);
   private postAppointmentSubscription?: Subscription;
   private postFinishSubscription?: Subscription;
   private updateAppointmentSubscription?: Subscription;
-  private companyPrices?: CompanyPrices;
-  private existingAppointment?: Appointment;
 
   constructor(
     private apiService: ApiService,
@@ -164,16 +171,20 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             timeStart: DateTimeService.toNgbTime(result.timeStart),
           });
 
-          if (result.isDone) {
+          this.isExpired = this.minDate.after(DateTimeService.toNgbDate(result.date));
+          if (result.isDone || this.isExpired) {
             this.appointmentForm.disable();
           }
 
+          this.hasBudgetError = result.hasBudgetError;
+          this.isPlanning = result.isPlanned;
           this.existingAppointment = result;
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
           this.canFinish = !result.isDone; // && result.isSignedByCustomer && result.isSignedByEmployee;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId);
+          this.calculatePrice();
         },
         error: (error) => {
           if (error.status === 404) {
@@ -188,6 +199,11 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   private calculatePrice() {
+    if (this.isPlanning) {
+      this.appointmentForm.get('clearanceType')?.setValue(this.selectedClearanceType);
+      return;
+    }
+
     const timeStartValue = this.appointmentForm.get('timeStart')?.value;
     const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
 
@@ -273,8 +289,10 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       distanceToCustomer: +this.appointmentForm.get('distanceToCustomer')?.value,
       employeeId: this.appointmentForm.get('employeeId')?.value,
       employeeReplacementId: this.appointmentForm.get('employeeReplacementId')?.value,
+      hasBudgetError: false,
       id: this.appointmentId,
       isDone: false,
+      isPlanned: false,
       isSignedByCustomer: this.appointmentForm.get('isSignedByCustomer')?.value,
       isSignedByEmployee: this.appointmentForm.get('isSignedByEmployee')?.value,
       notes: this.appointmentForm.get('notes')?.value,
@@ -349,11 +367,15 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   private onDateChanged(date: NgbDate) {
-    console.log(date);
+    if (this.isLoading || this.isExpired) return;
+
     if (this.minDate.after(date)) {
       this.toastr.info('Termin kann nicht vor dem aktuellen Monat liegen');
       this.appointmentForm.get('date')?.setValue(this.minDate);
+      date = this.minDate;
     }
+    this.isPlanning = this.nextMonth.before(date) || this.nextMonth.equals(date);
+    this.calculatePrice();
   }
 
   private UpdateAppointment(appointment: Appointment) {
