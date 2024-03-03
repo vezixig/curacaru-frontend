@@ -7,9 +7,11 @@ import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { ApiService } from './services/api.service';
+import { ManagerGuard } from './guards/manger.guard';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    ManagerGuard,
     { provide: LOCALE_ID, useValue: 'de-DE' },
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'EUR' },
     provideRouter(routes),

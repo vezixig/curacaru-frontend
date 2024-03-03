@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { ManagerGuard } from './guards/manger.guard';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard/budgets',
+    canActivate: [ManagerGuard],
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       {
@@ -38,6 +40,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard/company',
+    canActivate: [ManagerGuard],
     loadComponent: () => import('@curacaru/dashboard/company/company.component').then((o) => o.CompanyComponent),
     pathMatch: 'full',
   },
@@ -65,6 +68,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard/employees',
+    canActivate: [ManagerGuard],
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       {
@@ -83,6 +87,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard/insurances',
+    canActivate: [ManagerGuard],
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       {
