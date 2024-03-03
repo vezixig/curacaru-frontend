@@ -213,11 +213,14 @@
     </div>
   </div>
 
+  @if (hasRideCosts) {
+  <!-- info for not included ride costs in calculation -->
   <div class="row g-2 mt-2">
     <div class="alert alert-secondary mt-2" role="alert">
       <fa-icon [icon]="faCircleInfo" /> Bei der Berechnung der Reststunden werden keine Anfahrtskosten berücksichtigt.
     </div>
   </div>
+  }
 
   <!-- Buttons -->
   <div class="row g-2 mt-2">

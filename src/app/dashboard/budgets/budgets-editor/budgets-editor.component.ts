@@ -2,7 +2,7 @@ import { Budget } from '@curacaru/models/budget.model';
 import { BudgetService } from '@curacaru/services/budget.service';
 import { BudgetUpdate } from '@curacaru/models/BudgetUpdate';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { DateTimeService } from '@curacaru/services';
+import { ApiService, DateTimeService } from '@curacaru/services';
 import { DecimalPipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputComponent } from '@curacaru/shared/input/input.component';
@@ -10,11 +10,12 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { Router, RouterModule } from '@angular/router';
 import { StringCurrencyPipe } from '@curacaru/pipes/string-currency.pipe';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
 
 @Component({
   imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, RouterModule, InputComponent, NgbAccordionModule, NgxSkeletonLoaderModule],
@@ -33,12 +34,14 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
   currentYear = new Date().getFullYear();
   endOfMonth = DateTimeService.toLocalDateString(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
   endOfYear = DateTimeService.toLocalDateString(new Date(new Date().getFullYear(), 11, 31));
+  hasRideCosts = false;
   isLoading = true;
+  isSaving = false;
   nextYear = new Date().getFullYear() + 1;
   showLastYear = new Date().getMonth() <= 6;
-  isSaving = false;
 
   /** injected services */
+  private apiService = inject(ApiService);
   private budgetService = inject(BudgetService);
   private decimalPipe = inject(DecimalPipe);
   private formBuilder = inject(FormBuilder);
@@ -126,12 +129,12 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
 
   private loadBudget() {
     this.isLoading = true;
-    this.budgetService
-      .getBudget(this.customerId!)
+    forkJoin({ budget: this.budgetService.getBudget(this.customerId!), prices: this.apiService.getCompanyPrices() })
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
-        next: (next) => {
-          this.budget = next;
+        next: (result) => {
+          this.hasRideCosts = result.prices.rideCostsType == RideCostsType.FlatRate || result.prices.rideCostsType == RideCostsType.Kilometer;
+          this.budget = result.budget;
           this.TransferBudgetToForm(this.budget);
           this.isLoading = false;
         },
