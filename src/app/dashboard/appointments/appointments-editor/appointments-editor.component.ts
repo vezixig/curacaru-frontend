@@ -159,6 +159,10 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (result) => {
+          if (!this.customers.find((x) => x.customerId === result.customerId)) {
+            this.customers.push(result.customer!);
+          }
+
           this.appointmentForm.patchValue({
             customerId: result.customerId,
             clearanceType: result.clearanceType,
@@ -173,12 +177,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             timeStart: DateTimeService.toNgbTime(result.timeStart),
           });
 
-          console.log(result);
-
-          if (!this.customers.find((x) => x.customerId === result.customerId)) {
-            this.customers.push(result.customer!);
-          }
-
           this.isExpired = this.minDate.after(DateTimeService.toNgbDate(result.date));
           if (result.isDone || this.isExpired) {
             this.appointmentForm.disable();
@@ -190,7 +188,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
           this.canFinish = !this.isNew && !result.isDone && result.date <= this.today;
-          this.canOpen = !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
+          this.canOpen = (this.user?.isManager ?? false) && !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId);
           this.calculatePrice();
