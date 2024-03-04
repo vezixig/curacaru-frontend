@@ -7,7 +7,7 @@ import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-ic
 import { faCheck, faCircleInfo, faFileSignature, faGear, faHouse, faLocationDot, faPhone, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, map, takeUntil } from 'rxjs';
+import { Subject, forkJoin, map, takeUntil } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
@@ -67,12 +67,13 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   employees: EmployeeBasic[] = [];
   fromDate: NgbDate | null = this.calendar.getToday();
   hoveredDate: NgbDate | null = null;
-  isLoading: boolean = true;
-  isManager: boolean = false;
+  isLoading = true;
+  isManager = false;
   selectedCustomer?: Customer;
   selectedCustomerId?: number;
   selectedEmployee?: EmployeeBasic;
   selectedEmployeeId?: number;
+  showPriceInfo = false;
   toDate: NgbDate | null = this.calendar.getToday();
   isCollapsed = true;
   today = new Date();
@@ -94,27 +95,20 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
     this.isLoading = true;
     this.loadAppointments();
 
-    this.apiService
-      .getEmployeeBaseList()
+    forkJoin({
+      employees: this.apiService.getEmployeeBaseList(),
+      customers: this.apiService.getCustomerList(),
+      prices: this.apiService.getCompanyPrices(),
+    })
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
         next: (result) => {
-          this.employees = result;
+          this.employees = result.employees;
+          this.customers = result.customers;
+          this.showPriceInfo = result.prices.pricePerHour == 0;
         },
         error: (error) => {
-          this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-        },
-      });
-
-    this.apiService
-      .getCustomerList()
-      .pipe(takeUntil(this.$onDestroy))
-      .subscribe({
-        next: (result) => {
-          this.customers = result;
-        },
-        error: (error) => {
-          this.toastr.error(`Kundenliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
+          this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
         },
       });
   }

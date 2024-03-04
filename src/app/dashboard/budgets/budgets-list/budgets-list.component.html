@@ -1,67 +1,74 @@
 <div class="row">
   <h4 class="h-underline">Budgets</h4>
-</div>
 
-<table class="d-none d-md-table col-12 table mt-3 table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Kunde</th>
-      <th scope="col" class="text-end">Aktuelles Restbudget</th>
-      <th scope="col" class="text-end">Verbleibende Stunden</th>
-      <th scope="col">Aktion</th>
-    </tr>
-  </thead>
+  @if(showPriceInfo) {
+  <div class="alert alert-secondary">
+    <fa-icon [icon]="faInfoCircle" [fixedWidth]="true" />
+    <span class="my-3">Bitte fülle erst die <a routerLink="/dashboard/company">Unternehmensdaten</a> aus. Dann kannst du die Budgets nutzen.</span>
+  </div>
+  } @else {
+  <table class="d-none d-md-table col-12 table mt-3 table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Kunde</th>
+        <th scope="col" class="text-end">Aktuelles Restbudget</th>
+        <th scope="col" class="text-end">Verbleibende Stunden</th>
+        <th scope="col">Aktion</th>
+      </tr>
+    </thead>
 
-  <tbody>
-    @if (isLoading) { @for (_ of [].constructor(3); track _) {
-    <tr>
-      <td><ngx-skeleton-loader /></td>
-      <td><ngx-skeleton-loader /></td>
-      <td><ngx-skeleton-loader /></td>
-      <td></td>
-    </tr>
-    } } @for (budget of budgetList; track budget) {
-    <tr>
-      <td>{{ budget.customerName }}</td>
-      <td class="text-end">{{ budget.totalAmount | currency }}</td>
-      <td class="text-end">{{ budget.remainingHours | number : "1.2-2" }}</td>
-      <td>
-        <button
-          type="button"
-          [routerLink]="['/dashboard/budgets', budget.customerId]"
-          class="btn btn-outline-secondary btn-sm"
-          title="Budget bearbeiten"
-        >
-          <fa-icon [icon]="faGear" [fixedWidth]="true" />
-        </button>
-      </td>
-    </tr>
-    }
-  </tbody>
-</table>
+    <tbody>
+      @if (isLoading) { @for (_ of [].constructor(3); track _) {
+      <tr>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td></td>
+      </tr>
+      } } @for (budget of budgetList; track budget) {
+      <tr>
+        <td>{{ budget.customerName }}</td>
+        <td class="text-end">{{ budget.totalAmount | currency }}</td>
+        <td class="text-end">{{ budget.remainingHours | number : "1.2-2" }}</td>
+        <td>
+          <button
+            type="button"
+            [routerLink]="['/dashboard/budgets', budget.customerId]"
+            class="btn btn-outline-secondary btn-sm"
+            title="Budget bearbeiten"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
 
-<div class="d-md-none p-0">
-  @for (budget of budgetList; track budget) {
-  <div class="card my-3">
-    <div class="card-header d-flex">
-      <span class="lead text-truncate">{{ budget.customerName }}</span>
-      <div class="btn-group ms-auto" role="group">
-        <button
-          type="button"
-          [routerLink]="['/dashboard/budgets', budget.customerId]"
-          class="btn btn-outline-secondary btn-sm"
-          title="Budget bearbeiten"
-        >
-          <fa-icon [icon]="faGear" [fixedWidth]="true" />
-        </button>
+  <div class="d-md-none p-0">
+    @for (budget of budgetList; track budget) {
+    <div class="card my-3">
+      <div class="card-header d-flex">
+        <span class="lead text-truncate">{{ budget.customerName }}</span>
+        <div class="btn-group ms-auto" role="group">
+          <button
+            type="button"
+            [routerLink]="['/dashboard/budgets', budget.customerId]"
+            class="btn btn-outline-secondary btn-sm"
+            title="Budget bearbeiten"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="card-text list-unstyled">
+          <li><fa-icon [icon]="faMoney" [fixedWidth]="true" /> {{ budget.totalAmount | currency }}</li>
+          <li><fa-icon [icon]="faClock" [fixedWidth]="true" /> {{ budget.remainingHours | number : "1.2-2" }} verbleibende Stunden</li>
+        </ul>
       </div>
     </div>
-    <div class="card-body">
-      <ul class="card-text list-unstyled">
-        <li><fa-icon [icon]="faMoney" [fixedWidth]="true" /> {{ budget.totalAmount | currency }}</li>
-        <li><fa-icon [icon]="faClock" [fixedWidth]="true" /> {{ budget.remainingHours | number : "1.2-2" }} verbleibende Stunden</li>
-      </ul>
-    </div>
+    }
   </div>
   }
 </div>
