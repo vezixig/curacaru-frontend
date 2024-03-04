@@ -1,6 +1,7 @@
 import { Time } from '@angular/common';
 import { ClearanceType } from '@curacaru/enums/clearance-type';
 import { UUID } from 'angular2-uuid';
+import { MinimalCustomerListEntry } from './minimal-customer-list-entry.model';
 
 export interface Appointment {
   clearanceType: ClearanceType;
@@ -20,4 +21,5 @@ export interface Appointment {
   notes: string;
   timeEnd: Time;
   timeStart: Time;
+  customer?: MinimalCustomerListEntry;
 }

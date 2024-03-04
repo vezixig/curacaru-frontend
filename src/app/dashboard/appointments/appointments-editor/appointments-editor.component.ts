@@ -173,6 +173,12 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             timeStart: DateTimeService.toNgbTime(result.timeStart),
           });
 
+          console.log(result);
+
+          if (!this.customers.find((x) => x.customerId === result.customerId)) {
+            this.customers.push(result.customer!);
+          }
+
           this.isExpired = this.minDate.after(DateTimeService.toNgbDate(result.date));
           if (result.isDone || this.isExpired) {
             this.appointmentForm.disable();

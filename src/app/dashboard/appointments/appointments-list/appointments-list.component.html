@@ -143,9 +143,11 @@
             >
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
+            @if (!appointment.isDone && appointment.date > beginOfCurrentMonth) {
             <button type="button" (click)="onDelete(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin löschen">
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </button>
+            }
           </div>
         </td>
       </tr>
