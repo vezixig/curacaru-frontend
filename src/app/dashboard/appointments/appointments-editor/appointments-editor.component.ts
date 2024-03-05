@@ -190,7 +190,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.canFinish = !this.isNew && !result.isDone && result.date <= this.today;
           this.canOpen = (this.user?.isManager ?? false) && !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
           this.isLoading = false;
-          this.onCustomerChanged(result.customerId);
+          this.onCustomerChanged(result.customerId, true);
           this.calculatePrice();
         },
         error: (error) => {
@@ -363,7 +363,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  private onCustomerChanged(customerId: UUID): void {
+  private onCustomerChanged(customerId: UUID, skipSetter = false): void {
     if (this.isLoading) return;
 
     this.apiService
@@ -387,7 +387,9 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           }
         }
         this.selectedCustomer = customer;
-        this.appointmentForm.get('employeeId')?.setValue(customer.associatedEmployeeId);
+        if (!skipSetter) {
+          this.appointmentForm.get('employeeId')?.setValue(customer.associatedEmployeeId);
+        }
         this.calculatePrice();
       });
   }
