@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { TopbarComponent } from './topbar/topbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 
 import { SignupComponent } from '../auth/signup/signup.component';
 import { UserEmployee } from '../models/user-employee.model';
@@ -18,13 +18,13 @@ import { ApiService } from '../services/api.service';
   providers: [ApiService],
 })
 export class DashboardComponent {
-  hasCompany: boolean = false;
-  hasEmployee: boolean = false;
-  isLoading: boolean = true;
-  user: UserEmployee | undefined;
+  hasCompany = false;
+  hasEmployee = false;
+  isLoading = true;
+  user?: UserEmployee;
   error: any;
 
-  constructor(private apiService: ApiService, private _userService: UserService) {}
+  constructor(private userService: UserService) {}
 
   handleSignUpCompleted() {
     this.loadCompany();
@@ -36,26 +36,11 @@ export class DashboardComponent {
 
   private loadCompany() {
     this.isLoading = true;
-    this.apiService.getUser().subscribe({
-      next: (result: UserEmployee) => {
-        this.hasEmployee = result != null;
-        this.hasCompany = result.companyId != null;
-        this.isLoading = false;
-        this._userService.user = result;
-        this.user = result;
-      },
-      error: (error) => {
-        // show error modal
-        if (error.status == 404) {
-          this.hasEmployee = false;
-          this.hasCompany = false;
-          this.isLoading = false;
-        } else {
-          console.log(error);
-          this.isLoading = false;
-          this.error = error;
-        }
-      },
+    this.userService.user$.subscribe((result) => {
+      this.hasEmployee = result != null;
+      this.hasCompany = result.companyId != null;
+      this.isLoading = false;
+      this.user = result;
     });
   }
 }

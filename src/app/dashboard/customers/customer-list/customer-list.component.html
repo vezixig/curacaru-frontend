@@ -47,10 +47,15 @@
         <td>{{ customer.associatedEmployeeName }}</td>
         <td class="text-center">
           <div class="btn-group" role="group">
-            <button type="button" [routerLink]="['/dashboard/customers', customer.id]" class="btn btn-outline-secondary btn-sm" title="Kunden bearbeiten">
+            <button
+              type="button"
+              [routerLink]="['/dashboard/customers', customer.id]"
+              class="btn btn-outline-secondary btn-sm"
+              title="Kunden bearbeiten"
+            >
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
-            @if (isManager) {
+            @if (isManager | async) {
             <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </button>
@@ -77,7 +82,12 @@
             <fa-icon [icon]="faPhone" [fixedWidth]="true" />
           </a>
           }
-          <button type="button" [routerLink]="['/dashboard/customers', customer.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+          <button
+            type="button"
+            [routerLink]="['/dashboard/customers', customer.id]"
+            class="btn btn-outline-secondary btn-sm"
+            title="Mitarbeiter bearbeiten"
+          >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
           <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">

@@ -1,11 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { UserService } from '@curacaru/services';
+import { Observable, map } from 'rxjs';
 
 @Injectable()
 export class ManagerGuard {
   userService = inject(UserService);
 
-  canActivate(): boolean {
-    return this.userService.user?.isManager ?? false;
+  canActivate(): Observable<boolean> {
+    return this.userService.user$.pipe(map((result) => result?.isManager ?? false));
   }
 }

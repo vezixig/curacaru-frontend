@@ -8,43 +8,47 @@ import { UserEmployee } from '../../models/user-employee.model';
 import { UserService } from '../../services/user.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavigationEnd, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'cura-topbar',
   standalone: true,
   templateUrl: './topbar.component.html',
-  imports: [NgbDropdownModule, FontAwesomeModule],
+  imports: [NgbDropdownModule, FontAwesomeModule, AsyncPipe],
 })
-export class TopbarComponent implements OnInit {
-  faUser = faUser;
+export class TopbarComponent {
   faBars = faBars;
   faDoorOpen = faDoorOpen;
-  user?: UserEmployee;
+  faUser = faUser;
 
-  constructor(private auth: AuthService, private _userService: UserService, router: Router) {
-    router.events.subscribe((val) => {
+  closeResult = '';
+  user$: Observable<UserEmployee>;
+
+  private authService = inject(AuthService);
+  private offcanvasService = inject(NgbOffcanvas);
+  private router = inject(Router);
+  private userService = inject(UserService);
+
+  constructor() {
+    this.user$ = this.userService.user$;
+
+    this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
         this.offcanvasService.dismiss();
       }
     });
   }
 
-  private offcanvasService = inject(NgbOffcanvas);
-  closeResult = '';
-
   open() {
     this.offcanvasService.open(SidebarComponent, { ariaLabelledBy: 'offcanvas-basic-title' });
   }
 
   handleLogout(): void {
-    this.auth.logout({
+    this.authService.logout({
       logoutParams: {
         returnTo: environment.auth0.callbackUri,
       },
     });
-  }
-
-  ngOnInit(): void {
-    this.user = this._userService.user;
   }
 }

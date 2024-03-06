@@ -1,0 +1,5 @@
+<div class="row">
+  <h4 class="h-underline">Arbeitszeitreport {{ isNew ? "erstellen" : "xxx" }}</h4>
+  <div class="alert alert-danger" role="alert">Bitte füllen Sie alle Pflichtfelder aus.</div>
+  <form (ngSubmit)="onSave()" [formGroup]="reportForm"><cura-input key="employeeName"></cura-input>s</form>
+</div>

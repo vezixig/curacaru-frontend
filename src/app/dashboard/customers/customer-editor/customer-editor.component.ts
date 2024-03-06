@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -21,17 +21,17 @@ import { InputComponent } from '@curacaru/shared/input/input.component';
   standalone: true,
   styleUrls: ['./customer-editor.component.scss'],
   templateUrl: './customer-editor.component.html',
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule, InputComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule, InputComponent, AsyncPipe],
 })
 export class CustomerEditorComponent implements OnInit, OnDestroy {
-  cityName: string = '';
+  cityName = '';
   customerForm: FormGroup;
   employees: EmployeeBasic[] = [];
-  isLoading: boolean = false;
-  isNew: boolean = true;
-  isSaving: boolean = false;
+  isLoading = false;
+  isNew = true;
+  isSaving = false;
   newDeclarationOfAssignment: number | null = null;
-  isManager: boolean = false;
+  isManager = this.userService.isManager$;
 
   insuranceFormatter = (insurance: Insurance) => insurance.name;
 
@@ -61,8 +61,13 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   private postCustomerSubscription?: Subscription;
   private updateCustomerSubscription?: Subscription;
 
-  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private userService: UserService, private toastr: ToastrService) {
-    this.isManager = this.userService.user?.isManager ?? false;
+  constructor(
+    private apiService: ApiService,
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private userService: UserService,
+    private toastr: ToastrService
+  ) {
     this.customerForm = this.formBuilder.group({
       associatedEmployeeId: ['', [Validators.required]],
       birthDate: ['', [Validators.required]],
@@ -150,7 +155,12 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   handleAddDeclarationOfAssignment(event: Event | undefined = undefined) {
     event?.preventDefault();
-    if (this.newDeclarationOfAssignment != null && this.newDeclarationOfAssignment >= 2000 && this.newDeclarationOfAssignment < 9999 && !this.customerForm.get('declarationsOfAssignment')?.value.includes(this.newDeclarationOfAssignment)) {
+    if (
+      this.newDeclarationOfAssignment != null &&
+      this.newDeclarationOfAssignment >= 2000 &&
+      this.newDeclarationOfAssignment < 9999 &&
+      !this.customerForm.get('declarationsOfAssignment')?.value.includes(this.newDeclarationOfAssignment)
+    ) {
       this.customerForm.get('declarationsOfAssignment')?.value.push(this.newDeclarationOfAssignment);
       this.newDeclarationOfAssignment = null;
     }

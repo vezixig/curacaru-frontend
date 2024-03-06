@@ -8,7 +8,7 @@
   </div>
 
   <ul class="nav nav-pills flex-column mb-auto">
-    @if (isManager) {
+    @if (isManager | async ) {
     <li class="nav-item">
       <a class="nav-link" routerLink="/dashboard/employees" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faUsersGear" [fixedWidth]="true" />
@@ -38,7 +38,7 @@
     <!-- separator -->
     <div clasS="my-2"></div>
 
-    @if(isManager) {
+    @if(isManager | async) {
     <li class="nav-item">
       <a class="nav-link" routerLink="/dashboard/budgets" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faCoins" [fixedWidth]="true" />
@@ -55,6 +55,12 @@
       <a class="nav-link" routerLink="/dashboard/insurances" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
         <fa-icon [icon]="faBuilding" [fixedWidth]="true" />
         Versicherungen
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/dashboard/timetracker" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
+        <fa-icon [icon]="faStopwatch" [fixedWidth]="true" />
+        Arbeitszeiterfassung
       </a>
     </li>
     }

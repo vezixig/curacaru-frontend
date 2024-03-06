@@ -75,7 +75,7 @@
     </select>
   </div>
 
-  @if (isManager) {
+  @if (user?.isManager) {
   <div class="form-group">
     <label for="dpFromDate">Mitarbeiter</label>
     <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
@@ -222,7 +222,7 @@
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen
         </button>
       </div>
-      } @if (isManager && appointment.isDone && appointment.date >= beginOfCurrentMonth) {
+      } @if (user?.isManager && appointment.isDone && appointment.date >= beginOfCurrentMonth) {
       <div class="card-footer">
         <button type="button" (click)="onReopen(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin wieder öffnen">
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Öffnen

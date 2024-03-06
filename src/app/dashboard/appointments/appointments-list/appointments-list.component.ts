@@ -18,6 +18,7 @@ import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
+import { UserEmployee } from '@curacaru/models';
 
 @Component({
   imports: [
@@ -68,7 +69,6 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   fromDate: NgbDate | null = this.calendar.getToday();
   hoveredDate: NgbDate | null = null;
   isLoading = true;
-  isManager = false;
   selectedCustomer?: Customer;
   selectedCustomerId?: number;
   selectedEmployee?: EmployeeBasic;
@@ -77,6 +77,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   toDate: NgbDate | null = this.calendar.getToday();
   isCollapsed = true;
   today = new Date();
+  user?: UserEmployee;
 
   /** fields  */
   private $onDestroy = new Subject();
@@ -87,18 +88,17 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    this.isManager = this.userService.user?.isManager ?? false;
     var dateBounds = DateTimeService.getStartAndEndOfWeek(new Date());
     this.fromDate = dateBounds.start;
     this.toDate = dateBounds.end;
 
     this.isLoading = true;
-    this.loadAppointments();
 
     forkJoin({
       employees: this.apiService.getEmployeeBaseList(),
       customers: this.apiService.getCustomerList(),
       prices: this.apiService.getCompanyPrices(),
+      user: this.userService.user$,
     })
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
@@ -106,6 +106,8 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
           this.employees = result.employees;
           this.customers = result.customers;
           this.showPriceInfo = result.prices.pricePerHour == 0;
+          this.user = result.user;
+          this.loadAppointments();
         },
         error: (error) => {
           this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
@@ -155,7 +157,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
     let uri = `?`;
     uri += this.fromDate ? `from=${DateTimeService.toDateString(this.fromDate)}&` : '';
     uri += this.toDate ? `to=${DateTimeService.toDateString(this.toDate)}&` : '';
-    uri += this.isManager ? (this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '') : `employeeId=${this.userService.user?.id}&`;
+    uri += this.user?.isManager ? (this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '') : `employeeId=${this.user?.id}&`;
     uri += this.selectedCustomerId ? `customerId=${this.selectedCustomerId}&` : '';
     uri = uri.slice(0, -1);
 

@@ -31,7 +31,13 @@ export class CompanyComponent implements OnDestroy, OnInit {
   private changeZipCodeSubscription?: Subscription;
   private changePricePerHourSubscription?: Subscription;
 
-  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService, private userService: UserService) {
+  constructor(
+    private apiService: ApiService,
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private toastr: ToastrService,
+    private userService: UserService
+  ) {
     this.companyForm = this.formBuilder.group({
       name: [{ value: '', disabled: true }, [Validators.required, Validators.maxLength(150)]],
       ownerName: ['', [Validators.maxLength(150)]],
@@ -113,9 +119,7 @@ export class CompanyComponent implements OnDestroy, OnInit {
     this.updateEmployeeSubscription?.unsubscribe();
     this.updateEmployeeSubscription = this.apiService.updateCompany(company).subscribe({
       complete: () => {
-        if (this.userService.user) {
-          this.userService.user.companyRideCostsType = company.rideCostsType;
-        }
+        this.userService.clearUser$.next();
         this.toastr.success('Änderungen am Unternehmen wurden gespeichert');
         this.LoadCompany();
         this.isSaving = false;

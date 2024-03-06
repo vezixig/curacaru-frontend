@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
@@ -13,9 +13,10 @@ import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { EmployeeBasic } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
 import { ApiService, LocationService, UserService } from '@curacaru/services';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-  imports: [FontAwesomeModule, NgxSkeletonLoaderModule, ReplacePipe, RouterModule, FormsModule],
+  imports: [FontAwesomeModule, NgxSkeletonLoaderModule, ReplacePipe, RouterModule, FormsModule, AsyncPipe],
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
@@ -30,16 +31,20 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   faUser = faUser;
   faCircleInfo = faCircleInfo;
 
+  private apiService = inject(ApiService);
+  private modalService = inject(NgbModal);
+  private toastr = inject(ToastrService);
+  private userService = inject(UserService);
+  private locationService = inject(LocationService);
+
   filteredCustomers: CustomerListEntry[] = [];
   employees: EmployeeBasic[] = [];
   selectedEmployeeId?: number = undefined;
-  isManager: boolean = false;
-  isLoading: boolean = true;
+  isManager = this.userService.isManager$;
+  isLoading = true;
 
   private $onDestroy = new Subject();
   private customers: CustomerListEntry[] = [];
-
-  constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService, private userService: UserService, private locationService: LocationService) {}
 
   ngOnDestroy(): void {
     this.$onDestroy.next(true);
@@ -48,7 +53,6 @@ export class CustomerListComponent implements OnDestroy, OnInit {
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.isManager = this.userService.user?.isManager ?? false;
 
     forkJoin({
       customers: this.apiService.getCustomerList(),
@@ -68,7 +72,8 @@ export class CustomerListComponent implements OnDestroy, OnInit {
       });
   }
 
-  onCustomerAddressClick = (customer: CustomerListEntry) => this.locationService.openLocationLink(`${customer.street} ${customer.zipCode} ${customer.city}`);
+  onCustomerAddressClick = (customer: CustomerListEntry) =>
+    this.locationService.openLocationLink(`${customer.street} ${customer.zipCode} ${customer.city}`);
 
   onSelectionChanged = () => this.filterCustomers();
 

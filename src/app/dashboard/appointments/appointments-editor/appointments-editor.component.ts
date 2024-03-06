@@ -78,13 +78,12 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private userService: UserService
   ) {
-    this.user = this.userService.user;
     this.appointmentForm = this.formBuilder.group({
       customerId: ['', [Validators.required]],
       date: ['', { Validators: Validators.required, updateOn: 'blur' }],
       distanceToCustomer: [0],
       clearanceType: [null, [Validators.required]],
-      employeeId: [this.user?.isManager ? '' : this.user?.id, [Validators.required]],
+      employeeId: ['', [Validators.required]],
       employeeReplacementId: [''],
       isSignedByCustomer: [false],
       isSignedByEmployee: [false],
@@ -93,11 +92,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       timeStart: ['', [Validators.required]],
     });
 
-    // only managers can change the employee
-    if (!this.user?.isManager) {
-      this.appointmentForm.get('employeeId')?.disable();
-      this.appointmentForm.get('employeeReplacementId')?.disable();
-    }
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
     this.appointmentForm.get('distanceToCustomer')?.valueChanges.subscribe(() => this.calculatePrice());
     this.appointmentForm.get('date')?.valueChanges.subscribe((value) => this.onDateChanged(value));
@@ -128,10 +122,19 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       customers: this.apiService.getMinimalCustomerList(),
       employees: this.apiService.getEmployeeBaseList(),
       companyPrices: this.apiService.getCompanyPrices(),
+      user: this.userService.user$,
     })
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
         next: (result) => {
+          // only managers can change the employee
+          if (!result.user.isManager) {
+            this.appointmentForm.get('employeeId')?.disable();
+            this.appointmentForm.get('employeeReplacementId')?.disable();
+            this.appointmentForm.get('employeeId')?.setValue(result.user.id);
+          }
+
+          this.user = result.user;
           this.employees = result.employees;
           this.customers = result.customers;
           this.companyPrices = result.companyPrices;
