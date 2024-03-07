@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
       .subscribe(() => {
         var route = location.href.split('/').splice(3).join('/');
         route = route === '' ? '/dashboard' : route;
-        if (this.isAuthenticated) this.router.navigate([route]);
+        if (this.isAuthenticated) this.router.navigateByUrl(route);
       });
   }
 }

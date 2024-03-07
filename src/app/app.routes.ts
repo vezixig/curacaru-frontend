@@ -107,5 +107,26 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'dashboard/time-tracker',
+    children: [
+      { path: '', redirectTo: 'list', pathMatch: 'full' },
+      {
+        path: 'list',
+        loadComponent: () =>
+          import('@curacaru/dashboard/time-tracker/time-tracker-list/time-tracker-list.component').then((o) => o.TimeTrackerListComponent),
+      },
+      {
+        path: 'new',
+        loadComponent: () =>
+          import('@curacaru/dashboard/time-tracker/time-tracker-editor/time-tracker-editor.component').then((o) => o.TimeTrackerEditorComponent),
+      },
+      // {
+      //   path: ':id',
+      //   loadComponent: () =>
+      //     import('@curacaru/dashboard/insurances/insurances-editor/insurances-editor.component').then((o) => o.InsurancesEditorComponent),
+      // },
+    ],
+  },
   { path: 'dashboard', redirectTo: 'dashboard/appointments', pathMatch: 'full' },
 ];

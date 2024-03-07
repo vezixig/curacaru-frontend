@@ -7,6 +7,6 @@ export class ManagerGuard {
   userService = inject(UserService);
 
   canActivate(): Observable<boolean> {
-    return this.userService.user$.pipe(map((result) => result?.isManager ?? false));
+    return this.userService.isManager$;
   }
 }

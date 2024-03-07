@@ -16,11 +16,16 @@ import { MinimalCustomerListEntry } from '@curacaru/models/minimal-customer-list
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
+import { WorkingHours } from '@curacaru/models/working-hours.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
+  getWorkTime(id: UUID, month: number, year: number) {
+    return this.httpClient.get<WorkingHours[]>(`${this.apiUrl}/employee/${id}/work-time?month=${month}&year=${year}`);
+  }
+
   private apiUrl = environment.auth0.api.serverUrl;
   private regexDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
