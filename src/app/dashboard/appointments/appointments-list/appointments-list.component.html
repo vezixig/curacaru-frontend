@@ -122,14 +122,14 @@
         <td>{{ appointment.employeeName }}</td>
         <td>{{ appointment.employeeReplacementName }}</td>
         <td class="text-center">
-          <img
+          <div
             width="16"
             height="16"
             [class.bg-secondary]="appointment.hasBudgetError || appointment.isPlanned"
             [class.bg-success]="!(appointment.hasBudgetError || appointment.isPlanned) && appointment.isDone"
             [class.bg-danger]="!(appointment.hasBudgetError || appointment.isPlanned) && !appointment.isDone"
-            style="border-radius: 8px"
-          />
+            class="status-bullet"
+          ></div>
         </td>
         <td>
           <div class="btn-group" role="group">

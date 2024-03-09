@@ -26,7 +26,7 @@ export class DateTimeService {
   }
 
   static toDateString(date: NgbDate | null): string {
-    return date ? `${date.year}-${date.month}-${date.day}` : '';
+    return date ? `${date.year}-${date.month.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}` : '';
   }
 
   static toDate(date: NgbDate | null): Date {

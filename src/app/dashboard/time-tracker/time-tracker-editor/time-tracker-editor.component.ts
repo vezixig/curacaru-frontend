@@ -2,7 +2,7 @@ import SignaturePad from 'signature_pad';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
-import { AsyncPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { AsyncPipe, CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GermanDateParserFormatter } from '@curacaru/i18n/date-formatter';
@@ -17,6 +17,7 @@ import { WorkingHours } from '@curacaru/models/working-hours.model';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { faEraser } from '@fortawesome/free-solid-svg-icons';
 import { finalize, map, mergeMap, startWith, takeUntil, tap } from 'rxjs/operators';
+import { WorkingTimeService } from '@curacaru/services/working-time.service';
 
 @Component({
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
@@ -35,15 +36,16 @@ import { finalize, map, mergeMap, startWith, takeUntil, tap } from 'rxjs/operato
     ReactiveFormsModule,
     RouterModule,
     NgxSkeletonLoaderModule,
+    CommonModule,
     NgbDatepickerModule,
   ],
 })
-export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
+export class TimeTrackerEditorComponent implements OnDestroy {
   @ViewChild('canvas') canvasElement!: ElementRef;
   @ViewChild('canvasContainer') canvasContainer!: ElementRef;
 
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly apiService = inject(ApiService);
+  private readonly workingTimeService = inject(WorkingTimeService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
@@ -64,7 +66,10 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
   readonly selectedMonth = signal(new Date().getMonth() + 1);
   readonly selectedYear = signal(new Date().getFullYear());
   readonly totalWorkingHours$: Observable<number>;
-  readonly workingHours$: Observable<WorkingHours[]>;
+  readonly model$: Observable<{ workTime: WorkingHours[]; report: any }>;
+  readonly isSaving = signal(false);
+
+  private isSignaturePadInitialized = false;
 
   constructor() {
     this.isNew$ = this.activatedRoute.url.pipe(map((urlSegments) => urlSegments[urlSegments.length - 1].path === 'new'));
@@ -79,7 +84,7 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
     );
 
     // retrieve working hours
-    this.workingHours$ = combineLatest({ user: this.user$, queryParams: this.activatedRoute.queryParams }).pipe(
+    this.model$ = combineLatest({ user: this.user$, queryParams: this.activatedRoute.queryParams }).pipe(
       map((result) => {
         this.selectedMonth.set(parseInt(result.queryParams['month']) || new Date().getMonth() + 1);
         this.selectedYear.set(parseInt(result.queryParams['year']) || new Date().getFullYear());
@@ -87,7 +92,7 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
         return result.user;
       }),
       mergeMap((user) => {
-        return this.apiService.getWorkTime(user!.id, this.selectedMonth(), this.selectedYear()).pipe(
+        const workTime$ = this.workingTimeService.getWorkTime(user!.id, this.selectedMonth(), this.selectedYear()).pipe(
           startWith([]),
           map((workingHours) => {
             workingHours.forEach((wh) => {
@@ -95,21 +100,32 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
               wh.timeStart = DateTimeService.toTime(wh.timeStart.toString());
             });
             return workingHours;
-          }),
-          finalize(() => this.isLoadingWorkingHours.set(false))
+          })
+        );
+
+        const report$ = this.workingTimeService.getWorkTimeReport(user!.id, this.selectedYear(), this.selectedMonth());
+
+        return combineLatest({ workTime: workTime$, report: report$ }).pipe(
+          finalize(() => {
+            this.isLoadingWorkingHours.set(false);
+            this.initSignaturePad();
+          })
         );
       })
     );
 
     // calculate total working hours
-    this.totalWorkingHours$ = this.workingHours$.pipe(
-      map((workingHours) => workingHours.map(this.timeDiff)),
+    this.totalWorkingHours$ = this.model$.pipe(
+      map((result) => result.workTime.map(this.timeDiff)),
       map((timeDifferences) => timeDifferences.reduce((acc, value) => acc + value / 60, 0)),
       startWith(0)
     );
   }
 
-  ngAfterViewInit() {
+  initSignaturePad() {
+    console.log('initSignaturePad');
+    if (this.isSignaturePadInitialized == true) return;
+
     this.signaturePad = new SignaturePad(this.canvasElement.nativeElement);
 
     // resize the canvas to fit container - using css will only stretch the signature
@@ -118,6 +134,7 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
       .subscribe(() => {
         this.canvasWidth.set(this.canvasContainer.nativeElement.offsetWidth);
       });
+    this.isSignaturePadInitialized = true;
   }
 
   ngOnDestroy(): void {
@@ -126,13 +143,13 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   onSelectedMonthChange(selectedDate: string) {
-    this.router.navigate([], { queryParams: { month: selectedDate }, queryParamsHandling: 'merge' });
+    this.router.navigate([], { queryParams: { month: selectedDate }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   onSelectedYearChange(selectedYear: string) {
     this.selectedYear.set(parseInt(selectedYear) || new Date().getFullYear());
     if (this.selectedYear() > 2020 && this.selectedYear() < 2100) {
-      this.router.navigate([], { queryParams: { year: this.selectedYear() }, queryParamsHandling: 'merge' });
+      this.router.navigate([], { queryParams: { year: this.selectedYear() }, queryParamsHandling: 'merge', replaceUrl: true });
     }
   }
 
@@ -146,6 +163,9 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
       employeeName: ['', { Validators: Validators.required }],
       signatureDate: [DateTimeService.toNgbDate(new Date()), { Validators: Validators.required, updateOn: 'blur' }],
       signatureCity: ['', [Validators.required]],
+      signature: [''],
+      year: [],
+      month: [],
     });
   }
 
@@ -158,5 +178,12 @@ export class TimeTrackerEditorComponent implements AfterViewInit, OnDestroy {
       this.toasterService.error('Bitte unterschreibe den Report');
       return;
     }
+
+    this.reportForm.controls['signature'].setValue(this.signaturePad.toDataURL());
+    this.isSaving.set(true);
+    this.workingTimeService
+      .signWorkingTimeReport(this.reportForm.value)
+      .pipe(finalize(() => this.isSaving.set(false)))
+      .subscribe(() => this.router.navigate(['/dashboard/time-tracker']));
   }
 }

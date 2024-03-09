@@ -14,22 +14,19 @@
           type="number"
           class="form-control"
           value="2024"
+          formControlName="year"
           [ngModel]="selectedYear()"
-          [ngModelOptions]="{ standalone: true }"
           (ngModelChange)="onSelectedYearChange($event)"
         />
-        <select
-          class="form-control"
-          [ngModelOptions]="{ standalone: true }"
-          [ngModel]="selectedMonth()"
-          (ngModelChange)="onSelectedMonthChange($event)"
-        >
+        <select class="form-control" formControlName="month" (ngModelChange)="onSelectedMonthChange($event)">
           @for (month of months; track month) {
           <option [value]="month.value">{{ month.name }}</option>
           }
         </select>
       </div>
     </div>
+
+    @if(model$ | async; as model) {
 
     <div class="mt-3">
       <p>Arbeitszeiten</p>
@@ -48,7 +45,7 @@
             <td><ngx-skeleton-loader /></td>
             <td><ngx-skeleton-loader /></td>
           </tr>
-          } @for (appointment of workingHours$ |async; track appointment) {
+          } @for (appointment of model.workTime; track appointment) {
 
           <tr class="d-flex">
             <td class="col-3">{{ appointment.date | date : "dd.MM.yyyy" }}</td>
@@ -89,19 +86,20 @@
 
     <div class="row g-2 mt-2">
       <div class="col">
-        <button [disabled]="!reportForm.valid" type="submit" class="form-control btn btn-primary text-white">
-          <!-- @if (isSaving) {
+        <button [disabled]="!reportForm.valid || isSaving()" type="submit" class="form-control btn btn-primary text-white">
+          @if (isSaving()) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-          } -->
+          }
           <span>Mitarbeiterunterschrift speichern</span>
-          <!-- @if (isSaving) {
+          @if (isSaving()) {
           <span>...</span>
-          } -->
+          }
         </button>
       </div>
       <div class="col">
         <button type="button" [routerLink]="['/dashboard/time-tracker']" class="form-control btn btn-outline-secondary">Verwerfen</button>
       </div>
     </div>
+    }
   </form>
 </div>
