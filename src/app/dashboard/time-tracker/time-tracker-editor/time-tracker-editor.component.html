@@ -1,5 +1,5 @@
 <div class="row">
-  <h4 class="h-underline">Arbeitszeitreport {{ (isNew$ | async) ? "erstellen" : "xxx" }}</h4>
+  <h4 class="h-underline">Arbeitszeitreport {{ isNew() ? "erstellen" : "gegenzeichnen" }}</h4>
 
   <form (ngSubmit)="onSave()" [formGroup]="reportForm">
     <div class="form-group mb-2">
@@ -10,14 +10,7 @@
     <div class="form-group mb-2">
       <label>Jahr und Monat der Leistungserbringung</label>
       <div class="input-group">
-        <input
-          type="number"
-          class="form-control"
-          value="2024"
-          formControlName="year"
-          [ngModel]="selectedYear()"
-          (ngModelChange)="onSelectedYearChange($event)"
-        />
+        <input type="number" class="form-control" value="2024" formControlName="year" (ngModelChange)="onSelectedYearChange($event)" />
         <select class="form-control" formControlName="month" (ngModelChange)="onSelectedMonthChange($event)">
           @for (month of months; track month) {
           <option [value]="month.value">{{ month.name }}</option>
@@ -27,7 +20,6 @@
     </div>
 
     @if(model$ | async; as model) {
-
     <div class="mt-3">
       <p>Arbeitszeiten</p>
       <div class="table">
@@ -56,11 +48,26 @@
           }
         </table>
         <p class="mt-3">
-          Summe der Arbeitszeiten: <span class="ms-2 fw-bold">{{ totalWorkingHours$ | async }} Stunden</span>
+          Summe der Arbeitszeiten: <span class="ms-2 fw-bold">{{ model.totalWorkedHours }} Stunden</span>
         </p>
       </div>
     </div>
 
+    @if (model.report ) {
+    <div class="row">
+      <div class="alert alert-secondary mt-3" role="alert">
+        <fa-icon [icon]="faCircleInfo" /> Der Report für diesen Monat wurde am {{ model.report.signatureEmployeeDate | date }} in
+        {{ model.report.signatureEmployeeCity }} unterschrieben und muss nun von einem Manager gegengezeichnet werden.
+      </div>
+    </div>
+    } @if(model.report.signatureManagerDate) {
+    <div class="row">
+      <div class="alert alert-success mt-3" role="alert">
+        <fa-icon [icon]="faCircleInfo" /> Der Report für diesen Monat wurde am {{ model.report.signatureManagerDate | date }} in
+        {{ model.report.signatureManagerCity }} gegengezeichnet.
+      </div>
+    </div>
+    } @if (!model.report || (isManager() && !model.report.signatureManagerDate)) {
     <div class="mt-3">
       <div class="form-group mb-2">
         <label>Ort, Datum</label>
@@ -73,24 +80,23 @@
         </div>
       </div>
     </div>
-
     <div class="container p-0 pe-3">
       <div class="row">
-        <label>Unterschrift Mitarbeiter</label>
-        <div class="col-sm-auto col-md-6 col-lg-5 col-xl-4" #canvasContainer style="position: relative">
-          <fa-icon [icon]="faEraser" (click)="onClearSignatureClick()" class="icon-eraser" />
-          <canvas [width]="canvasWidth()" #canvas></canvas>
+        <label>Unterschrift {{ model.report ? "Manager" : "Mitarbeiter" }}</label>
+        <div class="col-sm-auto col-md-6 col-lg-5 col-xl-4" style="position: relative">
+          <cura-signature #signature></cura-signature>
         </div>
       </div>
     </div>
+    }
 
     <div class="row g-2 mt-2">
       <div class="col">
-        <button [disabled]="!reportForm.valid || isSaving()" type="submit" class="form-control btn btn-primary text-white">
+        <button [disabled]="!reportForm.valid || isSaving() || !model.report" type="submit" class="form-control btn btn-primary text-white">
           @if (isSaving()) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
           }
-          <span>Mitarbeiterunterschrift speichern</span>
+          <span>{{ model.report ? "Manager" : "Mitarbeiter" }}unterschrift speichern</span>
           @if (isSaving()) {
           <span>...</span>
           }
@@ -100,6 +106,11 @@
         <button type="button" [routerLink]="['/dashboard/time-tracker']" class="form-control btn btn-outline-secondary">Verwerfen</button>
       </div>
     </div>
+
+    } @else {
+    <td><ngx-skeleton-loader /></td>
+    <td><ngx-skeleton-loader /></td>
+    <td><ngx-skeleton-loader /></td>
     }
   </form>
 </div>

@@ -1,6 +1,5 @@
-import SignaturePad from 'signature_pad';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject, signal } from '@angular/core';
+import { Component, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { AsyncPipe, CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -9,15 +8,17 @@ import { GermanDateParserFormatter } from '@curacaru/i18n/date-formatter';
 import { InputComponent } from '@curacaru/shared/input/input.component';
 import { NgbDateParserFormatter, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { Observable, Subject, combineLatest, fromEvent } from 'rxjs';
+import { Observable, Subject, combineLatest } from 'rxjs';
 import { TimeFormatPipe } from '@curacaru/pipes/time.pipe';
 import { ToastrService } from 'ngx-toastr';
 import { UserEmployee } from '@curacaru/models';
 import { WorkingHours } from '@curacaru/models/working-hours.model';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
-import { faEraser } from '@fortawesome/free-solid-svg-icons';
-import { finalize, map, mergeMap, startWith, takeUntil, tap } from 'rxjs/operators';
+import { faCircleInfo, faEraser } from '@fortawesome/free-solid-svg-icons';
+import { finalize, map, mergeMap, shareReplay, startWith, tap } from 'rxjs/operators';
 import { WorkingTimeService } from '@curacaru/services/working-time.service';
+import { Signature } from '@curacaru/shared/signature/signature.component';
+import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
 
 @Component({
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
@@ -33,6 +34,7 @@ import { WorkingTimeService } from '@curacaru/services/working-time.service';
     DecimalPipe,
     FormsModule,
     InputComponent,
+    Signature,
     ReactiveFormsModule,
     RouterModule,
     NgxSkeletonLoaderModule,
@@ -41,8 +43,7 @@ import { WorkingTimeService } from '@curacaru/services/working-time.service';
   ],
 })
 export class TimeTrackerEditorComponent implements OnDestroy {
-  @ViewChild('canvas') canvasElement!: ElementRef;
-  @ViewChild('canvasContainer') canvasContainer!: ElementRef;
+  @ViewChild('signature') signatureElement!: Signature;
 
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly workingTimeService = inject(WorkingTimeService);
@@ -50,91 +51,87 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
   private readonly toasterService = inject(ToastrService);
+  private readonly apiService = inject(ApiService);
 
   faCalendar = faCalendar;
   faEraser = faEraser;
   months = DateTimeService.months;
+  faCircleInfo = faCircleInfo;
 
   private readonly user$: Observable<UserEmployee>;
   private readonly $onDestroy = new Subject();
-  private signaturePad!: SignaturePad;
 
   readonly canvasWidth = signal(120);
   readonly isLoadingWorkingHours = signal(false);
-  readonly isNew$: Observable<boolean>;
+  readonly isNew = signal(false);
   readonly reportForm: FormGroup;
-  readonly selectedMonth = signal(new Date().getMonth() + 1);
-  readonly selectedYear = signal(new Date().getFullYear());
-  readonly totalWorkingHours$: Observable<number>;
-  readonly model$: Observable<{ workTime: WorkingHours[]; report: any }>;
+  readonly model$: Observable<{ workTime: WorkingHours[]; report: WorkingTimeReport; totalWorkedHours: number }>;
   readonly isSaving = signal(false);
-
-  private isSignaturePadInitialized = false;
+  readonly isManager = signal(false);
 
   constructor() {
-    this.isNew$ = this.activatedRoute.url.pipe(map((urlSegments) => urlSegments[urlSegments.length - 1].path === 'new'));
+    //this.isNew$ = this.activatedRoute.url.pipe(map((urlSegments) => urlSegments[urlSegments.length - 1].path === 'new'));
     this.reportForm = this.buildForm();
 
     // retrieve user
     this.user$ = this.userService.user$.pipe(
       tap((user) => {
         this.reportForm.controls['employeeId'].setValue(user.id);
-        this.reportForm.controls['employeeName'].setValue(user.firstName + ' ' + user.lastName);
       })
     );
 
     // retrieve working hours
     this.model$ = combineLatest({ user: this.user$, queryParams: this.activatedRoute.queryParams }).pipe(
       map((result) => {
-        this.selectedMonth.set(parseInt(result.queryParams['month']) || new Date().getMonth() + 1);
-        this.selectedYear.set(parseInt(result.queryParams['year']) || new Date().getFullYear());
+        this.reportForm.controls['month'].setValue(parseInt(result.queryParams['month']) || new Date().getMonth() + 1);
+        this.reportForm.controls['year'].setValue(parseInt(result.queryParams['year']) || new Date().getFullYear());
+        if (result.queryParams['employeeId']) {
+          this.reportForm.controls['employeeId'].setValue(result.queryParams['employeeId']);
+        }
+        this.isNew.set(!result.queryParams['employeeId']);
         this.isLoadingWorkingHours.set(true);
-        return result.user;
+        this.isManager.set(result.user.isManager);
       }),
-      mergeMap((user) => {
-        const workTime$ = this.workingTimeService.getWorkTime(user!.id, this.selectedMonth(), this.selectedYear()).pipe(
-          startWith([]),
-          map((workingHours) => {
-            workingHours.forEach((wh) => {
-              wh.timeEnd = DateTimeService.toTime(wh.timeEnd.toString());
-              wh.timeStart = DateTimeService.toTime(wh.timeStart.toString());
-            });
-            return workingHours;
-          })
+      mergeMap(() => {
+        // get the worked hours
+        const workTime$ = this.workingTimeService
+          .getWorkTime(this.reportForm.get('employeeId')!.value, this.reportForm.get('month')!.value, this.reportForm.get('year')!.value)
+          .pipe(
+            startWith([]),
+            map((workingHours) => {
+              workingHours.forEach((wh) => {
+                wh.timeEnd = DateTimeService.toTime(wh.timeEnd.toString());
+                wh.timeStart = DateTimeService.toTime(wh.timeStart.toString());
+              });
+              return workingHours;
+            })
+          );
+
+        // get the employee
+        const employee$ = this.apiService.getEmployee(this.reportForm.get('employeeId')!.value).pipe(shareReplay(1));
+
+        // get the report
+        const report$ = this.workingTimeService.getWorkTimeReport(
+          this.reportForm.get('employeeId')!.value,
+          this.reportForm.get('year')!.value,
+          this.reportForm.get('month')!.value
         );
 
-        const report$ = this.workingTimeService.getWorkTimeReport(user!.id, this.selectedYear(), this.selectedMonth());
-
-        return combineLatest({ workTime: workTime$, report: report$ }).pipe(
+        return combineLatest({ workTime: workTime$, report: report$, employee: employee$ }).pipe(
+          map((result) => {
+            this.reportForm.controls['employeeName'].setValue(result.employee.firstName + ' ' + result.employee.lastName);
+            return {
+              report: result.report,
+              workTime: result.workTime,
+              totalWorkedHours: result.workTime.map(this.timeDiff).reduce((acc, value) => acc + value / 60, 0),
+            };
+          }),
           finalize(() => {
             this.isLoadingWorkingHours.set(false);
-            this.initSignaturePad();
           })
         );
       })
     );
-
-    // calculate total working hours
-    this.totalWorkingHours$ = this.model$.pipe(
-      map((result) => result.workTime.map(this.timeDiff)),
-      map((timeDifferences) => timeDifferences.reduce((acc, value) => acc + value / 60, 0)),
-      startWith(0)
-    );
-  }
-
-  initSignaturePad() {
-    console.log('initSignaturePad');
-    if (this.isSignaturePadInitialized == true) return;
-
-    this.signaturePad = new SignaturePad(this.canvasElement.nativeElement);
-
-    // resize the canvas to fit container - using css will only stretch the signature
-    fromEvent(window, 'resize')
-      .pipe(startWith([]), takeUntil(this.$onDestroy))
-      .subscribe(() => {
-        this.canvasWidth.set(this.canvasContainer.nativeElement.offsetWidth);
-      });
-    this.isSignaturePadInitialized = true;
   }
 
   ngOnDestroy(): void {
@@ -147,14 +144,10 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   }
 
   onSelectedYearChange(selectedYear: string) {
-    this.selectedYear.set(parseInt(selectedYear) || new Date().getFullYear());
-    if (this.selectedYear() > 2020 && this.selectedYear() < 2100) {
-      this.router.navigate([], { queryParams: { year: this.selectedYear() }, queryParamsHandling: 'merge', replaceUrl: true });
+    const year = parseInt(selectedYear) || new Date().getFullYear();
+    if (year > 2020 && year < 2100) {
+      this.router.navigate([], { queryParams: { year: year }, queryParamsHandling: 'merge', replaceUrl: true });
     }
-  }
-
-  onClearSignatureClick() {
-    this.signaturePad.clear();
   }
 
   private buildForm(): FormGroup {
@@ -174,12 +167,12 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     workingHour.timeEnd.hours * 60 + workingHour.timeEnd.minutes - (workingHour.timeStart.hours * 60 + workingHour.timeStart.minutes);
 
   public onSave() {
-    if (this.signaturePad.isEmpty()) {
+    if (this.signatureElement.isEmpty()) {
       this.toasterService.error('Bitte unterschreibe den Report');
       return;
     }
 
-    this.reportForm.controls['signature'].setValue(this.signaturePad.toDataURL());
+    this.reportForm.controls['signature'].setValue(this.signatureElement.toDataURL());
     this.isSaving.set(true);
     this.workingTimeService
       .signWorkingTimeReport(this.reportForm.value)

@@ -54,7 +54,7 @@
           } @if (item.status == WorkingHoursReportStatus.EmployeeSigned && isManager()) {
           <a
             [routerLink]="['/dashboard/time-tracker/new']"
-            [queryParams]="{ year: item.year, month: item.month }"
+            [queryParams]="{ year: item.year, month: item.month, employeeId: item.employeeId }"
             class="btn btn-outline-secondary btn-sm"
             title="Report unterschreiben"
           >
