@@ -5,4 +5,5 @@ export interface WorkingHours {
   date: Date;
   timeStart: Time;
   timeEnd: Time;
+  isDone: boolean;
 }

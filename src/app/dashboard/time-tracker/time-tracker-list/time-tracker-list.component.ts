@@ -11,6 +11,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faDownload, faFileSignature, faGear } from '@fortawesome/free-solid-svg-icons';
 import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { ToastrService } from 'ngx-toastr';
 import { Observable, combineLatest, finalize, map, mergeMap, startWith } from 'rxjs';
 
 @Component({
@@ -20,23 +21,23 @@ import { Observable, combineLatest, finalize, map, mergeMap, startWith } from 'r
   templateUrl: './time-tracker-list.component.html',
 })
 export class TimeTrackerListComponent {
-  private readonly workingTimeService = inject(WorkingTimeService);
-  private readonly userService = inject(UserService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly toastr = inject(ToastrService);
+  private readonly userService = inject(UserService);
+  private readonly workingTimeService = inject(WorkingTimeService);
 
-  months = DateTimeService.months;
   WorkingHoursReportStatus = WorkingHoursReportStatus;
-  faGear = faGear;
-  faFileSignature = faFileSignature;
   faDownload = faDownload;
+  faFileSignature = faFileSignature;
+  faGear = faGear;
+  months = DateTimeService.months;
 
-  readonly selectedMonth = signal(new Date().getMonth() + 1);
-  readonly selectedYear = signal(new Date().getFullYear());
   readonly isLoading = signal(false);
   readonly isManager = signal(false);
+  readonly selectedMonth = signal(new Date().getMonth() + 1);
+  readonly selectedYear = signal(new Date().getFullYear());
   readonly userId: WritableSignal<UUID> = signal('');
-
   readonly workingTimeList$: Observable<WorkingHoursReportListEntry[]>;
 
   constructor() {
@@ -55,6 +56,22 @@ export class TimeTrackerListComponent {
         )
       )
     );
+  }
+
+  onDownloadReport(report: WorkingHoursReportListEntry) {
+    this.workingTimeService.getPrintReport(report.employeeId, report.year, report.month).subscribe({
+      next: (result) => {
+        const blob = new Blob([result], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Einsatznachweis - ${report.employeeName}.pdf`;
+        link.click();
+      },
+      error: (error) => {
+        this.toastr.error(`Einsatznachweis konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
+      },
+    });
   }
 
   onSelectedMonthChange(selectedDate: string) {

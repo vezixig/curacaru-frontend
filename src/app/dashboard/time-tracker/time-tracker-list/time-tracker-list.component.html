@@ -28,40 +28,40 @@
       </tr>
     </thead>
     <tbody>
-      @for (item of workingTimeList$ | async ; track $index) {
+      @for (report of workingTimeList$ | async ; track $index) {
       <tr>
-        <td class="text-center">{{ item.year }}</td>
-        <td class="text-center">{{ item.month | monthName }}</td>
-        <td>{{ item.employeeName }}</td>
+        <td class="text-center">{{ report.year }}</td>
+        <td class="text-center">{{ report.month | monthName }}</td>
+        <td>{{ report.employeeName }}</td>
         <td class="text-center">
           <div
-            [class.bg-danger]="item.status == WorkingHoursReportStatus.NotSigned"
-            [class.bg-warning]="item.status == WorkingHoursReportStatus.EmployeeSigned"
-            [class.bg-success]="item.status == WorkingHoursReportStatus.ManagerSigned"
+            [class.bg-danger]="report.status == WorkingHoursReportStatus.NotSigned"
+            [class.bg-warning]="report.status == WorkingHoursReportStatus.EmployeeSigned"
+            [class.bg-success]="report.status == WorkingHoursReportStatus.ManagerSigned"
             class="status-bullet"
           ></div>
         </td>
         <td class="text-center">
-          @if (item.status == WorkingHoursReportStatus.NotSigned && item.employeeId == userId()) {
+          @if (report.status == WorkingHoursReportStatus.NotSigned && report.employeeId == userId()) {
           <a
             [routerLink]="['/dashboard/time-tracker/new']"
-            [queryParams]="{ year: item.year, month: item.month }"
+            [queryParams]="{ year: report.year, month: report.month }"
             class="btn btn-outline-secondary btn-sm"
             title="Report erstellen"
           >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </a>
-          } @if (item.status == WorkingHoursReportStatus.EmployeeSigned && isManager()) {
+          } @if (report.status == WorkingHoursReportStatus.EmployeeSigned && isManager()) {
           <a
             [routerLink]="['/dashboard/time-tracker/new']"
-            [queryParams]="{ year: item.year, month: item.month, employeeId: item.employeeId }"
+            [queryParams]="{ year: report.year, month: report.month, employeeId: report.employeeId }"
             class="btn btn-outline-secondary btn-sm"
             title="Report unterschreiben"
           >
             <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
           </a>
-          } @if (item.status == WorkingHoursReportStatus.ManagerSigned) {
-          <a [routerLink]="['/dashboard/time-tracker/new']" class="btn btn-outline-secondary btn-sm" title="Arbeitszeitreport herunterladen">
+          } @if (report.status == WorkingHoursReportStatus.ManagerSigned) {
+          <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeitreport herunterladen">
             <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           </a>
           }

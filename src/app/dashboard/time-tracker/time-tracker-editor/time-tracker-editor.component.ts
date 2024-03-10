@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { UserEmployee } from '@curacaru/models';
 import { WorkingHours } from '@curacaru/models/working-hours.model';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
-import { faCircleInfo, faEraser } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faEraser, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { finalize, map, mergeMap, shareReplay, startWith, tap } from 'rxjs/operators';
 import { WorkingTimeService } from '@curacaru/services/working-time.service';
 import { Signature } from '@curacaru/shared/signature/signature.component';
@@ -28,49 +28,49 @@ import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
   styleUrls: ['./time-tracker-editor.component.scss'],
   imports: [
     AsyncPipe,
+    CommonModule,
     DatePipe,
-    TimeFormatPipe,
-    FontAwesomeModule,
     DecimalPipe,
+    FontAwesomeModule,
     FormsModule,
     InputComponent,
-    Signature,
+    NgbDatepickerModule,
+    NgxSkeletonLoaderModule,
     ReactiveFormsModule,
     RouterModule,
-    NgxSkeletonLoaderModule,
-    CommonModule,
-    NgbDatepickerModule,
+    Signature,
+    TimeFormatPipe,
   ],
 })
 export class TimeTrackerEditorComponent implements OnDestroy {
   @ViewChild('signature') signatureElement!: Signature;
 
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly workingTimeService = inject(WorkingTimeService);
+  private readonly apiService = inject(ApiService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
-  private readonly userService = inject(UserService);
   private readonly toasterService = inject(ToastrService);
-  private readonly apiService = inject(ApiService);
-
-  faCalendar = faCalendar;
-  faEraser = faEraser;
-  months = DateTimeService.months;
-  faCircleInfo = faCircleInfo;
+  private readonly userService = inject(UserService);
+  private readonly workingTimeService = inject(WorkingTimeService);
 
   private readonly user$: Observable<UserEmployee>;
   private readonly $onDestroy = new Subject();
 
+  faCalendar = faCalendar;
+  faEraser = faEraser;
+  faTriangleExclamation = faTriangleExclamation;
+  months = DateTimeService.months;
+  faCircleInfo = faCircleInfo;
+
   readonly canvasWidth = signal(120);
   readonly isLoadingWorkingHours = signal(false);
-  readonly isNew = signal(false);
-  readonly reportForm: FormGroup;
-  readonly model$: Observable<{ workTime: WorkingHours[]; report: WorkingTimeReport; totalWorkedHours: number }>;
-  readonly isSaving = signal(false);
   readonly isManager = signal(false);
+  readonly isNew = signal(false);
+  readonly isSaving = signal(false);
+  readonly model$: Observable<{ workTime: WorkingHours[]; report: WorkingTimeReport; totalWorkedHours: number; canSign: boolean }>;
+  readonly reportForm: FormGroup;
 
   constructor() {
-    //this.isNew$ = this.activatedRoute.url.pipe(map((urlSegments) => urlSegments[urlSegments.length - 1].path === 'new'));
     this.reportForm = this.buildForm();
 
     // retrieve user
@@ -124,6 +124,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
               report: result.report,
               workTime: result.workTime,
               totalWorkedHours: result.workTime.map(this.timeDiff).reduce((acc, value) => acc + value / 60, 0),
+              canSign: result.workTime.findIndex((o) => o.isDone == false) == -1,
             };
           }),
           finalize(() => {

@@ -27,6 +27,10 @@ export class WorkingTimeService {
     return value;
   };
 
+  getPrintReport(employeeId: UUID, year: number, month: number) {
+    return this.httpClient.get(`${this.apiUrl}/work-time/employee/${employeeId}/report/${year}/${month}/print`, { responseType: 'blob' });
+  }
+
   /**
    * Gets the working time for a specific employee in a month
    * @param employeeId the id of the employee
