@@ -156,7 +156,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
       employeeId: ['', { Validators: Validators.required }],
       employeeName: ['', { Validators: Validators.required }],
       signatureDate: [DateTimeService.toNgbDate(new Date()), { Validators: Validators.required, updateOn: 'blur' }],
-      signatureCity: ['', [Validators.required]],
+      signatureCity: ['', [Validators.required, Validators.maxLength(25)]],
       signature: [''],
       year: [],
       month: [],

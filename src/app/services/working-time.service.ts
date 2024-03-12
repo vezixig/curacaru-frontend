@@ -43,7 +43,7 @@ export class WorkingTimeService {
   }
 
   getWorkTimeList(year: number, month: number) {
-    return this.httpClient.get<WorkingHoursReportListEntry[]>(`${this.apiUrl}/work-time/list?month=${year}&year=${month}`);
+    return this.httpClient.get<WorkingHoursReportListEntry[]>(`${this.apiUrl}/work-time/list?month=${month}&year=${year}`);
   }
 
   getWorkTimeReport(employeeId: UUID, year: number, month: number) {
