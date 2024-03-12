@@ -88,7 +88,7 @@
     <div class="row">
       <div class="alert alert-success mt-3" role="alert">
         <fa-icon [icon]="faCircleInfo" /> Der Report für diesen Monat wurde am {{ model.report.signatureManagerDate | date }} in
-        {{ model.report.signatureManagerCity }} gegengezeichnet.
+        {{ model.report.signatureManagerCity }} von einem Manager gegengezeichnet.
       </div>
     </div>
     } @if (model.canSign && (!model.report || (isManager() && !model.report.signatureManagerDate))) {
