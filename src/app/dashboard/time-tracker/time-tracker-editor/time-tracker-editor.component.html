@@ -77,7 +77,7 @@
       </p>
     </div>
 
-    @if (model.report ) {
+    @if (model.report && !model.report.signatureManagerDate ) {
     <div class="row">
       <div class="alert alert-secondary mt-3" role="alert">
         <fa-icon [icon]="faCircleInfo" /> Der Report für diesen Monat wurde am {{ model.report.signatureEmployeeDate | date }} in
