@@ -10,7 +10,7 @@
 
   <button type="button" [routerLink]="['/dashboard/appointments/new']" class="btn btn-primary text-white btn-block mb-3">Termin hinzufügen</button>
 
-  <div class="form-group">
+  <div class="form-group p-0">
     <label for="dpFromDate">Datum</label>
     <div class="input-group">
       <div class="dp-hidden position-absolute">
@@ -65,7 +65,7 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group p-0">
     <label for="dpFromDate">Kunde</label>
     <select class="form-select" name="customerSelect" [(ngModel)]="selectedCustomerId" (change)="onSelectionChanged()">
       <option></option>
@@ -76,7 +76,7 @@
   </div>
 
   @if (user?.isManager) {
-  <div class="form-group">
+  <div class="form-group p-0">
     <label for="dpFromDate">Mitarbeiter</label>
     <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
       <option></option>

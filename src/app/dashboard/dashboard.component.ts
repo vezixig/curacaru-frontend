@@ -36,11 +36,19 @@ export class DashboardComponent {
 
   private loadCompany() {
     this.isLoading = true;
-    this.userService.user$.subscribe((result) => {
-      this.hasEmployee = result != null;
-      this.hasCompany = result.companyId != null;
-      this.isLoading = false;
-      this.user = result;
+    this.userService.user$.subscribe({
+      next: (result) => {
+        this.hasEmployee = result != null;
+        this.hasCompany = result.companyId != null;
+        this.isLoading = false;
+        this.user = result;
+      },
+      error: (error) => {
+        this.error = error.status != 404;
+        this.isLoading = false;
+        this.hasCompany = false;
+        console.error(error);
+      },
     });
   }
 }

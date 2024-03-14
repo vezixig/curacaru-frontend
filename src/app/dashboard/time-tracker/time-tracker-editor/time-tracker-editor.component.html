@@ -1,5 +1,5 @@
 <div class="row">
-  <h4 class="h-underline">Arbeitszeitreport {{ isNew() ? "erstellen" : "gegenzeichnen" }}</h4>
+  <h4 class="h-underline">Arbeitszeiterfassung {{ isNew() ? "erstellen" : "gegenzeichnen" }}</h4>
 
   <form (ngSubmit)="onSave()" [formGroup]="reportForm">
     <div class="form-group mb-2">
@@ -56,8 +56,8 @@
           <div class="col-2">Dauer</div>
         </div>
         @for (appointment of model.workTime; track appointment) {
-        <div class="row border-bottom">
-          <div class="p-2 col-5">{{ appointment.date | date : "dd.MM.yyyy" }}</div>
+        <div class="row border-bottom py-2">
+          <div class="col-5">{{ appointment.date | date : "dd.MM.yyyy" }}</div>
           <div class="col-5">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</div>
           <div class="col-2">{{ appointment.workDuration | number : "1.2-2" }}h</div>
         </div>
@@ -80,14 +80,14 @@
     @if (model.report && !model.report.signatureManagerDate ) {
     <div class="row">
       <div class="alert alert-secondary mt-3" role="alert">
-        <fa-icon [icon]="faCircleInfo" /> Der Report für diesen Monat wurde am {{ model.report.signatureEmployeeDate | date }} in
+        <fa-icon [icon]="faCircleInfo" /> Die Arbeitszeiterfassung für diesen Monat wurde am {{ model.report.signatureEmployeeDate | date }} in
         {{ model.report.signatureEmployeeCity }} unterschrieben und muss nun von einem Manager gegengezeichnet werden.
       </div>
     </div>
     } @if(model.report && model.report.signatureManagerDate) {
     <div class="row">
       <div class="alert alert-success mt-3" role="alert">
-        <fa-icon [icon]="faCircleInfo" /> Der Report für diesen Monat wurde am {{ model.report.signatureManagerDate | date }} in
+        <fa-icon [icon]="faCircleInfo" /> Die Arbeitszeiterfassung für diesen Monat wurde am {{ model.report.signatureManagerDate | date }} in
         {{ model.report.signatureManagerCity }} von einem Manager gegengezeichnet.
       </div>
     </div>
@@ -112,10 +112,11 @@
         </div>
       </div>
     </div>
-    } @if(model.canSign == false) {
+    } @if(model.hasUndoneAppointments) {
     <div class="row">
       <div class="alert alert-warning mt-3" role="alert">
-        <fa-icon [icon]="faTriangleExclamation" /> Der Report kann nicht erstellt werden, es gibt noch nicht abgeschlossene Termine in diesem Monat.
+        <fa-icon [icon]="faTriangleExclamation" /> Die Arbeitszeiterfassung kann nicht erstellt werden, es gibt noch nicht abgeschlossene Termine in
+        diesem Monat.
       </div>
     </div>
     }

@@ -67,7 +67,13 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   readonly isManager = signal(false);
   readonly isNew = signal(false);
   readonly isSaving = signal(false);
-  readonly model$: Observable<{ workTime: WorkingHours[]; report: WorkingTimeReport; totalWorkedHours: number; canSign: boolean }>;
+  readonly model$: Observable<{
+    workTime: WorkingHours[];
+    report: WorkingTimeReport;
+    totalWorkedHours: number;
+    canSign: boolean;
+    hasUndoneAppointments: boolean;
+  }>;
   readonly reportForm: FormGroup;
 
   constructor() {
@@ -124,7 +130,8 @@ export class TimeTrackerEditorComponent implements OnDestroy {
               report: result.report,
               workTime: result.workTime,
               totalWorkedHours: result.workTime.map(this.timeDiff).reduce((acc, value) => acc + value / 60, 0),
-              canSign: result.workTime.findIndex((o) => o.isDone == false) == -1,
+              canSign: result.workTime.length > 0 && result.workTime.findIndex((o) => o.isDone == false) == -1,
+              hasUndoneAppointments: result.workTime.findIndex((o) => o.isDone == false) > -1,
             };
           }),
           finalize(() => {
@@ -178,6 +185,12 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     this.workingTimeService
       .signWorkingTimeReport(this.reportForm.value)
       .pipe(finalize(() => this.isSaving.set(false)))
-      .subscribe(() => this.router.navigate(['/dashboard/time-tracker']));
+      .subscribe({
+        next: (_) => {
+          this.toasterService.success('Unterschrift der Arbeitszeiterfassung erfolgreich gespeichert');
+          this.router.navigate(['/dashboard/time-tracker']);
+        },
+        error: (error) => this.toasterService.error(`Einsatznachweis konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`),
+      });
   }
 }

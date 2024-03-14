@@ -4,7 +4,7 @@
   <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block mb-3">Kunden hinzufügen</Button>
 
   <!-- employee filter -->
-  <div class="form-group">
+  <div class="form-group p-0">
     <label for="dpFromDate">Mitarbeiter</label>
     <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
       <option></option>

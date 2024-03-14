@@ -8,7 +8,8 @@ import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 import { DateTimeService, UserService } from '@curacaru/services';
 import { WorkingTimeService } from '@curacaru/services/working-time.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faDownload, faFileSignature, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar } from '@fortawesome/free-regular-svg-icons';
+import { faCircleInfo, faDownload, faFileSignature, faGear } from '@fortawesome/free-solid-svg-icons';
 import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
@@ -28,6 +29,8 @@ export class TimeTrackerListComponent {
   private readonly workingTimeService = inject(WorkingTimeService);
 
   WorkingHoursReportStatus = WorkingHoursReportStatus;
+  faCalendar = faCalendar;
+  faCircleInfo = faCircleInfo;
   faDownload = faDownload;
   faFileSignature = faFileSignature;
   faGear = faGear;
@@ -65,11 +68,11 @@ export class TimeTrackerListComponent {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `Einsatznachweis - ${report.employeeName}.pdf`;
+        link.download = `Arbeitszeiterfassung - ${report.employeeName}.pdf`;
         link.click();
       },
       error: (error) => {
-        this.toastr.error(`Einsatznachweis konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
+        this.toastr.error(`Arbeitszeiterfassung  konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
       },
     });
   }

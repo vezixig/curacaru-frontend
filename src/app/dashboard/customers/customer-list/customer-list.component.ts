@@ -100,6 +100,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
         complete: () => {
           this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
           this.customers = this.customers.filter((e) => e.id !== customer.id);
+          this.filterCustomers();
         },
         error: (error) => this.toastr.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
       });
