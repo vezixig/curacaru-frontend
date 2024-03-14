@@ -29,6 +29,13 @@ main {
   overflow-y: hidden;
 }
 
+.status-bullet {
+  border-radius: 8px;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
 .h-underline {
   padding-bottom: 10px;
   border-bottom: 2px solid $primary;

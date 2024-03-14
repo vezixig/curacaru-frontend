@@ -1,6 +1,127 @@
 <div class="row">
   <h4>Arbeitszeiterfassung</h4>
-  <button type="button" [routerLink]="['/dashboard/timetracker/new']" class="btn btn-primary text-white btn-block mb-3">
-    Arbeitszeitreport erstellen
+  <button type="button" [routerLink]="['/dashboard/time-tracker/new']" class="btn btn-primary text-white btn-block mb-3">
+    Arbeitszeiterfassung erstellen
   </button>
+
+  <div class="col p-0 pe-1">
+    <label>Jahr</label>
+    <input type="number" [min]="2020" [max]="2100" class="form-control" [ngModel]="selectedYear()" (ngModelChange)="onSelectedYearChange($event)" />
+  </div>
+  <div class="col p-0 ps-1">
+    <label>Monat</label>
+    <select class="form-control" [ngModel]="selectedMonth()" (ngModelChange)="onSelectedMonthChange($event)">
+      @for (month of months; track month) {
+      <option [value]="month.value">{{ month.name }}</option>
+      }
+    </select>
+  </div>
+
+  @if(workingTimeList$ | async; as workingTimeList) {
+  <table class="d-none d-md-table table mt-3 table-striped">
+    <thead>
+      <tr>
+        <th class="text-center">Jahr</th>
+        <th class="text-center">Monat</th>
+        <th>Mitarbeiter</th>
+        <th class="text-center">Status</th>
+        <th class="text-center">Aktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (report of workingTimeList; track $index) {
+      <tr>
+        <td class="text-center">{{ report.year }}</td>
+        <td class="text-center">{{ report.month | monthName }}</td>
+        <td>{{ report.employeeName }}</td>
+        <td class="text-center">
+          <div
+            [class.bg-danger]="report.status == WorkingHoursReportStatus.NotSigned"
+            [class.bg-warning]="report.status == WorkingHoursReportStatus.EmployeeSigned"
+            [class.bg-success]="report.status == WorkingHoursReportStatus.ManagerSigned"
+            class="status-bullet"
+          ></div>
+        </td>
+        <td class="text-center">
+          @if (report.status == WorkingHoursReportStatus.NotSigned && report.employeeId == userId()) {
+          <a
+            [routerLink]="['/dashboard/time-tracker/new']"
+            [queryParams]="{ year: report.year, month: report.month }"
+            class="btn btn-outline-secondary btn-sm"
+            title="Report erstellen"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </a>
+          } @if (report.status == WorkingHoursReportStatus.EmployeeSigned && isManager()) {
+          <a
+            [routerLink]="['/dashboard/time-tracker/new']"
+            [queryParams]="{ year: report.year, month: report.month, employeeId: report.employeeId }"
+            class="btn btn-outline-secondary btn-sm"
+            title="Arbeitszeiterfassung unterschreiben"
+          >
+            <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
+          </a>
+          } @if (report.status == WorkingHoursReportStatus.ManagerSigned) {
+          <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung herunterladen">
+            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          </a>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="d-md-none p-0">
+    @for (report of workingTimeList; track report) {
+    <div class="card my-2">
+      <div class="card-header d-flex">
+        <img
+          class="me-2"
+          width="10"
+          [class.bg-danger]="report.status == WorkingHoursReportStatus.NotSigned"
+          [class.bg-warning]="report.status == WorkingHoursReportStatus.EmployeeSigned"
+          [class.bg-success]="report.status == WorkingHoursReportStatus.ManagerSigned"
+        />
+        <span class="lead text-truncate">{{ report.employeeName }}</span>
+        <div class="btn-group ms-auto" role="group">
+          @if (report.status == WorkingHoursReportStatus.NotSigned && report.employeeId == userId()) {
+          <a
+            [routerLink]="['/dashboard/time-tracker/new']"
+            [queryParams]="{ year: report.year, month: report.month }"
+            class="btn btn-outline-secondary btn-sm"
+            title="Report erstellen"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </a>
+          } @if (report.status == WorkingHoursReportStatus.EmployeeSigned && isManager()) {
+          <a
+            [routerLink]="['/dashboard/time-tracker/new']"
+            [queryParams]="{ year: report.year, month: report.month, employeeId: report.employeeId }"
+            class="btn btn-outline-secondary btn-sm"
+            title="Report unterschreiben"
+          >
+            <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
+          </a>
+          } @if (report.status == WorkingHoursReportStatus.ManagerSigned) {
+          <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung herunterladen">
+            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          </a>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  @if(workingTimeList.length == 0) {
+  <div class="row">
+    <div class="alert alert-secondary mt-3" role="alert">
+      <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat wurde bisher keine Arbeitszeit erfasst.
+    </div>
+  </div>
+  } } @if (isLoading()) {
+  <ngx-skeleton-loader [theme]="{ height: '25px' }" />
+  <ngx-skeleton-loader [theme]="{ height: '25px' }" />
+  }
 </div>

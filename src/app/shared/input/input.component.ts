@@ -12,7 +12,7 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 export class InputComponent {
   @Input() form!: FormGroup;
   @Input() key!: string;
-  @Input() isLoading = true;
+  @Input() isLoading = false;
   @Input() label: string = '';
   @Input() type: string = 'text';
   @Input() placeholder: string = '';

@@ -26,7 +26,7 @@ export class DateTimeService {
   }
 
   static toDateString(date: NgbDate | null): string {
-    return date ? `${date.year}-${date.month}-${date.day}` : '';
+    return date ? `${date.year}-${date.month.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}` : '';
   }
 
   static toDate(date: NgbDate | null): Date {
@@ -50,6 +50,21 @@ export class DateTimeService {
   }
 
   static beginOfCurrentMonth: Date = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+  static months = [
+    { name: 'Januar', value: 1 },
+    { name: 'Februar', value: 2 },
+    { name: 'März', value: 3 },
+    { name: 'April', value: 4 },
+    { name: 'Mai', value: 5 },
+    { name: 'Juni', value: 6 },
+    { name: 'Juli', value: 7 },
+    { name: 'August', value: 8 },
+    { name: 'September', value: 9 },
+    { name: 'Oktober', value: 10 },
+    { name: 'November', value: 11 },
+    { name: 'Dezember', value: 12 },
+  ];
 
   /**
    * Gets the dates for Monday and Sunday of week the given date is in.
