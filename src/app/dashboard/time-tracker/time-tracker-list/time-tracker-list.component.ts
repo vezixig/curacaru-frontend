@@ -3,20 +3,23 @@ import { Component, Signal, WritableSignal, inject, signal } from '@angular/core
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { WorkingHoursReportStatus } from '@curacaru/enums/working-hours-report-status';
+import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { WorkingHoursReportListEntry } from '@curacaru/models/working-time-list-entry.model';
 import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 import { DateTimeService, UserService } from '@curacaru/services';
 import { WorkingTimeService } from '@curacaru/services/working-time.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCalendar } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faDownload, faFileSignature, faGear } from '@fortawesome/free-solid-svg-icons';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, combineLatest, finalize, map, mergeMap, startWith } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest, finalize, map, mergeMap, startWith } from 'rxjs';
 
 @Component({
   imports: [AsyncPipe, RouterModule, FormsModule, MonthNamePipe, NgxSkeletonLoaderModule, FontAwesomeModule],
+  providers: [MonthNamePipe],
   selector: 'cura-time-tracker-list',
   standalone: true,
   templateUrl: './time-tracker-list.component.html',
@@ -27,6 +30,8 @@ export class TimeTrackerListComponent {
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
   private readonly workingTimeService = inject(WorkingTimeService);
+  private readonly modalService = inject(NgbModal);
+  private readonly monthNamePipe = inject(MonthNamePipe);
 
   WorkingHoursReportStatus = WorkingHoursReportStatus;
   faCalendar = faCalendar;
@@ -34,6 +39,7 @@ export class TimeTrackerListComponent {
   faDownload = faDownload;
   faFileSignature = faFileSignature;
   faGear = faGear;
+  faTrashCan = faTrashCan;
   months = DateTimeService.months;
 
   readonly isLoading = signal(false);
@@ -42,9 +48,14 @@ export class TimeTrackerListComponent {
   readonly selectedYear = signal(new Date().getFullYear());
   readonly userId: WritableSignal<UUID> = signal('');
   readonly workingTimeList$: Observable<WorkingHoursReportListEntry[]>;
+  readonly $onRefresh = new Subject();
 
   constructor() {
-    this.workingTimeList$ = combineLatest({ user: this.userService.user$, queryParams: this.activatedRoute.queryParams }).pipe(
+    this.workingTimeList$ = combineLatest({
+      user: this.userService.user$,
+      queryParams: this.activatedRoute.queryParams,
+      refresh: this.$onRefresh.pipe(startWith(null)),
+    }).pipe(
       map((result) => {
         this.selectedMonth.set(parseInt(result.queryParams['month']) || new Date().getMonth() + 1);
         this.selectedYear.set(parseInt(result.queryParams['year']) || new Date().getFullYear());
@@ -59,6 +70,30 @@ export class TimeTrackerListComponent {
         )
       )
     );
+  }
+
+  onDeleteReport(report: WorkingHoursReportListEntry) {
+    const modalRef = this.modalService.open(NgbdModalConfirm);
+    modalRef.result.then(() => this.deleteReport(report));
+    modalRef.componentInstance.title = 'Arbeitszeiterfassung löschen';
+    modalRef.componentInstance.text = `Soll die Arbeitszeiterfassung von ${report.employeeName} für ${this.monthNamePipe.transform(report.month)} ${
+      report.year
+    } wirklich gelöscht werden?`;
+  }
+
+  private deleteReport(report: WorkingHoursReportListEntry) {
+    console.warn(report);
+    this.isLoading.set(true);
+    this.workingTimeService.deleteWorkingTimeReport(report.id).subscribe({
+      next: () => {
+        this.toastr.success('Arbeitszeiterfassung wurde gelöscht');
+        this.$onRefresh.next(true);
+      },
+      error: (error) => {
+        this.toastr.error(`Arbeitszeiterfassung konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
+        this.isLoading.set(false);
+      },
+    });
   }
 
   onDownloadReport(report: WorkingHoursReportListEntry) {

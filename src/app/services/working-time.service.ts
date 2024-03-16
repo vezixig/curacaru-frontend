@@ -55,4 +55,13 @@ export class WorkingTimeService {
     const serializedData = JSON.stringify(report, this.customSerializer);
     return this.httpClient.post(`${this.apiUrl}/work-time/sign`, serializedData, this.jsonHeader);
   }
+
+  /**
+   * Deletes a working time report
+   * @param id the id of the working time report
+   * @returns an empty observable
+   */
+  deleteWorkingTimeReport(reportId: UUID) {
+    return this.httpClient.delete(`${this.apiUrl}/work-time/report/${reportId}`);
+  }
 }

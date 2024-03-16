@@ -43,29 +43,35 @@
           ></div>
         </td>
         <td class="text-center">
-          @if (report.status == WorkingHoursReportStatus.NotSigned && report.employeeId == userId()) {
-          <a
-            [routerLink]="['/dashboard/time-tracker/new']"
-            [queryParams]="{ year: report.year, month: report.month }"
-            class="btn btn-outline-secondary btn-sm"
-            title="Report erstellen"
-          >
-            <fa-icon [icon]="faGear" [fixedWidth]="true" />
-          </a>
-          } @if (report.status == WorkingHoursReportStatus.EmployeeSigned && isManager()) {
-          <a
-            [routerLink]="['/dashboard/time-tracker/new']"
-            [queryParams]="{ year: report.year, month: report.month, employeeId: report.employeeId }"
-            class="btn btn-outline-secondary btn-sm"
-            title="Arbeitszeiterfassung unterschreiben"
-          >
-            <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
-          </a>
-          } @if (report.status == WorkingHoursReportStatus.ManagerSigned) {
-          <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung herunterladen">
-            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
-          </a>
-          }
+          <div class="btn-group ms-auto" role="group">
+            @if (report.status == WorkingHoursReportStatus.NotSigned && report.employeeId == userId()) {
+            <a
+              [routerLink]="['/dashboard/time-tracker/new']"
+              [queryParams]="{ year: report.year, month: report.month }"
+              class="btn btn-outline-secondary btn-sm"
+              title="Report erstellen"
+            >
+              <fa-icon [icon]="faGear" [fixedWidth]="true" />
+            </a>
+            } @if (report.status == WorkingHoursReportStatus.EmployeeSigned && isManager()) {
+            <a
+              [routerLink]="['/dashboard/time-tracker/new']"
+              [queryParams]="{ year: report.year, month: report.month, employeeId: report.employeeId }"
+              class="btn btn-outline-secondary btn-sm"
+              title="Arbeitszeiterfassung unterschreiben"
+            >
+              <fa-icon [icon]="faFileSignature" [fixedWidth]="true" />
+            </a>
+            } @if (report.status == WorkingHoursReportStatus.ManagerSigned) {
+            <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung herunterladen">
+              <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+            </a>
+            } @if(isManager()) {
+            <a (click)="onDeleteReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung löschen">
+              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+            </a>
+            }
+          </div>
         </td>
       </tr>
       }
@@ -106,6 +112,10 @@
           } @if (report.status == WorkingHoursReportStatus.ManagerSigned) {
           <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung herunterladen">
             <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          </a>
+          } @if(isManager()) {
+          <a (click)="onDeleteReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung löschen">
+            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </a>
           }
         </div>
