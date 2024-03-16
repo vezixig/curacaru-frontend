@@ -54,6 +54,7 @@ export const routes: Routes = [
       },
       {
         path: 'new',
+        canActivate: [ManagerGuard],
         loadComponent: () => import('@curacaru/dashboard/customers/customer-editor/customer-editor.component').then((o) => o.CustomerEditorComponent),
       },
       {
