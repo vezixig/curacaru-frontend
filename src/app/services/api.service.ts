@@ -107,10 +107,6 @@ export class ApiService {
   getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) =>
     this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' });
 
-  /** Gets an assignment declaration document */
-  getAssignmentDeclaration = (customerId: UUID, year: number) =>
-    this.httpClient.get(`${this.apiUrl}/document/assignment-declaration/${customerId}/${year}`, { responseType: 'blob' });
-
   /** Gets the list of customers with only minimal info */
   getMinimalCustomerList = () => this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`);
 

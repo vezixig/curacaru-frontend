@@ -2,9 +2,11 @@ import { UUID } from 'angular2-uuid';
 import { Insurance } from './insurance.model';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { Gender } from '@curacaru/enums/gender.enum';
+import { EmployeeBasic } from './employee-basic.model';
 
 export interface Customer {
   associatedEmployeeId: UUID;
+  associatedEmployee?: EmployeeBasic;
   birthDate: Date;
   careLevel: number;
   declarationsOfAssignment: number[];

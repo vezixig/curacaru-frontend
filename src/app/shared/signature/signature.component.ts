@@ -29,6 +29,10 @@ export class Signature implements AfterViewInit {
       });
   }
 
+  clear(): void {
+    this.signaturePad.clear();
+  }
+
   isEmpty(): boolean {
     return this.signaturePad.isEmpty();
   }

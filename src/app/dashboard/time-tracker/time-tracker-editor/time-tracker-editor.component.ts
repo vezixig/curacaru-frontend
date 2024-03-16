@@ -25,7 +25,6 @@ import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
   selector: 'cura-time-tracker-editor',
   standalone: true,
   templateUrl: './time-tracker-editor.component.html',
-  styleUrls: ['./time-tracker-editor.component.scss'],
   imports: [
     AsyncPipe,
     CommonModule,

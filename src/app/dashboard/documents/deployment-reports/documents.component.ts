@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
@@ -8,7 +8,7 @@ import { InsuranceStatusPipe } from '@curacaru/pipes/insurance-status.pipe';
 import { ApiService } from '@curacaru/services/api.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBuilding } from '@fortawesome/free-regular-svg-icons';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
@@ -20,15 +20,16 @@ import { Subscription } from 'rxjs';
   standalone: true,
   templateUrl: './documents.component.html',
 })
-export class DocumentsComponent implements OnDestroy, OnInit {
+export class DeploymentReportsComponent implements OnDestroy, OnInit {
   faDownload = faDownload;
   faBuilding = faBuilding;
+  faCircleInfo = faCircleInfo;
 
   customers: MinimalCustomerListEntry[] = [];
-  isLoading: boolean = true;
   selectedCustomerId?: number;
   filteredCustomers: MinimalCustomerListEntry[] = [];
   year = new Date().getFullYear();
+  readonly isLoading = signal(false);
 
   private getDeploymentsSubscription?: Subscription;
   private getCustomerListSubscription?: Subscription;
@@ -46,16 +47,18 @@ export class DocumentsComponent implements OnDestroy, OnInit {
       next: (result) => {
         this.customers = result;
         this.filterCustomers();
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
       error: (error) => {
         this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }
 
   onDownloadDeploymentReport = (customer: MinimalCustomerListEntry) => {
+    this.isLoading.set(true);
+
     this.apiService.getDeploymentReport(customer.customerId, customer.insuranceStatus).subscribe({
       next: (result) => {
         const blob = new Blob([result], { type: 'application/pdf' });
@@ -68,21 +71,8 @@ export class DocumentsComponent implements OnDestroy, OnInit {
       error: (error) => {
         this.toastr.error(`Einsatznachweis konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
       },
-    });
-  };
-
-  onDownloadAssignmentDeclaration = (customer: MinimalCustomerListEntry) => {
-    this.apiService.getAssignmentDeclaration(customer.customerId, this.year).subscribe({
-      next: (result) => {
-        const blob = new Blob([result], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `Abtretungserklärung ${this.year} - ${customer.customerName}.pdf`;
-        link.click();
-      },
-      error: (error) => {
-        this.toastr.error(`Abtretungserklärung konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
+      complete: () => {
+        this.isLoading.set(false);
       },
     });
   };

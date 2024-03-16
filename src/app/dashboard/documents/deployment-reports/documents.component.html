@@ -1,5 +1,5 @@
 <div class="row">
-  <h4 class="h-underline">Dokumente</h4>
+  <h4 class="h-underline">Einsatznachweise</h4>
 </div>
 
 <form class="mt-3">
@@ -30,7 +30,7 @@
   </thead>
 
   <tbody>
-    @if (isLoading) { @for (_ of [].constructor(3); track _) {
+    @if (isLoading()) { @for (_ of [].constructor(3); track _) {
     <tr>
       <td><ngx-skeleton-loader /></td>
       <td><ngx-skeleton-loader /></td>
@@ -41,16 +41,15 @@
       <td>{{ customer.customerName }}</td>
       <td>{{ customer.insuranceStatus | insuranceStatus }}</td>
       <td>
-        <button type="button" (click)="onDownloadDeploymentReport(customer)" class="btn btn-outline-secondary btn-sm m-1" title="Einsatznachweis herunterladen">
+        <button
+          type="button"
+          (click)="onDownloadDeploymentReport(customer)"
+          class="btn btn-outline-secondary btn-sm m-1"
+          title="Einsatznachweis herunterladen"
+        >
           <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           Einsatznachweis
         </button>
-        @if (customer.insuranceStatus === InsuranceStatus.Statutory) {
-        <button type="button" (click)="onDownloadAssignmentDeclaration(customer)" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen">
-          <fa-icon [icon]="faDownload" [fixedWidth]="true" />
-          Abtretungserklärung
-        </button>
-        }
       </td>
     </tr>
     }
@@ -68,18 +67,36 @@
         <li><fa-icon [icon]="faBuilding" [fixedWidth]="true" /> {{ customer.insuranceStatus | insuranceStatus }}</li>
       </ul>
       <div class="row">
-        <button type="button" (click)="onDownloadDeploymentReport(customer)" class="col btn btn-outline-secondary btn-sm m-1" title="Einsatznachweis herunterladen">
+        <button
+          [disabled]="isLoading()"
+          type="button"
+          (click)="onDownloadDeploymentReport(customer)"
+          class="col btn btn-outline-secondary btn-sm m-1"
+          title="Einsatznachweis herunterladen"
+        >
           <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           Einsatznachweis
         </button>
-        @if (customer.insuranceStatus === InsuranceStatus.Statutory) {
-        <button type="button" (click)="onDownloadAssignmentDeclaration(customer)" class="col btn btn-outline-secondary btn-sm m-1" title="Einsatznachweis herunterladen">
+        <!-- @if (customer.insuranceStatus === InsuranceStatus.Statutory) {
+        <button
+          type="button"
+          (click)="onDownloadAssignmentDeclaration(customer)"
+          class="col btn btn-outline-secondary btn-sm m-1"
+          title="Einsatznachweis herunterladen"
+        >
           <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           Abtretungserklärung
         </button>
-        }
+        } -->
       </div>
     </div>
   </div>
   }
 </div>
+
+@if (!filteredCustomers ||filteredCustomers.length == 0) {
+<div class="alert alert-secondary mt-3" role="alert">
+  <fa-icon [icon]="faCircleInfo" /> Bitte lege erst mindestens einen Kunden mit einem Versichertenstatus an. Dann kannst du auf den Bereich Dokumente
+  zugreifen.
+</div>
+}
