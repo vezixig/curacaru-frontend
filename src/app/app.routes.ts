@@ -63,8 +63,24 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'dashboard/documents',
-    loadComponent: () => import('@curacaru/dashboard/documents/documents.component').then((o) => o.DocumentsComponent),
+    path: 'dashboard/documents/deployment-reports',
+    loadComponent: () => import('@curacaru/dashboard/documents/deployment-reports/documents.component').then((o) => o.DeploymentReportsComponent),
+  },
+  {
+    path: 'dashboard/documents/assignment-declarations',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('@curacaru/dashboard/documents/assignment-declarations-list/assignment-declarations-list.component').then(
+        (o) => o.AssignmentDeclarationsListComponent
+      ),
+  },
+  {
+    path: 'dashboard/documents/assignment-declarations/sign',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('@curacaru/dashboard/documents/assignment-declaration-signature/assignment-declaration-signature.component').then(
+        (o) => o.AssignmentDeclarationSignatureComponent
+      ),
   },
   {
     path: 'dashboard/employees',
@@ -121,11 +137,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('@curacaru/dashboard/time-tracker/time-tracker-editor/time-tracker-editor.component').then((o) => o.TimeTrackerEditorComponent),
       },
-      // {
-      //   path: ':id',
-      //   loadComponent: () =>
-      //     import('@curacaru/dashboard/insurances/insurances-editor/insurances-editor.component').then((o) => o.InsurancesEditorComponent),
-      // },
     ],
   },
   { path: 'dashboard', redirectTo: 'dashboard/appointments', pathMatch: 'full' },
