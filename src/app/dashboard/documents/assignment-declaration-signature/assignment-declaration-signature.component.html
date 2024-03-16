@@ -18,7 +18,8 @@
       formControlName="year"
       [ngClass]="{ 'is-invalid': documentForm.controls['year'].invalid }"
     />
-    @if(dataModel$ |async; as dataModel) { @if(dataModel.insuranceId && dataModel.insuranceStatus == insuranceStatus.Statutory) {
+    @if(dataModel$ |async; as dataModel) { @if(dataModel.insuranceId && dataModel.insuredPersonNumber && dataModel.insuranceStatus ==
+    insuranceStatus.Statutory) {
 
     <label class="mt-2 fw-light">Bearbeitet von</label>
     <p class="ms-2 m-0 fs-5">{{ dataModel.associatedEmployee?.name }}</p>
