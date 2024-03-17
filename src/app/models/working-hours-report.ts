@@ -4,7 +4,7 @@ export interface WorkingTimeReportSignature {
   month: number;
   year: number;
   workingHours: number;
-  signatureDate: string;
+  signatureDate: Date;
   signatureCity: string;
   signature: string;
 }

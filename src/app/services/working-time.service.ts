@@ -52,8 +52,8 @@ export class WorkingTimeService {
 
   /** Creates a new signed working time report */
   signWorkingTimeReport(report: WorkingTimeReportSignature) {
-    const serializedData = JSON.stringify(report, this.customSerializer);
-    return this.httpClient.post(`${this.apiUrl}/work-time/sign`, serializedData, this.jsonHeader);
+    // const serializedData = JSON.stringify(report, this.customSerializer);
+    return this.httpClient.post(`${this.apiUrl}/work-time/sign`, report, this.jsonHeader);
   }
 
   /**

@@ -74,6 +74,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     hasUndoneAppointments: boolean;
   }>;
   readonly reportForm: FormGroup;
+  readonly today = new Date();
 
   constructor() {
     this.reportForm = this.buildForm();
@@ -161,7 +162,6 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     return this.formBuilder.group({
       employeeId: ['', { Validators: Validators.required }],
       employeeName: ['', { Validators: Validators.required }],
-      signatureDate: [DateTimeService.toNgbDate(new Date()), { Validators: Validators.required, updateOn: 'blur' }],
       signatureCity: ['', [Validators.required, Validators.maxLength(25)]],
       signature: [''],
       year: [],
