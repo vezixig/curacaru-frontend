@@ -4,7 +4,7 @@
     Abtretungserklärung erstellen
   </button>
 
-  @if(filterModel$ |async; as filterModel) {
+  @if(filterModel$ | async; as filterModel) {
   <form [formGroup]="filterForm" class="p-0">
     <div class="row gx-3">
       <div class="col-md-4 col-sm-12">
@@ -43,7 +43,7 @@
       }
     </div>
   </form>
-  } @if(listModel$ |async; as documents) {
+  } @if(listModel$ | async; as documents) {
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
       <tr>

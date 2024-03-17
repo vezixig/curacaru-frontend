@@ -2,6 +2,7 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { EmployeeBasic, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { AssignmentDeclarationListEntry } from '@curacaru/models/assignment-declaration-list-entry.model';
 import { ApiService, UserService } from '@curacaru/services';
@@ -10,7 +11,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faDownload, faGear } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin, map, startWith, switchMap, tap } from 'rxjs';
+import { Observable, Subject, catchError, combineLatest, debounceTime, finalize, forkJoin, map, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   templateUrl: './assignment-declarations-list.component.html',
@@ -41,6 +42,7 @@ export class AssignmentDeclarationsListComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly documentRepository = inject(DocumentRepository);
   private readonly toasterService = inject(ToastrService);
+  private readonly $initialized = new Subject();
 
   constructor() {
     this.filterForm = this.formBuilder.group({
@@ -56,10 +58,10 @@ export class AssignmentDeclarationsListComponent {
     this.filterModel$ = forkJoin({
       user: this.userService.user$,
       employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getMinimalCustomerList(),
-    });
+      customers: this.apiService.getMinimalCustomerList(InsuranceStatus.Statutory),
+    }).pipe(finalize(() => this.$initialized.next(true)));
 
-    this.listModel$ = combineLatest({ filter: this.filterModel$, queryParams: this.activeRoute.queryParams }).pipe(
+    this.listModel$ = combineLatest({ _: this.$initialized, queryParams: this.activeRoute.queryParams }).pipe(
       map(({ queryParams }) => {
         const queryFilter = {
           year: queryParams['year'] || new Date().getFullYear(),

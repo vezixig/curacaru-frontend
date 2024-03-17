@@ -14,7 +14,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, combineLatest, finalize, forkJoin, switchMap } from 'rxjs';
+import { Observable, Subject, combineLatest, finalize, forkJoin, switchMap } from 'rxjs';
 
 @Component({
   imports: [AsyncPipe, CommonModule, ReactiveFormsModule, FallbackSpacePipe, RouterModule, FontAwesomeModule, Signature, NgbDatepickerModule],
@@ -45,6 +45,7 @@ export class AssignmentDeclarationSignatureComponent {
   private readonly router = inject(Router);
   private readonly toasterService = inject(ToastrService);
   private readonly userService = inject(UserService);
+  private readonly $initialized = new Subject();
 
   constructor() {
     this.documentForm = this.formBuilder.group({
@@ -60,10 +61,10 @@ export class AssignmentDeclarationSignatureComponent {
 
     this.filterModel$ = forkJoin({
       user: this.userService.user$,
-      customers: this.apiService.getMinimalCustomerList(),
-    });
+      customers: this.apiService.getMinimalCustomerList(InsuranceStatus.Statutory),
+    }).pipe(finalize(() => this.$initialized.next(true)));
 
-    this.dataModel$ = combineLatest({ filter: this.filterModel$, queryParams: this.activatedRoute.queryParams }).pipe(
+    this.dataModel$ = combineLatest({ _: this.filterModel$, queryParams: this.activatedRoute.queryParams }).pipe(
       switchMap(({ queryParams }) => {
         this.documentForm.controls['year'].setValue(queryParams['year'] || this.today.getFullYear());
         this.documentForm.controls['customerId'].setValue(queryParams['customer']);

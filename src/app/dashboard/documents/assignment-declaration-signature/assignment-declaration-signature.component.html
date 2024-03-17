@@ -18,25 +18,25 @@
       formControlName="year"
       [ngClass]="{ 'is-invalid': documentForm.controls['year'].invalid }"
     />
-    @if(dataModel$ |async; as dataModel) { @if(dataModel.insuranceId && dataModel.insuredPersonNumber && dataModel.insuranceStatus ==
+    @if(dataModel$ | async; as dataModel) { @if(dataModel.insuranceId && dataModel.insuredPersonNumber && dataModel.insuranceStatus ==
     insuranceStatus.Statutory) {
 
     <label class="mt-2 fw-light">Bearbeitet von</label>
-    <p class="ms-2 m-0 fs-5">{{ dataModel.associatedEmployee?.name }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.associatedEmployee?.name }}</p>
     <label class="mt-2 fw-light">Geburtsdatum des Kunden</label>
-    <p class="ms-2 m-0 fs-5">{{ dataModel.birthDate | date }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.birthDate | date }}</p>
     <label class="mt-2 fw-light">Straße und Hausnummer des Kunden</label>
-    <p class="ms-2 m-0 fs-5">{{ dataModel.street }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.street }}</p>
     <label class="mt-2 fw-light">Postleitzahl und Ort des Kunden</label>
-    <p class="ms-2 m-0 fs-5">{{ dataModel.zipCode }} Duisburg</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.zipCode }} Duisburg</p>
     <label class="mt-2 fw-light">Krankenkasse und Versichertennummer des Kunden</label>
-    <p class="ms-2 m-0 fs-5">{{ dataModel.insurance?.name | fallbackSpace }} - {{ dataModel.insuredPersonNumber }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.insurance?.name | fallbackSpace }} - {{ dataModel.insuredPersonNumber }}</p>
     <label class="mt-2 fw-light">Straße und Hausnummer der Krankenkasse</label>
-    <p class="ms-2 m-0 fs-5">{{ dataModel.insurance?.street | fallbackSpace }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.insurance?.street | fallbackSpace }}</p>
     <label class="mt-2 fw-light">Postleitzahl und Ort der Krankenkasse</label>
-    <p class="ms-2 m-0 fs-5">{{ dataModel.insurance?.zipCode | fallbackSpace }} {{ dataModel.insurance?.city }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.insurance?.zipCode | fallbackSpace }} {{ dataModel.insurance?.city }}</p>
     <label class="mt-2 fw-light">Abtretungserklärung</label>
-    <p class="ms-2 m-0 fs-5">
+    <p class="ms-2 m-0 fs-6">
       Hiermit erteile ich mein Einverständnis, dass der Betreuungsdienst <span class="fw-bold">„{{ filterModel.user.companyName }}“</span> die
       Leistungen gemäß §45b SGB XI für das Jahr <span class="fw-bold">{{ documentForm.controls["year"].value }}</span> direkt mit meiner Pflegekasse
       abrechnen darf. Mit Vorlage einer Rechnung inklusive eines von mir unterschriebenen Einsatznachweises ist der Betreuungsdienst berechtigt, die

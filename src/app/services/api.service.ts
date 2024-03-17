@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Employee } from '../models/employee.model';
 import { UUID } from 'angular2-uuid';
@@ -108,7 +108,10 @@ export class ApiService {
     this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' });
 
   /** Gets the list of customers with only minimal info */
-  getMinimalCustomerList = () => this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`);
+  getMinimalCustomerList(insuranceStatus?: InsuranceStatus) {
+    const options = insuranceStatus != undefined ? { params: new HttpParams().set('insuranceStatus', insuranceStatus) } : {};
+    return this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`, options);
+  }
 
   /** Gets the list of customers with only minimal info */
   getCustomerWithBudget = (customerId: UUID) => this.httpClient.get<CustomerBudget>(`${this.apiUrl}/customer/${customerId}/budget`);
