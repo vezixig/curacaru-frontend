@@ -94,9 +94,11 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     this.onCareLEvelChange(this.customerForm.get('careLevel')?.value);
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
 
-    if (!this.isManager) {
-      this.customerForm.disable();
-    }
+    this.isManager.subscribe((value) => {
+      if (!value) {
+        this.customerForm.disable();
+      }
+    });
 
     this.changeZipCodeSubscription = this.customerForm.get('zipCode')?.valueChanges.subscribe((value) => {
       this.handleZipCodeChange(value);

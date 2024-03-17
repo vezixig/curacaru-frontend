@@ -66,7 +66,7 @@
             <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung herunterladen">
               <fa-icon [icon]="faDownload" [fixedWidth]="true" />
             </a>
-            } @if(isManager()) {
+            } @if(isManager() && report.status == WorkingHoursReportStatus.ManagerSigned) {
             <a (click)="onDeleteReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung löschen">
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </a>
@@ -113,7 +113,7 @@
           <a (click)="onDownloadReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung herunterladen">
             <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           </a>
-          } @if(isManager()) {
+          } @if(isManager() && report.status == WorkingHoursReportStatus.ManagerSigned) {
           <a (click)="onDeleteReport(report)" class="btn btn-outline-secondary btn-sm" title="Arbeitszeiterfassung löschen">
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </a>

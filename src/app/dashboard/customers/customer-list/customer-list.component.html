@@ -90,9 +90,11 @@
           >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
+          @if (isManager | async) {
           <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </button>
+          }
         </div>
       </div>
       <div class="card-body">
