@@ -13,6 +13,24 @@ import { UUID } from 'angular2-uuid';
 })
 export class DocumentRepository extends BaseRepository {
   /**
+   * Creates a new, signed assignment declaration
+   * @param document the signed assignment declaration
+   * @returns an empty observable
+   */
+  createAssignmentDeclaration(document: AssignmentDeclaration) {
+    return this.client.post(`${this.apiUrl}/documents/assignment-declarations`, document);
+  }
+
+  /**
+   * Deletes an assignment declaration
+   * @param id the id of the assignment declaration to delete
+   * @returns an empty observable
+   */
+  deleteAssignmentDeclaration(id: UUID) {
+    return this.client.delete(`${this.apiUrl}/documents/assignment-declarations/${id}`);
+  }
+
+  /**
    * Gets the list of assignment declarations
    * @param year the year to get the list for
    * @param customerId an optional customer id to filter by
@@ -28,15 +46,6 @@ export class DocumentRepository extends BaseRepository {
       options.params = options.params.set('employeeId', employeeId.toString());
     }
     return this.client.get<AssignmentDeclarationListEntry[]>(`${this.apiUrl}/documents/assignment-declarations/${year}`, options);
-  }
-
-  /**
-   * Creates a new, signed assignment declaration
-   * @param document the signed assignment declaration
-   * @returns an empty observable
-   */
-  createAssignmentDeclaration(document: AssignmentDeclaration) {
-    return this.client.post(`${this.apiUrl}/documents/assignment-declarations`, document);
   }
 
   /** Gets an assignment declaration document

@@ -7,7 +7,7 @@
   @if(filterModel$ | async; as filterModel) {
   <form [formGroup]="filterForm" class="p-0">
     <div class="row gx-3">
-      <div class="col-md-4 col-sm-12">
+      <div class="col col-12 col-md">
         <label for="inputYear">Jahr</label>
         <div class="input-group">
           <input
@@ -19,7 +19,7 @@
           />
         </div>
       </div>
-      <div class="col-md-4 col-sm-12">
+      <div class="col col-12 col-md">
         <label for="selectCustomer">Kunde</label>
         <select id="selectCustomer" class="form-select" formControlName="customerId">
           <option></option>
@@ -30,7 +30,7 @@
       </div>
 
       @if (filterModel.user.isManager) {
-      <div class="col-md-4 col-sm-12">
+      <div class="col col-12 col-md">
         <label for="selectEmployee">Mitarbeiter</label>
         <select id="selectEmployee" class="form-select" formControlName="employeeId">
           <option></option>
@@ -43,7 +43,7 @@
       }
     </div>
   </form>
-  } @if(listModel$ | async; as documents) {
+  @if(listModel$ | async; as documents) {
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
       <tr>
@@ -64,27 +64,33 @@
           <div width="16" height="16" [class.bg-success]="document.isSigned" [class.bg-danger]="!document.isSigned" class="status-bullet"></div>
         </td>
         <td class="text-center">
-          @if(document.isSigned) {
-          <button
-            type="button"
-            [disabled]="isLoading()"
-            class="btn btn-outline-secondary btn-sm"
-            title="Abtretungserklärung herunterladen"
-            (click)="onDownloadAssignmentDeclaration(document)"
-          >
-            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
-          </button>
-          } @else {
-          <button
-            type="button"
-            class="btn btn-outline-secondary btn-sm"
-            title="Abtretungserklärung erstellen"
-            [routerLink]="['/dashboard/documents/assignment-declarations/sign']"
-            [queryParams]="{ year: document.year, customer: document.customerId }"
-          >
-            <fa-icon [icon]="faGear" [fixedWidth]="true" />
-          </button>
-          }
+          <div class="btn-group ms-auto" role="group">
+            @if(document.isSigned) {
+            <button
+              type="button"
+              [disabled]="isLoading()"
+              class="btn btn-outline-secondary btn-sm"
+              title="Abtretungserklärung herunterladen"
+              (click)="onDownloadAssignmentDeclaration(document)"
+            >
+              <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+            </button>
+            } @else {
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              title="Abtretungserklärung erstellen"
+              [routerLink]="['/dashboard/documents/assignment-declarations/sign']"
+              [queryParams]="{ year: document.year, customer: document.customerId }"
+            >
+              <fa-icon [icon]="faGear" [fixedWidth]="true" />
+            </button>
+            } @if(filterModel.user.isManager && document.isSigned) {
+            <a (click)="onDeleteAssignmentDeclaration(document)" class="btn btn-outline-secondary btn-sm" title="Abtretungserklärung löschen">
+              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+            </a>
+            }
+          </div>
         </td>
       </tr>
       }
@@ -118,6 +124,10 @@
           >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
+          } @if(filterModel.user.isManager && document.isSigned) {
+          <a (click)="onDeleteAssignmentDeclaration(document)" class="btn btn-outline-secondary btn-sm" title="Abtretungserklärung löschen">
+            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+          </a>
           }
         </div>
       </div>
@@ -133,5 +143,5 @@
 
   @if (documents.length == 0) {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Abtretungserklärungen gefunden.</div>
-  } }
+  } } }
 </div>

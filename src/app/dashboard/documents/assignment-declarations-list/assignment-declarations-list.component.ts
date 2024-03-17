@@ -3,15 +3,17 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
+import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { EmployeeBasic, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { AssignmentDeclarationListEntry } from '@curacaru/models/assignment-declaration-list-entry.model';
 import { ApiService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCalendar, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faDownload, faGear } from '@fortawesome/free-solid-svg-icons';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, catchError, combineLatest, debounceTime, finalize, forkJoin, map, startWith, switchMap, tap } from 'rxjs';
+import { Observable, Subject, catchError, combineLatest, debounceTime, finalize, forkJoin, map, startWith, switchMap } from 'rxjs';
 
 @Component({
   templateUrl: './assignment-declarations-list.component.html',
@@ -20,11 +22,12 @@ import { Observable, Subject, catchError, combineLatest, debounceTime, finalize,
   standalone: true,
 })
 export class AssignmentDeclarationsListComponent {
-  faCircleInfo = faCircleInfo;
-  faGear = faGear;
-  faDownload = faDownload;
-  faUser = faUser;
   faCalendar = faCalendar;
+  faCircleInfo = faCircleInfo;
+  faDownload = faDownload;
+  faGear = faGear;
+  faTrashCan = faTrashCan;
+  faUser = faUser;
 
   readonly filterModel$: Observable<{
     customers: MinimalCustomerListEntry[];
@@ -35,14 +38,16 @@ export class AssignmentDeclarationsListComponent {
   readonly filterForm: FormGroup;
   readonly isLoading = signal(false);
 
-  private readonly userService = inject(UserService);
-  private readonly apiService = inject(ApiService);
-  private readonly router = inject(Router);
+  private readonly $onRefresh = new Subject();
+  private readonly onRefresh$ = this.$onRefresh.asObservable();
   private readonly activeRoute = inject(ActivatedRoute);
-  private readonly formBuilder = inject(FormBuilder);
+  private readonly apiService = inject(ApiService);
   private readonly documentRepository = inject(DocumentRepository);
-  private readonly toasterService = inject(ToastrService);
-  private readonly $initialized = new Subject();
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly toastrService = inject(ToastrService);
+  private readonly userService = inject(UserService);
+  private readonly modalService = inject(NgbModal);
 
   constructor() {
     this.filterForm = this.formBuilder.group({
@@ -59,9 +64,9 @@ export class AssignmentDeclarationsListComponent {
       user: this.userService.user$,
       employees: this.apiService.getEmployeeBaseList(),
       customers: this.apiService.getMinimalCustomerList(InsuranceStatus.Statutory),
-    }).pipe(finalize(() => this.$initialized.next(true)));
+    });
 
-    this.listModel$ = combineLatest({ _: this.$initialized, queryParams: this.activeRoute.queryParams }).pipe(
+    this.listModel$ = combineLatest({ _: this.onRefresh$.pipe(startWith(null)), queryParams: this.activeRoute.queryParams }).pipe(
       map(({ queryParams }) => {
         const queryFilter = {
           year: queryParams['year'] || new Date().getFullYear(),
@@ -75,12 +80,19 @@ export class AssignmentDeclarationsListComponent {
       switchMap((filter) =>
         this.documentRepository.getAssignmentDeclarationList(filter.year, filter.customerId, filter.employeeId).pipe(
           catchError(() => {
-            this.toasterService.error('Die Liste mit Abtretungserklärungen konnte nicht geladen werden');
+            this.toastrService.error('Die Liste mit Abtretungserklärungen konnte nicht geladen werden');
             return [];
           })
         )
       )
     );
+  }
+
+  onDeleteAssignmentDeclaration(declaration: AssignmentDeclarationListEntry) {
+    const modalRef = this.modalService.open(NgbdModalConfirm);
+    modalRef.result.then(() => this.deleteReport(declaration));
+    modalRef.componentInstance.title = 'Abtretungserklärung löschen';
+    modalRef.componentInstance.text = `Soll die Abtretungserklärung von ${declaration.customerName} für ${declaration.year} wirklich gelöscht werden?`;
   }
 
   onDownloadAssignmentDeclaration(declaration: AssignmentDeclarationListEntry) {
@@ -96,7 +108,7 @@ export class AssignmentDeclarationsListComponent {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toasterService.error(`Abtretungserklärung konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`),
+        this.toastrService.error(`Abtretungserklärung konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`),
           this.isLoading.set(false);
       },
     });
@@ -123,6 +135,20 @@ export class AssignmentDeclarationsListComponent {
       queryParams: { customer: selectedCustomerId == '' ? null : selectedCustomerId },
       queryParamsHandling: 'merge',
       replaceUrl: true,
+    });
+  }
+
+  private deleteReport(report: AssignmentDeclarationListEntry) {
+    this.isLoading.set(true);
+    this.documentRepository.deleteAssignmentDeclaration(report.assignmentDeclarationId).subscribe({
+      next: () => {
+        this.toastrService.success('Abtretungserklärung wurde gelöscht');
+        this.$onRefresh.next(true);
+      },
+      error: (error) => {
+        this.toastrService.error(`Abtretungserklärung konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
+        this.isLoading.set(false);
+      },
     });
   }
 }

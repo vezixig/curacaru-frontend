@@ -81,21 +81,6 @@ export class TimeTrackerListComponent {
     } wirklich gelöscht werden?`;
   }
 
-  private deleteReport(report: WorkingHoursReportListEntry) {
-    console.warn(report);
-    this.isLoading.set(true);
-    this.workingTimeService.deleteWorkingTimeReport(report.id).subscribe({
-      next: () => {
-        this.toastr.success('Arbeitszeiterfassung wurde gelöscht');
-        this.$onRefresh.next(true);
-      },
-      error: (error) => {
-        this.toastr.error(`Arbeitszeiterfassung konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
-        this.isLoading.set(false);
-      },
-    });
-  }
-
   onDownloadReport(report: WorkingHoursReportListEntry) {
     this.workingTimeService.getPrintReport(report.employeeId, report.year, report.month).subscribe({
       next: (result) => {
@@ -121,5 +106,19 @@ export class TimeTrackerListComponent {
     if (this.selectedYear() > 2020 && this.selectedYear() < 2100) {
       this.router.navigate([], { queryParams: { year: this.selectedYear() }, queryParamsHandling: 'merge', replaceUrl: true });
     }
+  }
+
+  private deleteReport(report: WorkingHoursReportListEntry) {
+    this.isLoading.set(true);
+    this.workingTimeService.deleteWorkingTimeReport(report.id).subscribe({
+      next: () => {
+        this.toastr.success('Arbeitszeiterfassung wurde gelöscht');
+        this.$onRefresh.next(true);
+      },
+      error: (error) => {
+        this.toastr.error(`Arbeitszeiterfassung konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
+        this.isLoading.set(false);
+      },
+    });
   }
 }
