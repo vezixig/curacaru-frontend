@@ -74,7 +74,13 @@
     <cura-input class="d-md-none" key="lastName" [isLoading]="isLoading" label="Nachname" [form]="customerForm" placeholder="Nachnamen eingeben" />
 
     <!-- street -->
-    <cura-input key="street" [isLoading]="isLoading" label="Straße und Hausnummer" [form]="customerForm" placeholder="Straße und Hausnummer eingeben" />
+    <cura-input
+      key="street"
+      [isLoading]="isLoading"
+      label="Straße und Hausnummer"
+      [form]="customerForm"
+      placeholder="Straße und Hausnummer eingeben"
+    />
 
     <!-- zip code and city-->
     <div class="form-group mb-2">
@@ -113,7 +119,13 @@
       } @if (!isLoading) {
       <div class="input-group">
         <input type="text" class="form-control" formControlName="emergencyContactName" id="inputEmergencyContactName" placeholder="Namen eingeben" />
-        <input type="text" class="form-control" formControlName="emergencyContactPhone" id="inputEmergencyContactPhone" placeholder="Telefonnummer eingeben" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="emergencyContactPhone"
+          id="inputEmergencyContactPhone"
+          placeholder="Telefonnummer eingeben"
+        />
       </div>
       }
     </div>
@@ -134,7 +146,10 @@
           [inputFormatter]="insuranceFormatter"
           [resultFormatter]="insuranceFormatter"
           [ngClass]="{
-            'is-valid': customerForm.controls['insuranceId'].valid && customerForm.controls['insuranceId'].value != '' && customerForm.controls['insuranceId'].value != undefined,
+            'is-valid':
+              customerForm.controls['insuranceId'].valid &&
+              customerForm.controls['insuranceId'].value != '' &&
+              customerForm.controls['insuranceId'].value != undefined,
             'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
           }"
           [ngbTypeahead]="search"
@@ -184,7 +199,10 @@
         [inputFormatter]="insuranceFormatter"
         [resultFormatter]="insuranceFormatter"
         [ngClass]="{
-          'is-valid': customerForm.controls['insuranceId'].valid && customerForm.controls['insuranceId'].value != '' && customerForm.controls['insuranceId'].value != undefined,
+          'is-valid':
+            customerForm.controls['insuranceId'].valid &&
+            customerForm.controls['insuranceId'].value != '' &&
+            customerForm.controls['insuranceId'].value != undefined,
           'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
         }"
         [ngbTypeahead]="search"
@@ -193,7 +211,14 @@
         [ngModelOptions]="{ standalone: true }"
       />
     </div>
-    <cura-input class="d-md-none" key="insuredPersonNumber" [isLoading]="isLoading" label="Versichertennummer" [form]="customerForm" placeholder="Versichertennummer eingeben" />
+    <cura-input
+      class="d-md-none"
+      key="insuredPersonNumber"
+      [isLoading]="isLoading"
+      label="Versichertennummer"
+      [form]="customerForm"
+      placeholder="Versichertennummer eingeben"
+    />
 
     <div class="form-group mb-2 d-md-none">
       <label for="inputInsuranceStatus">Versicherungsstatus</label>
@@ -236,42 +261,6 @@
         <option value="4">4</option>
         <option value="5">5</option>
       </select>
-      }
-    </div>
-
-    <!-- Betreuungsvertrag -->
-    <div class="form-group mb-3">
-      @if (!isLoading) {
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" formControlName="isCareContractAvailable" id="checkIsCareContractAvailable" />
-        <label class="form-check-label" for="checkIsCareContractAvailable"> Betreuungsvertrag vorhanden</label>
-      </div>
-      }
-    </div>
-
-    <!-- Abtretungserklärung -->
-    <div class="form-group mb-3">
-      <label for="selectCareLevel">Abtretungserklärung</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <div class="input-group">
-        <input
-          [disabled]="!isManager"
-          (keyup.enter)="handleAddDeclarationOfAssignment($event)"
-          (keydown.enter)="$event.preventDefault()"
-          [(ngModel)]="newDeclarationOfAssignment"
-          [ngModelOptions]="{ standalone: true }"
-          type="number"
-          class="form-control"
-          id="inputDeclarationsOfAssignment"
-          placeholder="Abtretungsjahr eingeben"
-        />
-        <button [disabled]="!isManager" (click)="handleAddDeclarationOfAssignment()" class="btn btn-outline-secondary" type="button">Hinzufügen</button>
-        @for (declarationYear of sortedDeclarations; track declarationYear) {
-        <span class="input-group-text deleter" (click)="handleRemoveDeclarationOfAssignment(declarationYear)">{{ declarationYear }}</span>
-        }
-      </div>
       }
     </div>
 

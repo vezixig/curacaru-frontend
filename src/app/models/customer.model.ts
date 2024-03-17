@@ -9,7 +9,6 @@ export interface Customer {
   associatedEmployee?: EmployeeBasic;
   birthDate: Date;
   careLevel: number;
-  declarationsOfAssignment: number[];
   emergencyContactName: string;
   emergencyContactPhone: string;
   firstName: string;
@@ -18,7 +17,6 @@ export interface Customer {
   insurance?: Insurance;
   insuredPersonNumber?: string;
   insuranceStatus?: InsuranceStatus;
-  isCareContractAvailable: boolean;
   lastName: string;
   phone: string;
   /** The salutation of the customer based on the gender */

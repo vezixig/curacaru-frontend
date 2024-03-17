@@ -30,18 +30,9 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   isLoading = false;
   isNew = true;
   isSaving = false;
-  newDeclarationOfAssignment: number | null = null;
   isManager = this.userService.isManager$;
 
   insuranceFormatter = (insurance: Insurance) => insurance.name;
-
-  // Gets the two newest declarations of assignment
-  get sortedDeclarations(): number[] {
-    return this.customerForm
-      .get('declarationsOfAssignment')
-      ?.value.sort((a: number, b: number) => b - a)
-      .slice(0, 2);
-  }
 
   set selectedInsurance(value: Insurance | undefined) {
     this._selectedInsurance = value;
@@ -72,7 +63,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       associatedEmployeeId: ['', [Validators.required]],
       birthDate: ['', [Validators.required]],
       careLevel: [1, [Validators.required]],
-      declarationsOfAssignment: [[]],
       doClearanceCareBenefit: [false],
       doClearancePreventiveCare: [false],
       doClearanceReliefAmount: [false],
@@ -83,7 +73,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       insuranceId: [''],
       insuranceStatus: ['', [Validators.required]],
       insuredPersonNumber: ['', [ValidateInsuredPersonNumber]],
-      isCareContractAvailable: [false],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       phone: [''],
       salutation: [0],
@@ -155,30 +144,11 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       })
     );
 
-  handleAddDeclarationOfAssignment(event: Event | undefined = undefined) {
-    event?.preventDefault();
-    if (
-      this.newDeclarationOfAssignment != null &&
-      this.newDeclarationOfAssignment >= 2000 &&
-      this.newDeclarationOfAssignment < 9999 &&
-      !this.customerForm.get('declarationsOfAssignment')?.value.includes(this.newDeclarationOfAssignment)
-    ) {
-      this.customerForm.get('declarationsOfAssignment')?.value.push(this.newDeclarationOfAssignment);
-      this.newDeclarationOfAssignment = null;
-    }
-  }
-
-  handleRemoveDeclarationOfAssignment(year: number) {
-    if (!this.isManager) return;
-    this.customerForm.get('declarationsOfAssignment')?.value.splice(this.customerForm.get('declarationsOfAssignment')?.value.indexOf(year), 1);
-  }
-
   handleSave(): void {
     const customer: Customer = {
       associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value.toString(),
       birthDate: this.customerForm.get('birthDate')?.value,
       careLevel: this.customerForm.get('careLevel')?.value,
-      declarationsOfAssignment: this.customerForm.get('declarationsOfAssignment')?.value,
       doClearanceCareBenefit: this.customerForm.get('doClearanceCareBenefit')?.value,
       doClearancePreventiveCare: this.customerForm.get('doClearancePreventiveCare')?.value,
       doClearanceReliefAmount: this.customerForm.get('doClearanceReliefAmount')?.value,
@@ -190,7 +160,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       insuranceId: this.customerForm.get('insuranceId')?.value,
       insuranceStatus: +this.customerForm.get('insuranceStatus')?.value,
       insuredPersonNumber: this.customerForm.get('insuredPersonNumber')?.value,
-      isCareContractAvailable: this.customerForm.get('isCareContractAvailable')?.value,
       lastName: this.customerForm.get('lastName')?.value,
       phone: this.customerForm.get('phone')?.value,
       salutation: +this.customerForm.get('salutation')?.value,
@@ -228,7 +197,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           associatedEmployeeId: result.associatedEmployeeId,
           birthDate: result.birthDate,
           careLevel: result.careLevel,
-          declarationsOfAssignment: result.declarationsOfAssignment,
           doClearanceCareBenefit: result.doClearanceCareBenefit,
           doClearancePreventiveCare: result.doClearancePreventiveCare,
           doClearanceReliefAmount: result.doClearanceReliefAmount,
@@ -240,7 +208,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           insuranceId: result.insuranceId,
           insuranceStatus: result.insuranceStatus,
           insuredPersonNumber: result.insuredPersonNumber,
-          isCareContractAvailable: result.isCareContractAvailable,
           lastName: result.lastName,
           phone: result.phone,
           salutation: result.salutation,
