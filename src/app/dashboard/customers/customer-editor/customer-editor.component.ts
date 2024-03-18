@@ -30,7 +30,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   isLoading = false;
   isNew = true;
   isSaving = false;
-  isManager = this.userService.isManager$;
+  isManager$ = this.userService.isManager$;
+  isManager: boolean = false;
 
   insuranceFormatter = (insurance: Insurance) => insurance.name;
 
@@ -83,8 +84,9 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     this.onCareLEvelChange(this.customerForm.get('careLevel')?.value);
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
 
-    this.isManager.subscribe((value) => {
+    this.isManager$.subscribe((value) => {
       if (!value) {
+        this.isManager = false;
         this.customerForm.disable();
       }
     });
