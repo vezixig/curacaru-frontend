@@ -14,7 +14,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, finalize, forkJoin, switchMap } from 'rxjs';
+import { Observable, combineLatest, distinctUntilKeyChanged, filter, finalize, map, merge, mergeMap, of, startWith, tap } from 'rxjs';
 
 @Component({
   imports: [AsyncPipe, CommonModule, ReactiveFormsModule, FallbackSpacePipe, RouterModule, FontAwesomeModule, Signature, NgbDatepickerModule],
@@ -29,11 +29,11 @@ export class AssignmentDeclarationSignatureComponent {
   faInfoCircle = faInfoCircle;
   insuranceStatus = InsuranceStatus;
 
-  readonly dataModel$: Observable<Customer>;
   readonly documentForm: FormGroup;
   readonly isSaving = signal(false);
-  readonly filterModel$: Observable<{
+  readonly dataModel$: Observable<{
     customers: MinimalCustomerListEntry[];
+    customer?: Customer;
     user: UserEmployee;
   }>;
   readonly today: Date = new Date();
@@ -45,7 +45,6 @@ export class AssignmentDeclarationSignatureComponent {
   private readonly router = inject(Router);
   private readonly toasterService = inject(ToastrService);
   private readonly userService = inject(UserService);
-  private readonly $initialized = new Subject();
 
   constructor() {
     this.documentForm = this.formBuilder.group({
@@ -59,19 +58,27 @@ export class AssignmentDeclarationSignatureComponent {
     this.documentForm.controls['year'].valueChanges.subscribe((year) => this.onSelectedYearChange(year));
     this.documentForm.controls['customerId'].valueChanges.subscribe((customerId) => this.onSelectedCustomerChange(customerId));
 
-    this.filterModel$ = forkJoin({
-      user: this.userService.user$,
-      customers: this.apiService.getMinimalCustomerList(InsuranceStatus.Statutory),
-    }).pipe(finalize(() => this.$initialized.next(true)));
+    const yearCombined$ = merge([this.documentForm.controls['year'].valueChanges.pipe(map((o) => +o)), of(this.today.getFullYear())]).pipe(
+      mergeMap((o) => o),
+      filter((year) => year >= 2020 && year < 2999)
+    );
 
-    this.dataModel$ = combineLatest({ _: this.filterModel$, queryParams: this.activatedRoute.queryParams }).pipe(
-      switchMap(({ queryParams }) => {
-        this.documentForm.controls['year'].setValue(queryParams['year'] || this.today.getFullYear());
-        this.documentForm.controls['customerId'].setValue(queryParams['customer']);
-        this.signatureElement?.clear();
-        if (!queryParams['customer']) return [];
+    const customers$ = yearCombined$.pipe(mergeMap((year) => this.apiService.getMinimalCustomerList(InsuranceStatus.Statutory, year)));
 
-        return this.apiService.getCustomer(queryParams['customer']);
+    const customer$ = this.activatedRoute.queryParams.pipe(
+      distinctUntilKeyChanged('customer'),
+      mergeMap((queryParams) => {
+        this.documentForm.controls['customerId'].setValue(queryParams['customer'], { emitEvent: false });
+        return queryParams['customer'] ? this.apiService.getCustomer(queryParams['customer']) : of(undefined);
+      }),
+      startWith(undefined)
+    );
+
+    this.dataModel$ = combineLatest({ user: this.userService.user$, customers: customers$, customer: customer$ }).pipe(
+      tap((result) => {
+        if (result.customer && !result.customers.find((o) => o.customerId == result.customer?.id)) {
+          this.documentForm.controls['customerId'].setValue(undefined);
+        }
       })
     );
   }
@@ -90,10 +97,9 @@ export class AssignmentDeclarationSignatureComponent {
       .subscribe({
         next: (_) => {
           this.toasterService.success('Abtretungserklärung erfolgreich gespeichert');
-          this.router.navigate([
-            '/dashboard/documents/assignment-declarations',
-            { year: this.documentForm.value['year'], customer: this.documentForm.value['customerId'] },
-          ]);
+          this.router.navigate(['/dashboard/documents/assignment-declarations'], {
+            queryParams: { year: this.documentForm.value['year'], customer: this.documentForm.value['customerId'] },
+          });
         },
         error: (error) => this.toasterService.error(`Abtretungserklärung konnte nicht erstellt werden: [${error.status}] ${error.error}`),
       });

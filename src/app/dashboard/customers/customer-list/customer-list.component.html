@@ -1,6 +1,6 @@
 <div class="row">
-  <h4>Kundenliste</h4>
   @if (isManager|async) {
+  <h4>Kundenliste</h4>
   <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block mb-3">Kunden hinzufügen</Button>
 
   <!-- employee filter -->
@@ -13,7 +13,10 @@
       }
     </select>
   </div>
+  } @else {
+  <h4 class="h-underline">Kundenliste</h4>
   }
+
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
       <tr>

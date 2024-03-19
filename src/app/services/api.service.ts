@@ -108,8 +108,14 @@ export class ApiService {
     this.httpClient.get(`${this.apiUrl}/document/deployment/${customerId}/${insuranceStatus}`, { responseType: 'blob' });
 
   /** Gets the list of customers with only minimal info */
-  getMinimalCustomerList(insuranceStatus?: InsuranceStatus) {
-    const options = insuranceStatus != undefined ? { params: new HttpParams().set('insuranceStatus', insuranceStatus) } : {};
+  getMinimalCustomerList(insuranceStatus?: InsuranceStatus, assignmentDeclarationYear?: number) {
+    const options = { params: new HttpParams() };
+    if (insuranceStatus != undefined) {
+      options.params = options.params.append('insuranceStatus', insuranceStatus);
+    }
+    if (assignmentDeclarationYear != undefined) {
+      options.params = options.params.append('assignmentDeclarationYear', assignmentDeclarationYear.toString());
+    }
     return this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`, options);
   }
 
