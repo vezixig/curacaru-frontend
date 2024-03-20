@@ -1,7 +1,7 @@
 <div class="row">
   <h4>Termine</h4>
 
-  @if(showPriceInfo) {
+  @if(filterModel$ | async; as filterModel) { @if(filterModel.showPriceInfo) {
   <div class="alert alert-secondary">
     <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" />
     <span class="my-3">Bitte fülle erst die <a routerLink="/dashboard/company">Unternehmensdaten</a> aus. Dann kannst du Termine vergeben.</span>
@@ -10,82 +10,82 @@
 
   <button type="button" [routerLink]="['/dashboard/appointments/new']" class="btn btn-primary text-white btn-block mb-3">Termin hinzufügen</button>
 
-  <div class="form-group p-0">
-    <label for="dpFromDate">Datum</label>
-    <div class="input-group">
-      <div class="dp-hidden position-absolute">
+  <form [formGroup]="filterForm">
+    <div class="form-group p-0">
+      <label for="dpFromDate">Datum</label>
+      <div class="input-group">
+        <div class="dp-hidden position-absolute">
+          <input
+            name="datepicker"
+            class="form-control"
+            ngbDatepicker
+            #datepicker="ngbDatepicker"
+            [autoClose]="'outside'"
+            (dateSelect)="onDateSelection($event)"
+            [displayMonths]="1"
+            [dayTemplate]="t"
+            outsideDays="hidden"
+            [startDate]="fromDate!"
+            tabindex="-1"
+          />
+          <ng-template #t let-date let-focused="focused">
+            <span
+              class="custom-day"
+              [class.focused]="focused"
+              [class.range]="isRange(date)"
+              [class.faded]="isHovered(date) || isInside(date)"
+              (mouseenter)="hoveredDate = date"
+              (mouseleave)="hoveredDate = null"
+            >
+              {{ date.day }}
+            </span>
+          </ng-template>
+        </div>
         <input
-          name="datepicker"
+          (click)="datepicker.toggle()"
+          readonly
+          [value]="filterForm.get('start')?.value | ngbDate"
           class="form-control"
-          ngbDatepicker
-          #datepicker="ngbDatepicker"
-          [autoClose]="'outside'"
-          (dateSelect)="onDateSelection($event)"
-          (closed)="onSelectionChanged()"
-          [displayMonths]="1"
-          [dayTemplate]="t"
-          outsideDays="hidden"
-          [startDate]="fromDate!"
-          tabindex="-1"
+          placeholder="tt.mm.jjjj"
         />
-        <ng-template #t let-date let-focused="focused">
-          <span
-            class="custom-day"
-            [class.focused]="focused"
-            [class.range]="isRange(date)"
-            [class.faded]="isHovered(date) || isInside(date)"
-            (mouseenter)="hoveredDate = date"
-            (mouseleave)="hoveredDate = null"
-          >
-            {{ date.day }}
-          </span>
-        </ng-template>
+        <input
+          (click)="datepicker.toggle()"
+          readonly
+          class="form-control"
+          [value]="filterForm.get('end')?.value | ngbDate"
+          placeholder="tt.mm.jjjj"
+        />
+        <button id="dpFromDate" class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
+          <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
+        </button>
       </div>
-      <input
-        (change)="onSelectionChanged()"
-        #dpFromDate
-        class="form-control"
-        placeholder="dd.mm.yyyy"
-        name="dpFromDate"
-        [value]="formatter.format(fromDate)"
-        (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
-      />
-      <input
-        (change)="onSelectionChanged()"
-        #dpToDate
-        class="form-control"
-        placeholder="dd.mm.yyyy"
-        name="dpToDate"
-        [value]="formatter.format(toDate)"
-        (input)="toDate = validateInput(toDate, dpToDate.value)"
-      />
-      <button class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
-        <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
-      </button>
     </div>
-  </div>
 
-  <div class="form-group p-0">
-    <label for="dpFromDate">Kunde</label>
-    <select class="form-select" name="customerSelect" [(ngModel)]="selectedCustomerId" (change)="onSelectionChanged()">
-      <option></option>
-      @for (customer of customers; track customer) {
-      <option [value]="customer.id">{{ customer.firstName }} {{ customer.lastName }}</option>
-      }
-    </select>
-  </div>
+    <div class="form-group p-0">
+      <label for="selectCustomer">Kunde</label>
+      <select id="selectCustomer" class="form-select" name="customerSelect" formControlName="customerId">
+        <option></option>
+        @for (customer of filterModel.customers; track customer) {
+        <option [value]="customer.id">{{ customer.firstName }} {{ customer.lastName }}</option>
+        }
+      </select>
+    </div>
 
-  @if (user?.isManager) {
-  <div class="form-group p-0">
-    <label for="dpFromDate">Mitarbeiter</label>
-    <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
-      <option></option>
-      @for (employee of employees; track employee) {
-      <option [value]="employee.id">{{ employee.name }}</option>
-      }
-    </select>
-  </div>
-  }
+    @if (filterModel.user.isManager) {
+    <div class="form-group p-0">
+      <label for="dpFromDate">Mitarbeiter</label>
+      <select class="form-select" name="employeeSelect" formControlName="employeeId">
+        <option></option>
+        @for (employee of filterModel.employees; track employee) {
+        <option [value]="employee.id">{{ employee.name }}</option>
+        }
+      </select>
+    </div>
+
+    }
+  </form>
+
+  @if(dataModel$ | async; as dataModel) { @if(dataModel.appointments.length > 0){
 
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
@@ -102,18 +102,7 @@
     </thead>
 
     <tbody>
-      @if (isLoading) { @for (_ of [].constructor(3); track _) {
-      <tr>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td></td>
-      </tr>
-      } } @for (appointment of appointments; track appointment) {
+      @for (appointment of dataModel.appointments; track appointment) {
       <tr>
         <td class="text-center">{{ appointment.date | date : "dd.MM.yyyy" }}</td>
         <td class="text-center">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</td>
@@ -164,7 +153,7 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (appointment of appointments; track appointment) {
+    @for (appointment of dataModel.appointments; track appointment) {
     <div class="card my-3">
       <div class="card-header d-flex align-content-start p-2">
         <img
@@ -222,7 +211,7 @@
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen
         </button>
       </div>
-      } @if (user?.isManager && appointment.isDone && appointment.date >= beginOfCurrentMonth) {
+      } @if (filterModel.user.isManager && appointment.isDone && appointment.date >= beginOfCurrentMonth) {
       <div class="card-footer">
         <button type="button" (click)="onReopen(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin wieder öffnen">
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Öffnen
@@ -233,7 +222,7 @@
     }
   </div>
 
-  @if (appointments.length == 0 && !isLoading) {
+  @if (dataModel.appointments.length == 0 && !isLoading) {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Termine gefunden.</div>
-  } }
+  }} } } }
 </div>

@@ -16,6 +16,7 @@ import { MinimalCustomerListEntry } from '@curacaru/models/minimal-customer-list
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
+import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({
   providedIn: 'root',
@@ -86,7 +87,18 @@ export class ApiService {
   getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`);
 
   /** Gets the list of appointments from the API filtered by the query */
-  getAppointmentList = (query: string) => this.httpClient.get<AppointmentListEntry[]>(`${this.apiUrl}/appointment/list${query}`);
+  getAppointmentList(from: NgbDate, to: NgbDate, customer?: number, employee?: number) {
+    const options = { params: new HttpParams() };
+    options.params = options.params.append('from', DateTimeService.toDateString(from));
+    options.params = options.params.append('to', DateTimeService.toDateString(to));
+    if (employee) {
+      options.params = options.params.append('employeeId', employee.toString());
+    }
+    if (customer) {
+      options.params = options.params.append('customerId', customer.toString());
+    }
+    return this.httpClient.get<AppointmentListEntry[]>(`${this.apiUrl}/appointment/list`, options);
+  }
 
   /** Gets the city name for the given zip code */
   getCityName = (zipCode: string) => this.httpClient.get(`${this.apiUrl}/address/city/${zipCode}`, { responseType: 'text' });

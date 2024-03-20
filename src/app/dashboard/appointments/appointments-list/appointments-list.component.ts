@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Component, OnDestroy, inject } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCheck, faCircleInfo, faFileSignature, faGear, faHouse, faLocationDot, faPhone, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, forkJoin, map, takeUntil } from 'rxjs';
+import { EMPTY, Observable, Subject, catchError, combineLatest, finalize, forkJoin, map, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
-import { Customer } from '../../../models/customer.model';
 import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { TimeFormatPipe } from '../../../pipes/time.pipe';
 import { CustomerListEntry } from '../../../models/customer-list-entry.model';
@@ -19,6 +18,7 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
 import { UserEmployee } from '@curacaru/models';
+import { NgbDatePipe } from '@curacaru/pipes/ngb-date-pipe';
 
 @Component({
   imports: [
@@ -30,7 +30,9 @@ import { UserEmployee } from '@curacaru/models';
     FormsModule,
     TimeFormatPipe,
     ReplacePipe,
+    NgbDatePipe,
     NgbCollapseModule,
+    ReactiveFormsModule,
   ],
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   selector: 'cura-appointments-list',
@@ -38,15 +40,18 @@ import { UserEmployee } from '@curacaru/models';
   styleUrls: ['./appointments-list.component.scss'],
   templateUrl: './appointments-list.component.html',
 })
-export class AppointmentsListComponent implements OnDestroy, OnInit {
+export class AppointmentsListComponent implements OnDestroy {
   /** injections */
-  private apiService = inject(ApiService);
-  private calendar = inject(NgbCalendar);
-  public formatter = inject(NgbDateParserFormatter);
-  private locationService = inject(LocationService);
-  private modalService = inject(NgbModal);
-  private toastr = inject(ToastrService);
-  private userService = inject(UserService);
+  public readonly formatter = inject(NgbDateParserFormatter);
+  private readonly apiService = inject(ApiService);
+  private readonly calendar = inject(NgbCalendar);
+  private readonly locationService = inject(LocationService);
+  private readonly modalService = inject(NgbModal);
+  private readonly toastr = inject(ToastrService);
+  private readonly userService = inject(UserService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
   /** relays  */
   faCalendar = faCalendar;
@@ -63,56 +68,116 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   beginOfCurrentMonth = DateTimeService.beginOfCurrentMonth;
 
   /** properties  */
-  appointments: AppointmentListEntry[] = [];
-  customers: CustomerListEntry[] = [];
-  employees: EmployeeBasic[] = [];
-  fromDate: NgbDate | null = this.calendar.getToday();
   hoveredDate: NgbDate | null = null;
   isLoading = true;
-  selectedCustomer?: Customer;
-  selectedCustomerId?: number;
-  selectedEmployee?: EmployeeBasic;
-  selectedEmployeeId?: number;
-  showPriceInfo = false;
-  toDate: NgbDate | null = this.calendar.getToday();
+
   isCollapsed = true;
   today = new Date();
-  user?: UserEmployee;
+  fromDate?: NgbDate;
+  toDate?: NgbDate;
+  ngbDatePipe = new NgbDatePipe();
+
+  readonly filterModel$: Observable<{
+    employees: EmployeeBasic[];
+    customers: CustomerListEntry[];
+    showPriceInfo: boolean;
+    user: UserEmployee;
+  }>;
+  readonly dataModel$: Observable<{
+    appointments: AppointmentListEntry[];
+  }>;
+  readonly filterForm: FormGroup;
 
   /** fields  */
   private $onDestroy = new Subject();
+  private $onRefresh = new Subject();
 
-  ngOnDestroy(): void {
-    this.$onDestroy.next(true);
-    this.$onDestroy.complete();
-  }
+  constructor() {
+    this.filterModel$ = forkJoin({
+      employees: this.apiService.getEmployeeBaseList(),
+      customers: this.apiService.getCustomerList(),
+      showPriceInfo: this.apiService.getCompanyPrices().pipe(map((result) => result.pricePerHour == 0)),
+      user: this.userService.user$,
+    }).pipe(
+      tap(() => (this.isLoading = true)),
+      catchError((error) => {
+        this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
+        return EMPTY;
+      }),
+      finalize(() => (this.isLoading = false))
+    );
 
-  ngOnInit(): void {
+    // Filter Form
     var dateBounds = DateTimeService.getStartAndEndOfWeek(new Date());
     this.fromDate = dateBounds.start;
     this.toDate = dateBounds.end;
 
-    this.isLoading = true;
+    this.filterForm = this.formBuilder.group({
+      employeeId: [undefined],
+      customerId: [undefined],
+      start: [dateBounds.start],
+      end: [dateBounds.end],
+    });
 
-    forkJoin({
-      employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getCustomerList(),
-      prices: this.apiService.getCompanyPrices(),
-      user: this.userService.user$,
-    })
-      .pipe(takeUntil(this.$onDestroy))
-      .subscribe({
-        next: (result) => {
-          this.employees = result.employees;
-          this.customers = result.customers;
-          this.showPriceInfo = result.prices.pricePerHour == 0;
-          this.user = result.user;
-          this.loadAppointments();
-        },
-        error: (error) => {
-          this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
-        },
+    this.filterForm
+      .get('employeeId')!
+      .valueChanges.pipe(takeUntil(this.$onDestroy))
+      .subscribe((next) => {
+        this.router.navigate([], { queryParams: { employeeId: next == '' ? undefined : next }, queryParamsHandling: 'merge' });
       });
+    this.filterForm
+      .get('customerId')!
+      .valueChanges.pipe(takeUntil(this.$onDestroy))
+      .subscribe((next) => {
+        this.router.navigate([], { queryParams: { customerId: next == '' ? undefined : next }, queryParamsHandling: 'merge' });
+      });
+
+    // Data Model
+    this.dataModel$ = combineLatest({
+      queryParams: this.activatedRoute.queryParams,
+      filter: this.filterModel$,
+      refresh: this.$onRefresh.pipe(startWith(true)),
+    }).pipe(
+      tap(() => (this.isLoading = true)),
+      switchMap((next) => {
+        if (next.queryParams['from'] && next.queryParams['from'] != this.filterForm.get('start')?.value) {
+          this.filterForm.patchValue({ start: DateTimeService.toNgbDate(next.queryParams['from']) }, { emitEvent: false });
+          this.fromDate = DateTimeService.toNgbDate(next.queryParams['from']);
+        }
+
+        if (next.queryParams['to'] && next.queryParams['to'] != this.filterForm.get('end')?.value) {
+          this.filterForm.patchValue({ end: DateTimeService.toNgbDate(next.queryParams['to']) }, { emitEvent: false });
+          this.toDate = DateTimeService.toNgbDate(next.queryParams['to']);
+        }
+
+        if (next.queryParams['customerId'] != this.filterForm.get('customerId')?.value) {
+          this.filterForm.patchValue({ customerId: next.queryParams['customerId'] }, { emitEvent: false });
+        }
+
+        if (next.filter.user.isManager && next.queryParams['employeeId'] != this.filterForm.get('employeeId')?.value) {
+          this.filterForm.patchValue({ employeeId: next.queryParams['employeeId'] }, { emitEvent: false });
+        }
+
+        return this.apiService
+          .getAppointmentList(
+            this.filterForm.get('start')?.value ?? dateBounds.start,
+            this.filterForm.get('end')?.value ?? dateBounds.end,
+            this.filterForm.get('customerId')?.value,
+            next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
+          )
+          .pipe(map((appointments) => ({ appointments: appointments.map(this.deserializeDates) })));
+      }),
+      catchError((error) => {
+        this.toastr.error(`Termine konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
+        return EMPTY;
+      }),
+      finalize(() => (this.isLoading = false))
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.$onDestroy.next(true);
+    this.$onDestroy.complete();
   }
 
   onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
@@ -122,16 +187,23 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate) && date.before(this.toDate);
   isRange = (date: NgbDate) => date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
 
-  onSelectionChanged = () => this.loadAppointments();
-
   onDateSelection(date: NgbDate) {
     if (!this.fromDate && !this.toDate) {
       this.fromDate = date;
     } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
       this.toDate = date;
     } else {
-      this.toDate = null;
+      this.toDate = undefined;
       this.fromDate = date;
+    }
+
+    if (this.fromDate && this.toDate && this.toDate.after(this.fromDate)) {
+      this.filterForm.patchValue({ start: this.fromDate, end: this.toDate });
+      this.router.navigate([], {
+        queryParams: { from: DateTimeService.toDateString(this.fromDate), to: DateTimeService.toDateString(this.toDate) },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
     }
   }
 
@@ -151,30 +223,6 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
   validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
     const parsed = this.formatter.parse(input);
     return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
-  }
-
-  private loadAppointments() {
-    let uri = `?`;
-    uri += this.fromDate ? `from=${DateTimeService.toDateString(this.fromDate)}&` : '';
-    uri += this.toDate ? `to=${DateTimeService.toDateString(this.toDate)}&` : '';
-    uri += this.user?.isManager ? (this.selectedEmployeeId ? `employeeId=${this.selectedEmployeeId}&` : '') : `employeeId=${this.user?.id}&`;
-    uri += this.selectedCustomerId ? `customerId=${this.selectedCustomerId}&` : '';
-    uri = uri.slice(0, -1);
-
-    this.apiService
-      .getAppointmentList(uri)
-      .pipe(takeUntil(this.$onDestroy))
-      .pipe(map((result) => result.map((entry) => this.deserializeDates(entry))))
-      .subscribe({
-        next: (result) => {
-          this.appointments = result;
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.toastr.error(`Termine konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
-          this.isLoading = false;
-        },
-      });
   }
 
   onFinish(appointment: AppointmentListEntry) {
@@ -207,7 +255,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
       });
   }
 
-  private deserializeDates(obj: any): any {
+  private deserializeDates(obj: any): AppointmentListEntry {
     //Check if the property is a Date type
     if (obj instanceof Object && obj.hasOwnProperty('date') && typeof obj.date === 'string') {
       obj.date = new Date(obj.date);
@@ -228,7 +276,7 @@ export class AppointmentsListComponent implements OnDestroy, OnInit {
       .subscribe({
         complete: () => {
           this.toastr.success(`Der Termin wurde gelöscht.`);
-          this.appointments = this.appointments.filter((e) => e.id !== appointment.id);
+          this.$onRefresh.next(true);
         },
         error: (error) => {
           this.toastr.error(`Termin konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
