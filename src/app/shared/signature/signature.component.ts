@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, ViewChild, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEraser } from '@fortawesome/free-solid-svg-icons';
 import { Subject, fromEvent, startWith, takeUntil } from 'rxjs';
@@ -13,10 +13,14 @@ import SignaturePad from 'signature_pad';
 })
 export class Signature implements AfterViewInit {
   @ViewChild('canvas') canvasElement!: ElementRef;
+  @Input() maxHeight = 250;
+  @Input() signingName = '';
 
   signaturePad!: SignaturePad;
   private readonly $onDestroy = new Subject();
   canvasWidth = signal(0);
+  canvasHeight = signal(0);
+  isHorizontal = signal(false);
   faEraser = faEraser;
 
   ngAfterViewInit(): void {
@@ -25,7 +29,15 @@ export class Signature implements AfterViewInit {
     fromEvent(window, 'resize')
       .pipe(startWith([]), takeUntil(this.$onDestroy))
       .subscribe(() => {
-        this.canvasWidth.set(this.canvasElement.nativeElement.parentElement.offsetWidth);
+        let width = this.canvasElement.nativeElement.parentElement.offsetWidth;
+        let height = this.canvasElement.nativeElement.parentElement.offsetHeight;
+        this.isHorizontal.set(width > 450);
+
+        width -= this.isHorizontal() ? 105 : 0;
+        height -= this.isHorizontal() ? 0 : 40;
+
+        this.canvasHeight.set(height);
+        this.canvasWidth.set(width);
       });
   }
 

@@ -1,7 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, TemplateRef, inject } from '@angular/core';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDate,
+  NgbDateParserFormatter,
+  NgbDatepickerModule,
+  NgbOffcanvas,
+  NgbTimepickerModule,
+  NgbTypeaheadModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, Subscription, forkJoin, map, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
@@ -18,6 +25,7 @@ import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
 import { ClearanceType } from '@curacaru/enums/clearance-type';
 import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { Signature } from '@curacaru/shared/signature/signature.component';
 
 @Component({
   imports: [
@@ -27,6 +35,7 @@ import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-i
     NgbDatepickerModule,
     NgbTimepickerModule,
     NgxSkeletonLoaderModule,
+    Signature,
     RouterModule,
     ReactiveFormsModule,
     NgbTypeaheadModule,
@@ -35,6 +44,7 @@ import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-i
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   standalone: true,
   templateUrl: './appointments-editor.component.html',
+  styleUrls: ['./appointments-editor.component.scss'],
 })
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
@@ -60,6 +70,8 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   selectedCustomer?: CustomerBudget;
   today = new Date();
   user?: UserEmployee;
+
+  private offcanvasService = inject(NgbOffcanvas);
 
   private $onDestroy = new Subject();
 
@@ -112,6 +124,10 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.$onDestroy.next(true);
     this.$onDestroy.complete();
+  }
+
+  openOffCanvas(template: TemplateRef<any>) {
+    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
   }
 
   ngOnInit() {

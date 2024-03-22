@@ -208,6 +208,18 @@
 
   <div class="row g-2 mt-2">
     <div class="col">
+      <button type="button" (click)="openOffCanvas(employeeSignature)" class="form-control btn btn-outline-primary h-100">
+        <span>Unterschrift Mitarbeiter</span>
+      </button>
+    </div>
+    <div class="col">
+      <button type="button" (click)="openOffCanvas(customerSignature)" class="form-control btn btn-outline-primary h-100">
+        <span>Unterschrift Kunde</span>
+      </button>
+    </div>
+  </div>
+  <div class="row g-2 mt-2">
+    <div class="col">
       <button
         [disabled]="!appointmentForm.valid || isLoading || isSaving || isChangingStatus"
         type="submit"
@@ -222,6 +234,7 @@
         }
       </button>
     </div>
+
     @if (canFinish) {
     <div class="col">
       <button
@@ -257,3 +270,23 @@
     </div>
   </div>
 </form>
+
+<ng-template #employeeSignature let-offcanvas>
+  <div class="offcanvas-header" style="height: 60px">
+    <h4 class="h-underline text-center w-100">Mitarbeiterunterschrift</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
+  </div>
+  <div class="offcanvas.body container" style="height: calc(100% - 70px); background-color: yellow">
+    <cura-signature #signature [signingName]="user ? user.firstName + ' ' + user.lastName : ''"></cura-signature>
+  </div>
+</ng-template>
+
+<ng-template #customerSignature let-offcanvas>
+  <div class="offcanvas-header" style="height: 60px">
+    <h4 class="h-underline text-center w-100">Kundenunterschrift</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
+  </div>
+  <div class="offcanvas.body container" style="height: calc(100% - 70px)">
+    <cura-signature #signature [signingName]="selectedCustomer?.customerName ?? ''"></cura-signature>
+  </div>
+</ng-template>
