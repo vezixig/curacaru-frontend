@@ -29,8 +29,10 @@ export class Signature implements AfterViewInit {
     fromEvent(window, 'resize')
       .pipe(startWith([]), takeUntil(this.$onDestroy))
       .subscribe(() => {
-        let width = this.canvasElement.nativeElement.parentElement.offsetWidth;
-        let height = this.canvasElement.nativeElement.parentElement.offsetHeight;
+        let size = this.canvasElement.nativeElement.parentElement.getBoundingClientRect();
+
+        let width = size.width; // this.canvasElement.nativeElement.parentElement.offsetWidth;
+        let height = size.height; // this.canvasElement.nativeElement.parentElement.offsetHeight;
         this.isHorizontal.set(width > 450);
 
         width -= this.isHorizontal() ? 105 : 0;

@@ -1,11 +1,10 @@
 <div class="wrapper">
+  <canvas #canvas [height]="canvasHeight()" [width]="canvasWidth()" style="background-color: green"></canvas>
   @if (isHorizontal()) {
   <button class="form-control btn text-white btn-primary submitButtonHorizontal">Bestätigen</button>
   } @else {
   <button class="form-control btn text-white btn-primary submitButtonVertical">Bestätigen</button>
   }
-
-  <canvas #canvas [height]="canvasHeight()" [width]="canvasWidth()" style="background-color: green"></canvas>
   <fa-icon [icon]="faEraser" (click)="signaturePad.clear()" class="icon-eraser" />
   <div class="tool-wrapper" [style.width.px]="canvasWidth()" [style.height.px]="canvasHeight()">
     <p class="signing-name">{{ canvasHeight() + "x" + canvasWidth() }}</p>
