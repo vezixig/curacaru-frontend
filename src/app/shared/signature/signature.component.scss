@@ -8,7 +8,12 @@ canvas {
   height: 100%;
   width: 100%;
   padding-bottom: 10px;
-  background-color: rebeccapurple;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  -moz-user-select: -moz-none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .submitButtonHorizontal {
@@ -21,6 +26,7 @@ canvas {
 .submitButtonVertical {
   position: absolute;
   bottom: 0px;
+  left: 0px;
   height: 35px;
   width: 100%;
 }

@@ -189,35 +189,42 @@
       </div>
       }
     </div>
-
-    <!-- Signatures -->
-    <!-- <div class="form-group mb-4">
-  <label for="inputNotes">Unterschriften:</label>
-  <div class="input-group" style="cursor: pointer">
-    <span class="input-group-text" (click)="toggleIsSignedByCustomer()">Kunde</span>
-    <div class="input-group-text bg-white px-3" (click)="toggleIsSignedByCustomer()">
-      <input type="checkbox" formControlName="isSignedByCustomer" #checkSignatureCustomer />
-    </div>
-    <span class="input-group-text" (click)="toggleIsSignedByEmployee()">Mitarbeiter</span>
-    <div class="input-group-text bg-white px-3" (click)="toggleIsSignedByEmployee()">
-      <input type="checkbox" formControlName="isSignedByEmployee" />
-    </div>
-  </div>
-</div> -->
   </div>
 
+  @if (appointmentForm.get('isDone')?.value != true) {
   <div class="row g-2 mt-2">
     <div class="col">
-      <button type="button" (click)="openOffCanvas(employeeSignature)" class="form-control btn btn-outline-primary h-100">
+      <button
+        [disabled]="appointmentForm.get('isSignedByEmployee')?.value == true"
+        type="button"
+        (click)="openOffCanvas(employeeSignature)"
+        [class.btn-outline-primary]="appointmentForm.get('isSignedByEmployee')?.value == false"
+        [class.btn-outline-success]="appointmentForm.get('isSignedByEmployee')?.value == true"
+        class="form-control btn h-100"
+      >
         <span>Unterschrift Mitarbeiter</span>
+        @if(appointmentForm.get('isSignedByEmployee')?.value == true) {
+        <fa-icon [icon]="faCheck" class="text-success ms-2" />
+        }
       </button>
     </div>
     <div class="col">
-      <button type="button" (click)="openOffCanvas(customerSignature)" class="form-control btn btn-outline-primary h-100">
+      <button
+        [disabled]="appointmentForm.get('isSignedByCustomer')?.value == true"
+        type="button"
+        (click)="openOffCanvas(customerSignature)"
+        [class.btn-outline-primary]="appointmentForm.get('isSignedByCustomer')?.value == false"
+        [class.btn-outline-success]="appointmentForm.get('isSignedByCustomer')?.value == true"
+        class="form-control btn h-100"
+      >
         <span>Unterschrift Kunde</span>
+        @if(appointmentForm.get('isSignedByCustomer')?.value == true) {
+        <fa-icon [icon]="faCheck" class="text-success ms-2" />
+        }
       </button>
     </div>
   </div>
+  }
   <div class="row g-2 mt-2">
     <div class="col">
       <button
@@ -272,21 +279,21 @@
 </form>
 
 <ng-template #employeeSignature let-offcanvas>
-  <div class="offcanvas-header" style="height: 60px">
+  <div class="offcanvas-header offcanvas-signature" style="height: 60px">
     <h4 class="h-underline text-center w-100">Mitarbeiterunterschrift</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
   </div>
-  <div class="offcanvas.body container" style="height: calc(100% - 70px); background-color: yellow">
-    <cura-signature #signature [signingName]="user ? user.firstName + ' ' + user.lastName : ''"></cura-signature>
+  <div class="offcanvas.body container" style="height: calc(100% - 70px)">
+    <cura-signature #signature [signatureName]="user ? user.firstName + ' ' + user.lastName : ''" (signatureTaken)="onEmployeeSigned($event)" />
   </div>
 </ng-template>
 
 <ng-template #customerSignature let-offcanvas>
-  <div class="offcanvas-header" style="height: 60px">
+  <div class="offcanvas-header offcanvas-signature" style="height: 60px">
     <h4 class="h-underline text-center w-100">Kundenunterschrift</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
   </div>
   <div class="offcanvas.body container" style="height: calc(100% - 70px)">
-    <cura-signature #signature [signingName]="selectedCustomer?.customerName ?? ''"></cura-signature>
+    <cura-signature #signature [signatureName]="selectedCustomer?.customerName ?? ''" (signatureTaken)="onCustomerSigned($event)"></cura-signature>
   </div>
 </ng-template>
