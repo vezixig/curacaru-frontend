@@ -1,7 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, TemplateRef, inject } from '@angular/core';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbTimepickerModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDate,
+  NgbDateParserFormatter,
+  NgbDatepickerModule,
+  NgbOffcanvas,
+  NgbTimepickerModule,
+  NgbTypeaheadModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, Subscription, forkJoin, map, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +24,9 @@ import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
 import { ClearanceType } from '@curacaru/enums/clearance-type';
-import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { Signature } from '@curacaru/shared/signature/signature.component';
+import { AppointmentRepository } from '@curacaru/services/repositories/appointment.repository';
 
 @Component({
   imports: [
@@ -27,6 +36,7 @@ import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-i
     NgbDatepickerModule,
     NgbTimepickerModule,
     NgxSkeletonLoaderModule,
+    Signature,
     RouterModule,
     ReactiveFormsModule,
     NgbTypeaheadModule,
@@ -35,9 +45,11 @@ import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-i
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   standalone: true,
   templateUrl: './appointments-editor.component.html',
+  styleUrls: ['./appointments-editor.component.scss'],
 })
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
+  faCheck = faCheck;
   faCircleInfo = faCircleInfo;
   faCircleExclamation = faCircleExclamation;
   RideCostType = RideCostsType;
@@ -60,6 +72,9 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   selectedCustomer?: CustomerBudget;
   today = new Date();
   user?: UserEmployee;
+
+  private readonly offcanvasService = inject(NgbOffcanvas);
+  private readonly appointmentRepository = inject(AppointmentRepository);
 
   private $onDestroy = new Subject();
 
@@ -87,6 +102,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       employeeReplacementId: [''],
       isSignedByCustomer: [false],
       isSignedByEmployee: [false],
+      isDone: [false],
       notes: [''],
       timeEnd: ['', [Validators.required]],
       timeStart: ['', [Validators.required]],
@@ -112,6 +128,10 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.$onDestroy.next(true);
     this.$onDestroy.complete();
+  }
+
+  openOffCanvas(template: TemplateRef<any>) {
+    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
   }
 
   ngOnInit() {
@@ -175,6 +195,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             employeeReplacementId: result.employeeReplacementId,
             isSignedByCustomer: result.isSignedByCustomer,
             isSignedByEmployee: result.isSignedByEmployee,
+            isDone: result.isDone,
             notes: result.notes,
             timeEnd: DateTimeService.toNgbTime(result.timeEnd),
             timeStart: DateTimeService.toNgbTime(result.timeStart),
@@ -190,7 +211,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.existingAppointment = result;
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
-          this.canFinish = !this.isNew && !result.isDone && result.date <= this.today;
+          this.canFinish = !this.isNew && !result.isDone && result.isSignedByCustomer && result.isSignedByEmployee && result.date <= this.today;
           this.canOpen = (this.user?.isManager ?? false) && !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId, true);
@@ -204,6 +225,36 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             this.toastr.error(`Termin konnte nicht geladen werden: [${error.status}] ${error.error}`);
             this.isLoading = false;
           }
+        },
+      });
+  }
+
+  onEmployeeSigned($event: string) {
+    this.appointmentRepository
+      .addEmployeeSignature(this.appointmentId!, $event)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        next: () => {
+          this.loadAppointment();
+          this.offcanvasService.dismiss();
+        },
+        error: (error) => {
+          this.toastr.error(`Unterschrift konnte nicht gespeichert werden: [${error.status}] ${error.error}`);
+        },
+      });
+  }
+
+  onCustomerSigned($event: string) {
+    this.appointmentRepository
+      .addCustomerSignature(this.appointmentId!, $event)
+      .pipe(takeUntil(this.$onDestroy))
+      .subscribe({
+        next: () => {
+          this.loadAppointment();
+          this.offcanvasService.dismiss();
+        },
+        error: (error) => {
+          this.toastr.error(`Unterschrift konnte nicht gespeichert werden: [${error.status}] ${error.error}`);
         },
       });
   }
