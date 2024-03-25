@@ -65,7 +65,16 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard/documents/deployment-reports',
-    loadComponent: () => import('@curacaru/dashboard/documents/deployment-reports/documents.component').then((o) => o.DeploymentReportsComponent),
+    loadComponent: () =>
+      import('@curacaru/dashboard/documents/deployment-reports-list/deployment-reports.list.component').then((o) => o.DeploymentReportsListComponent),
+  },
+  {
+    path: 'dashboard/documents/deployment-reports/sign',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('@curacaru/dashboard/documents/deployment-report-signature/deployment-report-signature.component').then(
+        (o) => o.DeploymentReportSignatureComponent
+      ),
   },
   {
     path: 'dashboard/documents/assignment-declarations',

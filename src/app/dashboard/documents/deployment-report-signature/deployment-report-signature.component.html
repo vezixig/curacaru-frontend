@@ -1,0 +1,170 @@
+<div class="row" class="">
+  <h4 class="h-underline">Einsatznachweis erstellen</h4>
+  @if(filterModel$ | async; as filterModel) {
+
+  <form [formGroup]="documentForm" class="p-0" (ngSubmit)="onSave()">
+    <label class="mt-2 fw-light" for="inputYear">Jahr und Monat der Leistungserbringung</label>
+    <div class="input-group">
+      <input
+        id="inputYear"
+        class="form-control"
+        type="number"
+        formControlName="year"
+        [ngClass]="{ 'is-invalid': documentForm.controls['year'].invalid }"
+      />
+      <select id="selectMonth" class="form-control" formControlName="month">
+        @for (month of months; track month) {
+        <option [value]="month.value">{{ month.name }}</option>
+        }
+      </select>
+    </div>
+
+    <label for="selectCustomer" class="mt-2 fw-light">Kunde</label>
+    <select id="selectCustomer" class="form-select" formControlName="customerId">
+      <option></option>
+      @for (customer of filterModel.customers; track customer) {
+      <option [value]="customer.customerId">{{ customer.customerName }}</option>
+      }
+    </select>
+
+    <label for="selectClearanceType" class="mt-2 fw-light">Abrechnungsoption</label>
+    <select id="selectClearanceType" class="form-select" formControlName="clearanceType">
+      <option value="3">Selbstzahler</option>
+      <option value="0">Entlastungsbetrag §45b SGB XI</option>
+      <option value="1">..% Pflegesachleistungen §36 SGB XI (max. 40%)</option>
+      <option value="2">Verhinderungspflege § 39 SGB XI</option>
+    </select>
+
+    @if (dataModel$ | async; as dataModel) { @if(dataModel.document) {
+    <label class="mt-2 fw-light">Bearbeitet von</label>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.customer.associatedEmployee?.name }}</p>
+    <label class="mt-2 fw-light">Vertreten von</label>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.document.replacementEmployeeNames }}</p>
+
+    <label class="mt-2 fw-light">Arbeitszeiten</label>
+    <div class="table ms-2">
+      <table class="w-100">
+        <thead>
+          <tr class="d-flex">
+            <th class="col-3" scope="col">Datum</th>
+            <th class="col-3" scope="col">Beginn</th>
+            <th class="col-3" scope="col">Ende</th>
+            <th class="col-3" scope="col">Arbeitszeit gesamt</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(time of dataModel.document.times; track time) {
+          <tr class="d-flex">
+            <td class="col-3">{{ time.date | date }}</td>
+            <td class="col-3">{{ time.start | timeFormat }} Uhr</td>
+            <td class="col-3">{{ time.end | timeFormat }} Uhr</td>
+            <td class="col-3">{{ time.duration | number : "1.2-2" }} h</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="mt-3">
+      Summe der Arbeitszeiten: <span class="ms-2 fw-bold">{{ dataModel.document.totalDuration | number : "1.0-2" }} Stunden</span>
+    </p>
+
+    @if(dataModel.document.hasUnfinishedAppointment) {
+    <div class="row">
+      <div class="alert alert-warning mt-3" role="alert">
+        <fa-icon [icon]="faExclamationTriangle" [fixedWidth]="true" /> Es gibt noch nicht abgeschlossene Termine für diesen Monat.
+      </div>
+    </div>
+    } @if (!dataModel.document.isCreated) {
+    <label class="mt-2 fw-light">Ort, Datum</label>
+    <div class="row">
+      <div class="col-sm-12 col-md-5">
+        <input type="text" class="form-control" formControlName="signatureCity" />
+      </div>
+      <div class="col-5 d-flex align-items-center">den {{ today | date }}</div>
+    </div>
+    <div class="row g-2 mt-2">
+      <div class="col">
+        <button
+          [disabled]="documentForm.get('signatureEmployee')?.value != '' || dataModel.document.hasUnfinishedAppointment"
+          type="button"
+          (click)="openOffCanvas(employeeSignature)"
+          [class.btn-outline-primary]="documentForm.get('signatureEmployee')?.value == ''"
+          [class.btn-outline-success]="documentForm.get('signatureEmployee')?.value != ''"
+          class="form-control btn"
+        >
+          <span>Unterschrift Mitarbeiter</span>
+          @if(documentForm.get('signatureEmployee')?.value != '') {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
+      </div>
+      <div class="col">
+        <button
+          [disabled]="documentForm.get('signatureCustomer')?.value != '' || dataModel.document.hasUnfinishedAppointment"
+          type="button"
+          (click)="openOffCanvas(customerSignature)"
+          [class.btn-outline-primary]="documentForm.get('signatureCustomer')?.value == ''"
+          [class.btn-outline-success]="documentForm.get('signatureCustomer')?.value != ''"
+          class="form-control btn"
+        >
+          <span>Unterschrift Kunde</span>
+          @if(documentForm.get('signatureCustomer')?.value != '') {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
+      </div>
+      <div class="col">
+        <button [disabled]="documentForm.invalid" type="submit" class="form-control btn btn-primary text-white">Einsatznachweis erstellen</button>
+      </div>
+      <div class="col">
+        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary">Verwerfen</button>
+      </div>
+    </div>
+    } @else {
+    <div class="row">
+      <div class="alert alert-secondary mt-3" role="alert">
+        <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Der Einsatznachweis für diesen Monat wurde bereits erfasst.
+      </div>
+    </div>
+    }
+
+    <ng-template #employeeSignature let-offcanvas>
+      <div class="offcanvas-header offcanvas-signature" style="height: 60px">
+        <h4 class="h-underline text-center w-100">Mitarbeiterunterschrift</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
+      </div>
+      <div class="offcanvas.body container" style="height: calc(100% - 70px)">
+        <cura-signature
+          #signature
+          [signatureName]="dataModel.user.firstName + ' ' + dataModel.user.lastName"
+          (signatureTaken)="onEmployeeSigned($event)"
+        />
+      </div>
+    </ng-template>
+
+    <ng-template #customerSignature let-offcanvas>
+      <div class="offcanvas-header offcanvas-signature" style="height: 60px">
+        <h4 class="h-underline text-center w-100">Kundenunterschrift</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
+      </div>
+      <div class="offcanvas.body container" style="height: calc(100% - 70px)">
+        <cura-signature
+          #signature
+          [signatureName]="dataModel.customer.firstName + ' ' + dataModel.customer.lastName"
+          (signatureTaken)="onCustomerSigned($event)"
+        ></cura-signature>
+      </div>
+    </ng-template>
+
+    } @else {
+    <div class="row">
+      <div class="alert alert-secondary mt-3" role="alert">
+        <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat wurden keine Termine mit der gewählten Abrechnungsoption erfasst.
+      </div>
+    </div>
+    } }
+  </form>
+
+  }
+</div>

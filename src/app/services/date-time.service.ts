@@ -8,6 +8,7 @@ import { NgbTime } from '../models/ngbtime';
 })
 export class DateTimeService {
   private static dateFormat = new Intl.DateTimeFormat('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  static today: Date = new Date();
 
   static toNgbTime(timeStart: Time | string): NgbTime {
     if (typeof timeStart === 'string') {

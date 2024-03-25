@@ -206,6 +206,40 @@
 </div> -->
   </div>
 
+  @if (!isNew && appointmentForm.get('isDone')?.value != true) {
+  <div class="row g-2 mt-2">
+    <div class="col">
+      <button
+        [disabled]="appointmentForm.get('isSignedByEmployee')?.value == true"
+        type="button"
+        (click)="openOffCanvas(employeeSignature)"
+        [class.btn-outline-primary]="appointmentForm.get('isSignedByEmployee')?.value == false"
+        [class.btn-outline-success]="appointmentForm.get('isSignedByEmployee')?.value == true"
+        class="form-control btn h-100"
+      >
+        <span>Unterschrift Mitarbeiter</span>
+        @if(appointmentForm.get('isSignedByEmployee')?.value == true) {
+        <fa-icon [icon]="faCheck" class="text-success ms-2" />
+        }
+      </button>
+    </div>
+    <div class="col">
+      <button
+        [disabled]="appointmentForm.get('isSignedByCustomer')?.value == true"
+        type="button"
+        (click)="openOffCanvas(customerSignature)"
+        [class.btn-outline-primary]="appointmentForm.get('isSignedByCustomer')?.value == false"
+        [class.btn-outline-success]="appointmentForm.get('isSignedByCustomer')?.value == true"
+        class="form-control btn h-100"
+      >
+        <span>Unterschrift Kunde</span>
+        @if(appointmentForm.get('isSignedByCustomer')?.value == true) {
+        <fa-icon [icon]="faCheck" class="text-success ms-2" />
+        }
+      </button>
+    </div>
+  </div>
+  }
   <div class="row g-2 mt-2">
     <div class="col">
       <button

@@ -1,0 +1,103 @@
+<div class="row">
+  <h4>Einsatznachweise</h4>
+  <button type="button" [routerLink]="['/dashboard/documents/assignment-declarations/sign']" class="btn btn-primary text-white btn-block mb-3">
+    Einsatznachweis erstellen
+  </button>
+
+  @if(filterModel$ | async; as filterModel) {
+  <form [formGroup]="filterForm" class="p-0">
+    <div class="row gx-3">
+      <div class="col col-12 col-md">
+        <label for="inputYear">Jahr</label>
+        <div class="input-group">
+          <input
+            id="inputYear"
+            class="form-control"
+            type="number"
+            formControlName="year"
+            [ngClass]="{ 'is-invalid': filterForm.controls['year'].invalid }"
+          />
+        </div>
+      </div>
+      <div class="col p-0 ps-1">
+        <label for="selectMonth">Monat</label>
+        <select id="selectMonth" class="form-control" formControlName="month">
+          @for (month of months; track month) {
+          <option [value]="month.value">{{ month.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="col col-12 col-md">
+        <label for="selectCustomer">Kunde</label>
+        <select id="selectCustomer" class="form-select" formControlName="customerId">
+          <option></option>
+          @for (customer of filterModel.customers; track customer) {
+          <option [value]="customer.customerId">{{ customer.customerName }}</option>
+          }
+        </select>
+      </div>
+
+      @if (filterModel.user.isManager) {
+      <div class="col col-12 col-md">
+        <label for="selectEmployee">Mitarbeiter</label>
+        <select id="selectEmployee" class="form-select" formControlName="employeeId">
+          <option></option>
+          @for (employee of filterModel.employees; track employee) {
+          <option [value]="employee.id">{{ employee.name }}</option>
+          }
+        </select>
+      </div>
+
+      }
+    </div>
+  </form>
+
+  @if(listModel$ | async; as documents) {
+  <table class="d-none d-md-table table mt-3 table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Jahr</th>
+        <th scope="col">Monat</th>
+        <th scope="col">Kunde</th>
+        <th scope="col">Bearbeitung</th>
+        <th scope="col">Vertretung</th>
+        <th scope="col">Abrechnungsoption</th>
+        <th class="text-center" scope="col">Status</th>
+        <th class="text-center" scope="col">Aktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (document of documents; track document) {
+      <tr>
+        <td>{{ document.year }}</td>
+        <td>{{ document.month | monthName }}</td>
+        <td>{{ document.customerName }}</td>
+        <td>{{ document.employeeName }}</td>
+        <td>{{ document.replacementEmployeeNames }}</td>
+        <td>{{ document.clearanceType | clearanceTypeName }}</td>
+        <td class="text-center">
+          <div width="16" height="16" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" class="status-bullet"></div>
+        </td>
+        <td class="text-center">
+          @if (!document.isCreated) {
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            title="Einsatznachweis erstellen"
+            [routerLink]="['/dashboard/documents/deployment-reports/sign']"
+            [queryParams]="{ year: document.year, month: document.month, clearanceType: document.clearanceType, customerId: document.customerId }"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+          } @else {
+          <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadReport(document)">
+            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          </button>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  } }
+</div>
