@@ -91,21 +91,33 @@
           <div width="16" height="16" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" class="status-bullet"></div>
         </td>
         <td class="text-center">
-          @if (!document.isCreated) {
-          <button
-            type="button"
-            class="btn btn-outline-secondary btn-sm"
-            title="Einsatznachweis erstellen"
-            [routerLink]="['/dashboard/documents/deployment-reports/sign']"
-            [queryParams]="{ year: document.year, month: document.month, clearanceType: document.clearanceType, customerId: document.customerId }"
-          >
-            <fa-icon [icon]="faGear" [fixedWidth]="true" />
-          </button>
-          } @else {
-          <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadReport(document)">
-            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
-          </button>
-          }
+          <div class="btn-group">
+            @if (!document.isCreated) {
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              title="Einsatznachweis erstellen"
+              [routerLink]="['/dashboard/documents/deployment-reports/sign']"
+              [queryParams]="{ year: document.year, month: document.month, clearanceType: document.clearanceType, customerId: document.customerId }"
+            >
+              <fa-icon [icon]="faGear" [fixedWidth]="true" />
+            </button>
+            } @else {
+            <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadReport(document)">
+              <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+            </button>
+            @if(filterModel.user.isManager) {
+            <button
+              type="button"
+              (click)="onDeleteDeploymentReport(document)"
+              [disabled]="isLoading()"
+              class="btn btn-outline-secondary btn-sm"
+              title="Einsatznachweis löschen"
+            >
+              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+            </button>
+            } }
+          </div>
         </td>
       </tr>
       }
@@ -133,7 +145,17 @@
           <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadReport(document)">
             <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           </button>
-          }
+          @if(filterModel.user.isManager) {
+          <button
+            type="button"
+            (click)="onDeleteDeploymentReport(document)"
+            [disabled]="isLoading()"
+            class="btn btn-outline-secondary btn-sm"
+            title="Einsatznachweis löschen"
+          >
+            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+          </button>
+          } }
         </div>
       </div>
       <div class="card-body">

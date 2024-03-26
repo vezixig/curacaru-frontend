@@ -3,6 +3,7 @@ import { UUID } from 'angular2-uuid';
 
 export interface DeploymentReportListEntry {
   isCreated: boolean;
+  reportId: UUID;
   clearanceType: ClearanceType;
   customerId: UUID;
   replacementEmployeeId?: UUID;

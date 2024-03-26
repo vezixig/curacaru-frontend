@@ -73,6 +73,15 @@ export class DocumentRepository extends BaseRepository {
   }
 
   /**
+   * Deletes a deployment report
+   * @param id the id of the report
+   * @returns an empty observable
+   */
+  deleteDeploymentReport(id: UUID) {
+    return this.client.delete(`${this.apiUrl}/documents/deployment-reports/${id}`);
+  }
+
+  /**
    * Gets the list of assignment declarations
    * @param year the year to get the list for
    * @param customerId an optional customer id to filter by

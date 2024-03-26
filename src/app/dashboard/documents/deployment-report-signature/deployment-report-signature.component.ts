@@ -20,6 +20,7 @@ import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map
   imports: [ReactiveFormsModule, CommonModule, TimeFormatPipe, FontAwesomeModule, Signature, RouterModule],
   standalone: true,
   templateUrl: './deployment-report-signature.component.html',
+  styleUrls: ['./deployment-report-signature.component.scss'],
 })
 export class DeploymentReportSignatureComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
