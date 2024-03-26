@@ -1,10 +1,21 @@
 <div class="row">
   <h4>Einsatznachweise</h4>
-  <button type="button" [routerLink]="['/dashboard/documents/assignment-declarations/sign']" class="btn btn-primary text-white btn-block mb-3">
+
+  @if(filterModel$ | async; as filterModel) {
+
+  <button
+    type="button"
+    [routerLink]="['/dashboard/documents/deployment-reports/sign']"
+    [queryParams]="{
+      year: filterForm.get('year')?.value ?? undefined, 
+      month: filterForm.get('month')?.value ?? undefined, 
+      customerId: filterForm.get('customerId')?.value ?? undefined,
+      }"
+    class="btn btn-primary text-white btn-block mb-3"
+  >
     Einsatznachweis erstellen
   </button>
 
-  @if(filterModel$ | async; as filterModel) {
   <form [formGroup]="filterForm" class="p-0">
     <div class="row gx-3">
       <div class="col col-12 col-md">

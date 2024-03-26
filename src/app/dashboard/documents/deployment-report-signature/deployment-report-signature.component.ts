@@ -91,10 +91,10 @@ export class DeploymentReportSignatureComponent {
         forkJoin({
           customer: this.apiService.getCustomer(next.queryParams['customerId']).pipe(),
           document: this.documentRepository.getDeploymentReport(
-            next.queryParams['year'],
-            next.queryParams['month'],
-            next.queryParams['customerId'],
-            next.queryParams['clearanceType']
+            this.documentForm.controls['year'].value,
+            this.documentForm.controls['month'].value,
+            this.documentForm.controls['customerId'].value,
+            this.documentForm.controls['clearanceType'].value
           ),
         }).pipe(map((result) => ({ ...result, user: next.user })))
       )

@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { DeploymentReportListEntry } from '@curacaru/models/deployment-report-list.entry.model';
 import { MinimalCustomerListEntry } from '@curacaru/models/minimal-customer-list-entry.model';
@@ -13,11 +12,10 @@ import { DateTimeService, UserService } from '@curacaru/services';
 import { ApiService } from '@curacaru/services/api.service';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBuilding } from '@fortawesome/free-regular-svg-icons';
-import { faCircleInfo, faDownload, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faGear } from '@fortawesome/free-solid-svg-icons';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subscription, catchError, combineLatest, debounceTime, forkJoin, map, switchMap } from 'rxjs';
+import { Observable, catchError, combineLatest, debounceTime, forkJoin, map, switchMap } from 'rxjs';
 
 @Component({
   imports: [
@@ -35,6 +33,7 @@ import { Observable, Subscription, catchError, combineLatest, debounceTime, fork
   selector: 'cura-deployment',
   standalone: true,
   templateUrl: './deployment-reports-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeploymentReportsListComponent {
   private readonly activeRoute = inject(ActivatedRoute);
