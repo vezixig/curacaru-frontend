@@ -81,13 +81,14 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
     });
 
-    this.onCareLEvelChange(this.customerForm.get('careLevel')?.value);
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
 
     this.isManager$.subscribe((value) => {
       if (!value) {
         this.isManager = false;
         this.customerForm.disable();
+      } else {
+        this.isManager = true;
       }
     });
 
@@ -113,6 +114,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (this.router.url.endsWith('new')) {
       this.isNew = true;
+      this.onCareLEvelChange(this.customerForm.get('careLevel')?.value);
     } else {
       this.LoadCustomer();
     }
