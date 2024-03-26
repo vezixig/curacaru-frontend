@@ -59,7 +59,6 @@ export class DeploymentReportSignatureComponent {
       signatureEmployee: ['', [Validators.required]],
       signatureCustomer: ['', [Validators.required]],
       signatureCity: ['', [Validators.required]],
-      canSign: [false, Validators.requiredTrue],
     });
 
     this.documentForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() =>

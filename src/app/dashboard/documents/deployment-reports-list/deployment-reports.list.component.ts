@@ -12,7 +12,8 @@ import { DateTimeService, UserService } from '@curacaru/services';
 import { ApiService } from '@curacaru/services/api.service';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faDownload, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faCircleInfo, faCoins, faDownload, faGear, faPersonCane, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, catchError, combineLatest, debounceTime, forkJoin, map, switchMap } from 'rxjs';
@@ -44,8 +45,14 @@ export class DeploymentReportsListComponent {
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
 
+  faCalendar = faCalendar;
+  faCircleInfo = faCircleInfo;
+  faCoins = faCoins;
   faDownload = faDownload;
   faGear = faGear;
+  faPersonCane = faPersonCane;
+  faUser = faUser;
+  faUserAlt = faUserAlt;
   months = DateTimeService.months;
 
   readonly filterModel$: Observable<{

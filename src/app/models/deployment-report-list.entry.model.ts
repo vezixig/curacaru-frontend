@@ -5,7 +5,6 @@ export interface DeploymentReportListEntry {
   isCreated: boolean;
   clearanceType: ClearanceType;
   customerId: UUID;
-  employeeId: UUID;
   replacementEmployeeId?: UUID;
   month: number;
   year: number;

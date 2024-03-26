@@ -37,9 +37,9 @@
 
     @if (dataModel$ | async; as dataModel) { @if(dataModel.document) {
     <label class="mt-2 fw-light">Bearbeitet von</label>
-    <p class="ms-2 m-0 fs-6">{{ dataModel.customer.associatedEmployee?.name }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.document.employeeName }}</p>
     <label class="mt-2 fw-light">Vertreten von</label>
-    <p class="ms-2 m-0 fs-6">{{ dataModel.document.replacementEmployeeNames }}</p>
+    <p class="ms-2 m-0 fs-6">{{ dataModel.document.replacementEmployeeNames === "" ? "-" : dataModel.document.replacementEmployeeNames }}</p>
 
     <label class="mt-2 fw-light">Arbeitszeiten</label>
     <div class="table ms-2">

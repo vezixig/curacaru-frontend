@@ -30,7 +30,7 @@
           />
         </div>
       </div>
-      <div class="col p-0 ps-1">
+      <div class="col">
         <label for="selectMonth">Monat</label>
         <select id="selectMonth" class="form-control" formControlName="month">
           @for (month of months; track month) {
@@ -63,7 +63,8 @@
     </div>
   </form>
 
-  @if(listModel$ | async; as documents) {
+  @if(listModel$ | async; as documents) { @if(documents.length > 0) {
+
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
       <tr>
@@ -110,5 +111,50 @@
       }
     </tbody>
   </table>
-  } }
+
+  <div class="d-md-none p-0">
+    @for (document of documents; track document) {
+    <div class="card my-3">
+      <div class="card-header d-flex px-2">
+        <img class="me-2" width="10" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" />
+        <span class="lead text-truncate">{{ document.customerName }}</span>
+        <div class="btn-group ms-auto" role="group">
+          @if(!document.isCreated) {
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            title="Einsatznachweis erstellen"
+            [routerLink]="['/dashboard/documents/deployment-reports/sign']"
+            [queryParams]="{ year: document.year, month: document.month, clearanceType: document.clearanceType, customerId: document.customerId }"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+          } @else {
+          <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadReport(document)">
+            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          </button>
+          }
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="card-text list-unstyled">
+          <li class="pb-2">{{ document.clearanceType | clearanceTypeName }}</li>
+          <li><fa-icon [icon]="faCalendar" [fixedWidth]="true" /> {{ document.month | monthName }} {{ document.year }}</li>
+          @if(document.replacementEmployeeNames != '') {
+          <li><fa-icon [icon]="faUserAlt" [fixedWidth]="true" /> {{ document.replacementEmployeeNames }}</li>
+          }
+          <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ document.employeeName }}</li>
+        </ul>
+      </div>
+    </div>
+    }
+  </div>
+
+  } @else {
+  <div class="row">
+    <div class="alert alert-secondary mt-3" role="alert">
+      <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Es wurden keine Einsätze gefunden, die den gewählten Filtern entsprechen.
+    </div>
+  </div>
+  } }}
 </div>
