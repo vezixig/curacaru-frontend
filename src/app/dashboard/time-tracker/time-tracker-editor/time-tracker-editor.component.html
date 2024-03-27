@@ -53,85 +53,85 @@
         <div class="row border-bottom fw-bold">
           <div class="col-5">Datum</div>
           <div class="col-5">Uhrzeit</div>
-          <div class="col-2">Dauer</div>
+          <div class="col-2">Arbeitszeit/div></div>
+          @for (appointment of model.workTime; track appointment) {
+          <div class="row border-bottom py-2">
+            <div class="col-5">{{ appointment.date | date : "dd.MM.yyyy" }}</div>
+            <div class="col-5">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</div>
+            <div class="col-2">{{ appointment.workDuration | number : "1.2-2" }}h</div>
+          </div>
+          }
         </div>
-        @for (appointment of model.workTime; track appointment) {
-        <div class="row border-bottom py-2">
-          <div class="col-5">{{ appointment.date | date : "dd.MM.yyyy" }}</div>
-          <div class="col-5">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</div>
-          <div class="col-2">{{ appointment.workDuration | number : "1.2-2" }}h</div>
+
+        @if(model.workTime.length == 0) {
+        <div class="row">
+          <div class="alert alert-secondary mt-3" role="alert">
+            <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat wurde bisher keine Arbeitszeit erfasst.
+          </div>
         </div>
         }
+
+        <p class="mt-3">
+          Summe der Arbeitszeiten: <span class="ms-2 fw-bold">{{ model.totalWorkedHours }} Stunden</span>
+        </p>
       </div>
 
-      @if(model.workTime.length == 0) {
+      @if (model.report && !model.report.signatureManagerDate ) {
       <div class="row">
         <div class="alert alert-secondary mt-3" role="alert">
-          <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat wurde bisher keine Arbeitszeit erfasst.
+          <fa-icon [icon]="faCircleInfo" /> Die Arbeitszeiterfassung für diesen Monat wurde am {{ model.report.signatureEmployeeDate | date }} in
+          {{ model.report.signatureEmployeeCity }} unterschrieben und muss nun von einem Manager gegengezeichnet werden.
+        </div>
+      </div>
+      } @if(model.report && model.report.signatureManagerDate) {
+      <div class="row">
+        <div class="alert alert-success mt-3" role="alert">
+          <fa-icon [icon]="faCircleInfo" /> Die Arbeitszeiterfassung für diesen Monat wurde am {{ model.report.signatureManagerDate | date }} in
+          {{ model.report.signatureManagerCity }} von einem Manager gegengezeichnet.
+        </div>
+      </div>
+      } @if (model.canSign && (!model.report || (isManager() && !model.report.signatureManagerDate))) {
+      <div class="mt-3">
+        <label class="mt-2 fw-light">Ort, Datum</label>
+        <div class="row">
+          <div class="col-sm-12 col-md-5">
+            <input type="text" class="form-control" formControlName="signatureCity" />
+          </div>
+          <div class="col-5 d-flex align-items-center">den {{ today | date }}</div>
+        </div>
+      </div>
+      <div class="container p-0 pe-3">
+        <div class="row">
+          <label>Unterschrift {{ model.report ? "Manager" : "Mitarbeiter" }}</label>
+          <div class="col-sm-auto col-md-6 col-lg-5 col-xl-4" style="position: relative">
+            <cura-signature #signature></cura-signature>
+          </div>
+        </div>
+      </div>
+      } @if(model.hasUndoneAppointments) {
+      <div class="row">
+        <div class="alert alert-warning mt-3" role="alert">
+          <fa-icon [icon]="faTriangleExclamation" /> Die Arbeitszeiterfassung kann nicht erstellt werden, es gibt noch nicht abgeschlossene Termine in
+          diesem Monat.
         </div>
       </div>
       }
 
-      <p class="mt-3">
-        Summe der Arbeitszeiten: <span class="ms-2 fw-bold">{{ model.totalWorkedHours }} Stunden</span>
-      </p>
-    </div>
-
-    @if (model.report && !model.report.signatureManagerDate ) {
-    <div class="row">
-      <div class="alert alert-secondary mt-3" role="alert">
-        <fa-icon [icon]="faCircleInfo" /> Die Arbeitszeiterfassung für diesen Monat wurde am {{ model.report.signatureEmployeeDate | date }} in
-        {{ model.report.signatureEmployeeCity }} unterschrieben und muss nun von einem Manager gegengezeichnet werden.
-      </div>
-    </div>
-    } @if(model.report && model.report.signatureManagerDate) {
-    <div class="row">
-      <div class="alert alert-success mt-3" role="alert">
-        <fa-icon [icon]="faCircleInfo" /> Die Arbeitszeiterfassung für diesen Monat wurde am {{ model.report.signatureManagerDate | date }} in
-        {{ model.report.signatureManagerCity }} von einem Manager gegengezeichnet.
-      </div>
-    </div>
-    } @if (model.canSign && (!model.report || (isManager() && !model.report.signatureManagerDate))) {
-    <div class="mt-3">
-      <label class="mt-2 fw-light">Ort, Datum</label>
-      <div class="row">
-        <div class="col-sm-12 col-md-5">
-          <input type="text" class="form-control" formControlName="signatureCity" />
+      <div class="row g-2 mt-2">
+        <div class="col">
+          <button [disabled]="!reportForm.valid || isSaving()" type="submit" class="form-control btn btn-primary text-white">
+            @if (isSaving()) {
+            <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+            }
+            <span>{{ model.report ? "Manager" : "Mitarbeiter" }}unterschrift speichern</span>
+            @if (isSaving()) {
+            <span>...</span>
+            }
+          </button>
         </div>
-        <div class="col-5 d-flex align-items-center">den {{ today | date }}</div>
-      </div>
-    </div>
-    <div class="container p-0 pe-3">
-      <div class="row">
-        <label>Unterschrift {{ model.report ? "Manager" : "Mitarbeiter" }}</label>
-        <div class="col-sm-auto col-md-6 col-lg-5 col-xl-4" style="position: relative">
-          <cura-signature #signature></cura-signature>
+        <div class="col">
+          <button type="button" [routerLink]="['/dashboard/time-tracker']" class="form-control btn btn-outline-secondary">Verwerfen</button>
         </div>
-      </div>
-    </div>
-    } @if(model.hasUndoneAppointments) {
-    <div class="row">
-      <div class="alert alert-warning mt-3" role="alert">
-        <fa-icon [icon]="faTriangleExclamation" /> Die Arbeitszeiterfassung kann nicht erstellt werden, es gibt noch nicht abgeschlossene Termine in
-        diesem Monat.
-      </div>
-    </div>
-    }
-
-    <div class="row g-2 mt-2">
-      <div class="col">
-        <button [disabled]="!reportForm.valid || isSaving()" type="submit" class="form-control btn btn-primary text-white">
-          @if (isSaving()) {
-          <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-          }
-          <span>{{ model.report ? "Manager" : "Mitarbeiter" }}unterschrift speichern</span>
-          @if (isSaving()) {
-          <span>...</span>
-          }
-        </button>
-      </div>
-      <div class="col">
-        <button type="button" [routerLink]="['/dashboard/time-tracker']" class="form-control btn btn-outline-secondary">Verwerfen</button>
       </div>
     </div>
 

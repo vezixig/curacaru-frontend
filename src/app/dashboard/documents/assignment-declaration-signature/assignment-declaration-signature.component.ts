@@ -51,7 +51,7 @@ export class AssignmentDeclarationSignatureComponent {
       year: [new Date().getFullYear(), [Validators.required, Validators.min(2020), Validators.max(2999)]],
       customerId: [undefined, [Validators.required]],
       signature: [undefined],
-      signatureCity: [undefined, [Validators.required]],
+      signatureCity: [undefined, [Validators.required, Validators.maxLength(30)]],
       isAccepted: [false, [ValidateTrue]],
     });
 

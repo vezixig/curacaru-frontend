@@ -59,7 +59,7 @@ export class DeploymentReportSignatureComponent {
       month: [new Date().getMonth() + 1, [Validators.required, Validators.min(1), Validators.max(12)]],
       signatureEmployee: ['', [Validators.required]],
       signatureCustomer: ['', [Validators.required]],
-      signatureCity: ['', [Validators.required]],
+      signatureCity: ['', [Validators.required, Validators.maxLength(30)]],
     });
 
     this.documentForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() =>

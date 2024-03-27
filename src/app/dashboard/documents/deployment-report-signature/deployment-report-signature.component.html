@@ -81,7 +81,7 @@
     <label class="mt-2 fw-light">Ort, Datum</label>
     <div class="row">
       <div class="col-sm-12 col-md-5">
-        <input type="text" class="form-control" formControlName="signatureCity" />
+        <input maxlength="30" type="text" class="form-control" formControlName="signatureCity" />
       </div>
       <div class="col-5 d-flex align-items-center">den {{ today | date }}</div>
     </div>
