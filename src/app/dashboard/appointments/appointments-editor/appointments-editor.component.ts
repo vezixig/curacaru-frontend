@@ -81,7 +81,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   private appointmentId?: UUID;
 
   private companyPrices?: CompanyPrices;
-  private existingAppointment?: Appointment;
+  existingAppointment?: Appointment;
   private nextMonth = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 2, 1);
   private postAppointmentSubscription?: Subscription;
   private updateAppointmentSubscription?: Subscription;
