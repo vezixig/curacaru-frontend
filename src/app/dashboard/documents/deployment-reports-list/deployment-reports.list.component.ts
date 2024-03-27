@@ -82,7 +82,7 @@ export class DeploymentReportsListComponent {
     this.filterModel$ = forkJoin({
       user: this.userService.user$,
       employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getMinimalCustomerList(),
+      customers: this.apiService.getMinimalCustomerListDeploymentReports(),
     });
 
     this.listModel$ = combineLatest({ queryParams: this.activeRoute.queryParams, refresh: this.$onRefresh.pipe(startWith({})) }).pipe(

@@ -74,7 +74,7 @@ export class DeploymentReportSignatureComponent {
       })
     );
 
-    this.filterModel$ = this.apiService.getMinimalCustomerList().pipe(map((customers) => ({ customers })));
+    this.filterModel$ = this.apiService.getMinimalCustomerListDeploymentReports().pipe(map((customers) => ({ customers })));
 
     this.dataModel$ = combineLatest({ filter: this.filterModel$, queryParams: this.activatedRoute.queryParams, user: this.userService.user$ }).pipe(
       tap((next) => {

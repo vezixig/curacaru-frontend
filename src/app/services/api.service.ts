@@ -131,6 +131,10 @@ export class ApiService {
     return this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal`, options);
   }
 
+  getMinimalCustomerListDeploymentReports() {
+    return this.httpClient.get<MinimalCustomerListEntry[]>(`${this.apiUrl}/customer/list/minimal-deployment-reports`);
+  }
+
   /** Gets the list of customers with only minimal info */
   getCustomerWithBudget = (customerId: UUID) => this.httpClient.get<CustomerBudget>(`${this.apiUrl}/customer/${customerId}/budget`);
 
