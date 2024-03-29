@@ -1,4 +1,4 @@
-<form (ngSubmit)="handleSave()" [formGroup]="employeeForm">
+<form (ngSubmit)="onSaveEmployee()" [formGroup]="employeeForm">
   <div class="row">
     <h4 class="h-underline">Mitarbeiter {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
 
@@ -13,8 +13,8 @@
       type="email"
     />
     } @else {
-    <Label class="fw-light">E-Mail</Label>
-    <p class="ms-3 m-0 fs-6">{{ employeeForm.get("email")?.value }}</p>
+    <Label class="fw-light">E-Mail Adresse</Label>
+    <p class="ms-3 mt-1 m-0 fs-6">{{ employeeForm.get("email")?.value }}</p>
     }
     <cura-input key="firstName" [isLoading]="isLoading" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
     <cura-input key="lastName" [isLoading]="isLoading" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
@@ -35,7 +35,7 @@
 
   <div class="row g-2 mt-2">
     <div class="col">
-      <button [disabled]="!employeeForm.valid || isLoading || isSaving" type="submit" class="form-control btn btn-primary text-white">
+      <button [disabled]="isLoading || isSaving" type="submit" class="form-control btn btn-primary text-white">
         @if (isSaving) {
         <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
         }

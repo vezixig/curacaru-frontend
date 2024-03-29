@@ -66,6 +66,7 @@ export class AppointmentsListComponent implements OnDestroy {
   faUser = faUser;
   faUserSolid = faUserAlt;
   beginOfCurrentMonth = DateTimeService.beginOfCurrentMonth;
+  DateTimeService = DateTimeService;
 
   /** properties  */
   hoveredDate: NgbDate | null = null;

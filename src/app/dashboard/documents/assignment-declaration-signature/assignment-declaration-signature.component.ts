@@ -69,6 +69,11 @@ export class AssignmentDeclarationSignatureComponent {
       distinctUntilKeyChanged('customer'),
       mergeMap((queryParams) => {
         this.documentForm.controls['customerId'].setValue(queryParams['customer'], { emitEvent: false });
+
+        if (queryParams['year'] && queryParams['year'] != this.documentForm.controls['year'].value) {
+          this.documentForm.controls['year'].setValue(queryParams['year'], { emitEvent: false });
+        }
+
         return queryParams['customer'] ? this.apiService.getCustomer(queryParams['customer']) : of(undefined);
       }),
       startWith(undefined)

@@ -53,7 +53,14 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleSave(): void {
+  onSaveEmployee(): void {
+    if (this.employeeForm.invalid) {
+      Object.keys(this.employeeForm.controls).forEach((key) => {
+        this.employeeForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
+
     const employee: Employee = {
       email: this.employeeForm.get('email')?.value,
       firstName: this.employeeForm.get('firstName')?.value,

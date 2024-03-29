@@ -9,7 +9,7 @@ import {
   NgbTimepickerModule,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject, Subscription, forkJoin, map, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
@@ -75,6 +75,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
   private readonly offcanvasService = inject(NgbOffcanvas);
   private readonly appointmentRepository = inject(AppointmentRepository);
+  private readonly activeRoute = inject(ActivatedRoute);
 
   private $onDestroy = new Subject();
 
@@ -135,7 +136,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.isNew = this.router.url.endsWith('new');
+    this.isNew = !this.activeRoute.snapshot.params['id'];
     this.isLoading = true;
 
     forkJoin({
@@ -152,11 +153,20 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             this.appointmentForm.get('employeeId')?.disable();
             this.appointmentForm.get('employeeReplacementId')?.disable();
             this.appointmentForm.get('employeeId')?.setValue(result.user.id);
+          } else if (this.activeRoute.snapshot.queryParams['employeeId']) {
+            this.appointmentForm.get('employeeId')?.setValue(this.activeRoute.snapshot.queryParams['employeeId']);
           }
 
           this.user = result.user;
           this.employees = result.employees;
           this.customers = result.customers;
+          if (this.activeRoute.snapshot.queryParams['customerId']) {
+            this.appointmentForm.get('customerId')?.setValue(this.activeRoute.snapshot.queryParams['customerId']);
+          }
+          if (this.activeRoute.snapshot.queryParams['date']) {
+            this.appointmentForm.get('date')?.setValue(DateTimeService.toNgbDate(this.activeRoute.snapshot.queryParams['date']));
+          }
+
           this.companyPrices = result.companyPrices;
         },
         complete: () => {

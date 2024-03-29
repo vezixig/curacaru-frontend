@@ -8,7 +8,18 @@
   </div>
   } @else {
 
-  <button type="button" [routerLink]="['/dashboard/appointments/new']" class="btn btn-primary text-white btn-block mb-3">Termin hinzufügen</button>
+  <button
+    type="button"
+    [routerLink]="['/dashboard/appointments/new']"
+    [queryParams]="{
+      date: DateTimeService.toDateString(fromDate!),
+      customerId: filterForm.get('customerId')?.value,
+      employeeId: filterForm.get('employeeId')?.value
+    }"
+    class="btn btn-primary text-white btn-block mb-3"
+  >
+    Termin hinzufügen
+  </button>
 
   <form [formGroup]="filterForm">
     <div class="form-group p-0">

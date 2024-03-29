@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Employee } from '../../../models/employee.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faGear, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faGear, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -24,6 +24,7 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
   faPhone = faPhone;
   faEnvelope = faEnvelope;
   faTrashCan = faTrashCan;
+  faEllipsis = faEllipsis;
   faUser = faUser;
   isLoading: boolean = true;
   employees: Employee[] = [];
