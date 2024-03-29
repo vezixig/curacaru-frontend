@@ -1,12 +1,12 @@
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Component, OnDestroy, ViewChild, inject, signal } from '@angular/core';
+import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { AsyncPipe, CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GermanDateParserFormatter } from '@curacaru/i18n/date-formatter';
 import { InputComponent } from '@curacaru/shared/input/input.component';
-import { NgbDateParserFormatter, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter, NgbDatepickerModule, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { TimeFormatPipe } from '@curacaru/pipes/time.pipe';
@@ -42,8 +42,6 @@ import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
   ],
 })
 export class TimeTrackerEditorComponent implements OnDestroy {
-  @ViewChild('signature') signatureElement!: Signature;
-
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
   private readonly formBuilder = inject(FormBuilder);
@@ -51,6 +49,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   private readonly toasterService = inject(ToastrService);
   private readonly userService = inject(UserService);
   private readonly workingTimeService = inject(WorkingTimeService);
+  private readonly offcanvasService = inject(NgbOffcanvas);
 
   private readonly user$: Observable<UserEmployee>;
   private readonly $onDestroy = new Subject();
@@ -71,6 +70,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     report: WorkingTimeReport;
     totalWorkedHours: number;
     canSign: boolean;
+    userName: string;
     hasUndoneAppointments: boolean;
   }>;
   readonly reportForm: FormGroup;
@@ -131,6 +131,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
               workTime: result.workTime,
               totalWorkedHours: result.workTime.map(this.timeDiff).reduce((acc, value) => acc + value / 60, 0),
               canSign: result.workTime.length > 0 && result.workTime.findIndex((o) => o.isDone == false) == -1,
+              userName: result.employee.firstName + ' ' + result.employee.lastName,
               hasUndoneAppointments: result.workTime.findIndex((o) => o.isDone == false) > -1,
             };
           }),
@@ -140,6 +141,10 @@ export class TimeTrackerEditorComponent implements OnDestroy {
         );
       })
     );
+  }
+
+  openOffCanvas(template: TemplateRef<any>) {
+    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
   }
 
   ngOnDestroy(): void {
@@ -158,6 +163,12 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     }
   }
 
+  onSigned($event: string) {
+    this.reportForm.get('signature')!.setValue($event);
+    this.onSave();
+    this.offcanvasService.dismiss();
+  }
+
   private buildForm(): FormGroup {
     return this.formBuilder.group({
       employeeId: ['', { Validators: Validators.required }],
@@ -174,12 +185,6 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     workingHour.timeEnd.hours * 60 + workingHour.timeEnd.minutes - (workingHour.timeStart.hours * 60 + workingHour.timeStart.minutes);
 
   public onSave() {
-    if (this.signatureElement.isEmpty()) {
-      this.toasterService.error('Bitte unterschreibe den Report');
-      return;
-    }
-
-    this.reportForm.controls['signature'].setValue(this.signatureElement.toDataURL());
     this.isSaving.set(true);
     this.workingTimeService
       .signWorkingTimeReport(this.reportForm.value)

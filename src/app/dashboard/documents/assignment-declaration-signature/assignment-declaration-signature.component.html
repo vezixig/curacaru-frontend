@@ -2,7 +2,7 @@
   <h4 class="h-underline">Abtretungserklärung erstellen</h4>
 
   @if(dataModel$ | async; as dataModel) {
-  <form [formGroup]="documentForm" class="p-0" (ngSubmit)="onSave()">
+  <form [formGroup]="documentForm" class="p-0">
     <label class="mt-2 fw-light" for="inputYear">Ausstellungsjahr der Abtretungserklärung</label>
     <input
       id="inputYear"
@@ -59,19 +59,15 @@
       <div class="col-5">den {{ today | date }}</div>
     </div>
 
-    <div class="container p-0 pe-3">
-      <div class="row">
-        <label class="mt-2 fw-light">Unterschrift des Kunden</label>
-        <div class="col-sm-auto col-md-6 col-lg-5 col-xl-4" style="position: relative">
-          <cura-signature #signature></cura-signature>
-        </div>
-      </div>
-    </div>
-
     <div class="row mt-2">
       <div class="col">
-        <button [disabled]="!documentForm.valid || isSaving()" type="submit" class="form-control btn btn-primary text-white h-100">
-          <span>Unterschrift speichern</span>
+        <button
+          [disabled]="!documentForm.valid || isSaving()"
+          (click)="openOffCanvas(signature)"
+          type="submit"
+          class="form-control btn btn-primary text-white h-100"
+        >
+          <span>Unterschrift Kunde</span>
         </button>
       </div>
       <div class="col">
@@ -90,5 +86,19 @@
     </div>
     }
   </form>
+
+  <ng-template #signature let-offcanvas>
+    <div class="offcanvas-header offcanvas-signature" style="height: 60px">
+      <h4 class="h-underline text-center w-100">Kundenunterschrift</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
+    </div>
+    <div class="offcanvas.body container" style="height: calc(100% - 70px)">
+      <cura-signature
+        #signature
+        [signatureName]="dataModel.customer?.firstName + ' ' + dataModel.customer?.lastName"
+        (signatureTaken)="onSigned($event)"
+      />
+    </div>
+  </ng-template>
   }
 </div>

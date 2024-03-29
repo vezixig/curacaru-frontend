@@ -1,5 +1,5 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Component, ViewChild, inject, signal } from '@angular/core';
+import { Component, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
@@ -12,7 +12,7 @@ import { ValidateTrue } from '@curacaru/validators/true.validator';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDatepickerModule, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, combineLatest, distinctUntilKeyChanged, filter, finalize, map, merge, mergeMap, of, startWith, tap } from 'rxjs';
 
@@ -23,8 +23,6 @@ import { Observable, combineLatest, distinctUntilKeyChanged, filter, finalize, m
   templateUrl: './assignment-declaration-signature.component.html',
 })
 export class AssignmentDeclarationSignatureComponent {
-  @ViewChild('signature') signatureElement!: Signature;
-
   faCalendar = faCalendar;
   faInfoCircle = faInfoCircle;
   insuranceStatus = InsuranceStatus;
@@ -45,6 +43,7 @@ export class AssignmentDeclarationSignatureComponent {
   private readonly router = inject(Router);
   private readonly toasterService = inject(ToastrService);
   private readonly userService = inject(UserService);
+  private readonly offCanvasService = inject(NgbOffcanvas);
 
   constructor() {
     this.documentForm = this.formBuilder.group({
@@ -88,13 +87,16 @@ export class AssignmentDeclarationSignatureComponent {
     );
   }
 
-  onSave() {
-    if (this.signatureElement.isEmpty()) {
-      this.toasterService.error('Bitte unterschreibe den Report');
-      return;
-    }
+  openOffCanvas(template: TemplateRef<any>) {
+    this.offCanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
+  }
 
-    this.documentForm.controls['signature'].setValue(this.signatureElement.toDataURL());
+  onSigned($event: string) {
+    this.documentForm.controls['signature'].setValue($event);
+    this.save();
+  }
+
+  private save() {
     this.isSaving.set(true);
     this.documentRepository
       .createAssignmentDeclaration(this.documentForm.value)
