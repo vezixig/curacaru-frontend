@@ -7,7 +7,7 @@
         </button>
 
         <img src="../assets/img/logo_text.png" alt="Logo" height="30" class="d-none d-lg-inline-block align-text-top" />
-        <img src="../assets/img/logo.svg" alt="Logo" height="30" class="mx-2 d-lg-none d-inline-block align-text-top" />
+        <img src="../assets/img/logo.svg" alt="Logo" height="30" width="30" class="mx-2 d-lg-none d-inline-block align-text-top" />
         <span class="d-none d-lg-inline-block" style="font-size: 0.5em; opacity: 0.5; margin-right: 20px">0.1</span>
       </div>
 
@@ -19,9 +19,9 @@
 
       <div class="col-auto p-0 ms-auto">
         <div ngbDropdown class="d-inline-block" display="dynamic" container="body">
-          <button type="button" class="btn btn-outline-secondary" id="buttonDropDown" ngbDropdownToggle>
+          <a type="button" class="text-secondary" id="buttonDropDown" ngbDropdownToggle>
             <fa-icon [icon]="faUser" />
-          </button>
+          </a>
           <div ngbDropdownMenu aria-labelledby="buttonDropDown">
             <button (click)="handleLogout()" ngbDropdownItem><fa-icon [icon]="faDoorOpen" [fixedWidth]="true" /> Abmelden</button>
             <div class="dropdown-divider"></div>

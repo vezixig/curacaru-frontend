@@ -190,14 +190,14 @@ export class AppointmentsListComponent implements OnDestroy {
   onDateSelection(date: NgbDate) {
     if (!this.fromDate && !this.toDate) {
       this.fromDate = date;
-    } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
+    } else if (this.fromDate && !this.toDate && date && (date.equals(this.fromDate) || date.after(this.fromDate))) {
       this.toDate = date;
     } else {
       this.toDate = undefined;
       this.fromDate = date;
     }
 
-    if (this.fromDate && this.toDate && this.toDate.after(this.fromDate)) {
+    if (this.fromDate && this.toDate && (this.toDate.equals(this.fromDate) || this.toDate.after(this.fromDate))) {
       this.filterForm.patchValue({ start: this.fromDate, end: this.toDate });
       this.router.navigate([], {
         queryParams: { from: DateTimeService.toDateString(this.fromDate), to: DateTimeService.toDateString(this.toDate) },
