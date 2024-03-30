@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
@@ -6,14 +6,18 @@ import { faCircleInfo, faGear, faHouse, faLocationDot, faPhone } from '@fortawes
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, forkJoin, takeUntil } from 'rxjs';
+import { Observable, Subject, combineLatest, forkJoin, map, takeUntil, tap } from 'rxjs';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
-import { EmployeeBasic } from '@curacaru/models';
+import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
 import { ApiService, LocationService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
+import { Store, StoreModule, provideStore } from '@ngrx/store';
+import { ChangeEmployeeFilterAction, CustomerListState, customerReducer } from '@curacaru/state/customer-list.state';
+import { state } from '@angular/animations';
+import { UUID } from 'angular2-uuid';
 
 @Component({
   imports: [FontAwesomeModule, NgxSkeletonLoaderModule, ReplacePipe, RouterModule, FormsModule, AsyncPipe],
@@ -22,7 +26,7 @@ import { AsyncPipe } from '@angular/common';
   standalone: true,
   templateUrl: './customer-list.component.html',
 })
-export class CustomerListComponent implements OnDestroy, OnInit {
+export class CustomerListComponent implements OnDestroy {
   faGear = faGear;
   faHouse = faHouse;
   faLocationDot = faLocationDot;
@@ -31,17 +35,16 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   faUser = faUser;
   faCircleInfo = faCircleInfo;
 
-  private apiService = inject(ApiService);
-  private modalService = inject(NgbModal);
-  private toastr = inject(ToastrService);
-  private userService = inject(UserService);
-  private locationService = inject(LocationService);
+  private readonly apiService = inject(ApiService);
+  private readonly modalService = inject(NgbModal);
+  private readonly toastr = inject(ToastrService);
+  private readonly userService = inject(UserService);
+  private readonly locationService = inject(LocationService);
+  private readonly store = inject(Store);
 
-  filteredCustomers: CustomerListEntry[] = [];
-  employees: EmployeeBasic[] = [];
-  selectedEmployeeId?: number = undefined;
-  isManager = this.userService.isManager$;
-  isLoading = true;
+  model$ = new Observable<{ customers: CustomerListEntry[]; employees: EmployeeBasic[]; user: UserEmployee }>();
+  isLoading = signal(false);
+  selectedEmployeeId = signal<UUID | undefined>(undefined);
 
   private $onDestroy = new Subject();
   private customers: CustomerListEntry[] = [];
@@ -51,38 +54,32 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     this.$onDestroy.complete();
   }
 
-  ngOnInit(): void {
-    this.isLoading = true;
+  constructor() {
+    this.isLoading.set(true);
 
-    forkJoin({
+    this.model$ = combineLatest({
       customers: this.apiService.getCustomerList(),
       employees: this.apiService.getEmployeeBaseList(),
-    })
-      .pipe(takeUntil(this.$onDestroy))
-      .subscribe({
-        next: (result) => {
-          this.employees = result.employees;
-          this.customers = result.customers;
-        },
-        complete: () => {
-          this.filterCustomers();
-          this.isLoading = false;
-        },
-        error: (error) => this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`),
-      });
+      state: this.store,
+      user: this.userService.user$,
+    }).pipe(
+      tap((result) => (result.state.customerList.employeeId != '' ? this.selectedEmployeeId.set(result.state.customerList.employeeId) : '')),
+      map((result) => ({
+        customers: result.customers.filter(
+          (o) => !result.state.customerList.employeeId || o.associatedEmployeeId == result.state.customerList.employeeId
+        ),
+        employees: result.employees,
+        user: result.user,
+      }))
+    );
   }
 
-  onCustomerAddressClick = (customer: CustomerListEntry) =>
+  onCustomerAddressClick(customer: CustomerListEntry) {
     this.locationService.openLocationLink(`${customer.street} ${customer.zipCode} ${customer.city}`);
+  }
 
-  onSelectionChanged = () => this.filterCustomers();
-
-  private filterCustomers() {
-    if (this.selectedEmployeeId) {
-      this.filteredCustomers = this.customers.filter((e) => e.associatedEmployeeId === this.selectedEmployeeId);
-    } else {
-      this.filteredCustomers = this.customers;
-    }
+  onSelectionChanged() {
+    this.store.dispatch(ChangeEmployeeFilterAction({ employeeId: this.selectedEmployeeId() == '' ? undefined : this.selectedEmployeeId() }));
   }
 
   handleDelete(customer: CustomerListEntry) {
@@ -100,9 +97,11 @@ export class CustomerListComponent implements OnDestroy, OnInit {
         complete: () => {
           this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
           this.customers = this.customers.filter((e) => e.id !== customer.id);
-          this.filterCustomers();
         },
         error: (error) => this.toastr.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
       });
   }
+}
+function provideEffects(appEffects: any): readonly any[] | import('@angular/core').Type<any> {
+  throw new Error('Function not implemented.');
 }

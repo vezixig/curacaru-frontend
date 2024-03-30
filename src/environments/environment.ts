@@ -11,4 +11,5 @@ export const environment = {
       serverUrl: 'https://localhost:7077',
     },
   },
+  production: false,
 };

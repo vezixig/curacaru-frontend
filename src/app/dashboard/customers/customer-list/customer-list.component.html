@@ -1,20 +1,19 @@
 <div class="row">
-  @if (isManager|async) {
-  <h4>Kundenliste</h4>
+  @if(model$ | async; as model) {
+  <h4 [class.h-underline]="!model.user.isManager">Kundenliste</h4>
+
+  @if (model.user.isManager) {
   <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block mb-3">Kunden hinzufügen</Button>
 
-  <!-- employee filter -->
   <div class="form-group p-0">
     <label for="dpFromDate">Mitarbeiter</label>
     <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
       <option></option>
-      @for (employee of employees; track employee) {
+      @for (employee of model.employees; track employee) {
       <option [value]="employee.id">{{ employee.name }}</option>
       }
     </select>
   </div>
-  } @else {
-  <h4 class="h-underline">Kundenliste</h4>
   }
 
   <table class="d-none d-md-table table table-striped">
@@ -30,17 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      @if (isLoading) { @for (_ of [].constructor(3); track _) {
-      <tr>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td></td>
-      </tr>
-      } } @for (customer of filteredCustomers; track customer) {
+      @for (customer of model.customers; track customer) {
       <tr>
         <td>{{ customer.firstName }}</td>
         <td>{{ customer.lastName }}</td>
@@ -58,7 +47,7 @@
             >
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
-            @if (isManager | async) {
+            @if (model.user.isManager) {
             <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </button>
@@ -72,7 +61,7 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (customer of filteredCustomers; track customer) {
+    @for (customer of model.customers; track customer) {
     <div class="card my-3">
       <div class="card-header d-flex">
         <span class="lead text-truncate">{{ customer.firstName }} {{ customer.lastName }}</span>
@@ -94,7 +83,7 @@
           >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
-          @if (isManager | async) {
+          @if (model.user.isManager) {
           <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </button>
@@ -114,7 +103,12 @@
     }
   </div>
 
-  @if (filteredCustomers.length == 0) {
+  @if (model.customers.length == 0) {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Kunden gefunden.</div>
+  } } @else {
+  <h4 class="h-underline">Kundenliste</h4>
+  <ngx-skeleton-loader />
+  <ngx-skeleton-loader />
+  <ngx-skeleton-loader />
   }
 </div>

@@ -63,3 +63,17 @@ main {
 .text-muted {
   opacity: 0.6 !important;
 }
+
+.signature-panel {
+  height: min(100vh, 350px) !important;
+  margin: auto;
+}
+
+.offcanvas-signature {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  -moz-user-select: -moz-none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

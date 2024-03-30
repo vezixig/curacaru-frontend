@@ -45,7 +45,6 @@ import { AppointmentRepository } from '@curacaru/services/repositories/appointme
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   standalone: true,
   templateUrl: './appointments-editor.component.html',
-  styleUrls: ['./appointments-editor.component.scss'],
 })
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;

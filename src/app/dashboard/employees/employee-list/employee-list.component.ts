@@ -1,16 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ApiService } from '../../../services/api.service';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Employee } from '../../../models/employee.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEllipsis, faGear, faPhone } from '@fortawesome/free-solid-svg-icons';
-import { faEnvelope, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
-import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
-import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
-import { ApiService } from '../../../services/api.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
+import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { faEllipsis, faGear, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   imports: [FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule, ReplacePipe],
@@ -32,7 +32,9 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
   private deleteEmployeeSubscription?: Subscription;
   private getEmployeeListSubscription?: Subscription;
 
-  constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService) {}
+  private readonly apiService = inject(ApiService);
+  private readonly modalService = inject(NgbModal);
+  private readonly toastrService = inject(ToastrService);
 
   ngOnDestroy(): void {
     this.getEmployeeListSubscription?.unsubscribe();
@@ -47,7 +49,7 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
+        this.toastrService.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
         this.isLoading = false;
       },
     });
@@ -65,10 +67,10 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
 
     this.deleteEmployeeSubscription = this.apiService.deleteEmployee(employee.id).subscribe({
       complete: () => {
-        this.toastr.success(`${employee.firstName} ${employee.lastName} wurde gelöscht.`);
+        this.toastrService.success(`${employee.firstName} ${employee.lastName} wurde gelöscht.`);
         this.employees = this.employees.filter((e) => e.id !== employee.id);
       },
-      error: (error) => this.toastr.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
+      error: (error) => this.toastrService.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
     });
   }
 }

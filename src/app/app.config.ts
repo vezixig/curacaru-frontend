@@ -7,6 +7,9 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { ManagerGuard } from './guards/manger.guard';
+import { provideStore } from '@ngrx/store';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { appStore } from './state/app.store';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,5 +39,10 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAnimations(),
     provideToastr(),
+    provideStore(appStore),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: environment.production,
+    }),
   ],
 };
