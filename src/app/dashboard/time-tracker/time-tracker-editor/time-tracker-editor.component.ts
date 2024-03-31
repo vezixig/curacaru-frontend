@@ -70,6 +70,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     report: WorkingTimeReport;
     totalWorkedHours: number;
     canSign: boolean;
+    employeeName: string;
     userName: string;
     hasUndoneAppointments: boolean;
   }>;
@@ -97,8 +98,9 @@ export class TimeTrackerEditorComponent implements OnDestroy {
         this.isNew.set(!result.queryParams['employeeId']);
         this.isLoadingWorkingHours.set(true);
         this.isManager.set(result.user.isManager);
+        return result.user;
       }),
-      mergeMap(() => {
+      mergeMap((next) => {
         // get the worked hours
         const workTime$ = this.workingTimeService
           .getWorkTime(this.reportForm.get('employeeId')!.value, this.reportForm.get('month')!.value, this.reportForm.get('year')!.value)
@@ -131,7 +133,8 @@ export class TimeTrackerEditorComponent implements OnDestroy {
               workTime: result.workTime,
               totalWorkedHours: result.workTime.map(this.timeDiff).reduce((acc, value) => acc + value / 60, 0),
               canSign: result.workTime.length > 0 && result.workTime.findIndex((o) => o.isDone == false) == -1,
-              userName: result.employee.firstName + ' ' + result.employee.lastName,
+              employeeName: result.employee.firstName + ' ' + result.employee.lastName,
+              userName: next.firstName,
               hasUndoneAppointments: result.workTime.findIndex((o) => o.isDone == false) > -1,
             };
           }),

@@ -72,7 +72,8 @@ export class DateTimeService {
    * @param date The date to get the start and end of the week from.
    * @returns The start and end date of the week of the given date.
    */
-  static getStartAndEndOfWeek(date: Date) {
+  static getStartAndEndOfWeek(date?: Date) {
+    date ??= new Date();
     const dayOfWeek = date.getDay();
     const startOfWeek = new Date(date);
     startOfWeek.setDate(date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));

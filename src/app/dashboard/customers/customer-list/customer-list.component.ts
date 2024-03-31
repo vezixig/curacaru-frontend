@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
@@ -6,7 +6,7 @@ import { faCircleInfo, faGear, faHouse, faLocationDot, faPhone } from '@fortawes
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, forkJoin, map, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, combineLatest, map, takeUntil, tap } from 'rxjs';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
@@ -14,9 +14,8 @@ import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
 import { ApiService, LocationService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
-import { Store, StoreModule, provideStore } from '@ngrx/store';
-import { ChangeEmployeeFilterAction, CustomerListState, customerReducer } from '@curacaru/state/customer-list.state';
-import { state } from '@angular/animations';
+import { Store } from '@ngrx/store';
+import { ChangeEmployeeFilterAction } from '@curacaru/state/customer-list.state';
 import { UUID } from 'angular2-uuid';
 
 @Component({

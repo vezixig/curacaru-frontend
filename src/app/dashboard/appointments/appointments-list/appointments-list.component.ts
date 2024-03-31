@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCheck, faCircleInfo, faFileSignature, faGear, faHouse, faLocationDot, faPhone, faUserAlt } from '@fortawesome/free-solid-svg-icons';
@@ -19,6 +19,8 @@ import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
 import { UserEmployee } from '@curacaru/models';
 import { NgbDatePipe } from '@curacaru/pipes/ngb-date-pipe';
+import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
+import { Store } from '@ngrx/store';
 
 @Component({
   imports: [
@@ -45,15 +47,16 @@ export class AppointmentsListComponent implements OnDestroy {
   public readonly formatter = inject(NgbDateParserFormatter);
   private readonly apiService = inject(ApiService);
   private readonly calendar = inject(NgbCalendar);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly locationService = inject(LocationService);
   private readonly modalService = inject(NgbModal);
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly router = inject(Router);
-  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly store = inject(Store<AppointmentListState>);
 
   /** relays  */
+  DateTimeService = DateTimeService;
+  beginOfCurrentMonth = DateTimeService.beginOfCurrentMonth;
   faCalendar = faCalendar;
   faCheck = faCheck;
   faCircleInfo = faCircleInfo;
@@ -65,13 +68,10 @@ export class AppointmentsListComponent implements OnDestroy {
   faTrashCan = faTrashCan;
   faUser = faUser;
   faUserSolid = faUserAlt;
-  beginOfCurrentMonth = DateTimeService.beginOfCurrentMonth;
-  DateTimeService = DateTimeService;
 
   /** properties  */
   hoveredDate: NgbDate | null = null;
   isLoading = true;
-
   isCollapsed = true;
   today = new Date();
   fromDate?: NgbDate;
@@ -124,39 +124,40 @@ export class AppointmentsListComponent implements OnDestroy {
       .get('employeeId')!
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
-        this.router.navigate([], { queryParams: { employeeId: next == '' ? undefined : next }, queryParamsHandling: 'merge' });
+        this.store.dispatch(AppointmentListActions.changeEmployeeFilter({ employeeId: next }));
       });
     this.filterForm
       .get('customerId')!
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
-        this.router.navigate([], { queryParams: { customerId: next == '' ? undefined : next }, queryParamsHandling: 'merge' });
+        console.log(next);
+        this.store.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: next }));
       });
 
     // Data Model
     this.dataModel$ = combineLatest({
-      queryParams: this.activatedRoute.queryParams,
       filter: this.filterModel$,
+      state: this.store,
       refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
       tap(() => (this.isLoading = true)),
       switchMap((next) => {
-        if (next.queryParams['from'] && next.queryParams['from'] != this.filterForm.get('start')?.value) {
-          this.filterForm.patchValue({ start: DateTimeService.toNgbDate(next.queryParams['from']) }, { emitEvent: false });
-          this.fromDate = DateTimeService.toNgbDate(next.queryParams['from']);
+        if (next.state.appointmentList.dateStart != this.filterForm.get('start')?.value) {
+          this.filterForm.patchValue({ start: next.state.appointmentList.dateStart }, { emitEvent: false });
+          this.fromDate = next.state.appointmentList.dateStart;
         }
 
-        if (next.queryParams['to'] && next.queryParams['to'] != this.filterForm.get('end')?.value) {
-          this.filterForm.patchValue({ end: DateTimeService.toNgbDate(next.queryParams['to']) }, { emitEvent: false });
-          this.toDate = DateTimeService.toNgbDate(next.queryParams['to']);
+        if (next.state.appointmentList.dateEnd != this.filterForm.get('end')?.value) {
+          this.filterForm.patchValue({ end: next.state.appointmentList.dateEnd }, { emitEvent: false });
+          this.toDate = next.state.appointmentList.dateEnd;
         }
 
-        if (next.queryParams['customerId'] != this.filterForm.get('customerId')?.value) {
-          this.filterForm.patchValue({ customerId: next.queryParams['customerId'] }, { emitEvent: false });
+        if (next.filter.user.isManager && next.state.appointmentList.employeeId != this.filterForm.get('employeeId')?.value) {
+          this.filterForm.patchValue({ employeeId: next.state.appointmentList.employeeId }, { emitEvent: false });
         }
 
-        if (next.filter.user.isManager && next.queryParams['employeeId'] != this.filterForm.get('employeeId')?.value) {
-          this.filterForm.patchValue({ employeeId: next.queryParams['employeeId'] }, { emitEvent: false });
+        if (next.state.appointmentList.customerId != this.filterForm.get('customerId')?.value) {
+          this.filterForm.patchValue({ customerId: next.state.appointmentList.customerId }, { emitEvent: false });
         }
 
         return this.apiService
@@ -200,11 +201,7 @@ export class AppointmentsListComponent implements OnDestroy {
 
     if (this.fromDate && this.toDate && (this.toDate.equals(this.fromDate) || this.toDate.after(this.fromDate))) {
       this.filterForm.patchValue({ start: this.fromDate, end: this.toDate });
-      this.router.navigate([], {
-        queryParams: { from: DateTimeService.toDateString(this.fromDate), to: DateTimeService.toDateString(this.toDate) },
-        queryParamsHandling: 'merge',
-        replaceUrl: true,
-      });
+      this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: this.fromDate, dateEnd: this.toDate }));
     }
   }
 

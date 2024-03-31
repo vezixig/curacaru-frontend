@@ -84,8 +84,8 @@
 
     @if (filterModel.user.isManager) {
     <div class="form-group p-0">
-      <label for="dpFromDate">Mitarbeiter</label>
-      <select class="form-select" name="employeeSelect" formControlName="employeeId">
+      <label for="selectEmployee">Mitarbeiter</label>
+      <select id="selectEmployee" class="form-select" name="employeeSelect" formControlName="employeeId">
         <option></option>
         @for (employee of filterModel.employees; track employee) {
         <option [value]="employee.id">{{ employee.name }}</option>

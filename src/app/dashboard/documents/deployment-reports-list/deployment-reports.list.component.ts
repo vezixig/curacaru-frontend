@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { DeploymentReportListEntry } from '@curacaru/models/deployment-report-list.entry.model';
@@ -12,10 +12,12 @@ import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 import { DateTimeService, UserService } from '@curacaru/services';
 import { ApiService } from '@curacaru/services/api.service';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
+import { DeploymentReportChangeFilterAction } from '@curacaru/state/deployment-report-list.state';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faCoins, faDownload, faGear, faPersonCane, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin, map, startWith, switchMap } from 'rxjs';
@@ -39,24 +41,23 @@ import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeploymentReportsListComponent {
-  private readonly activeRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
+  private readonly clearanceTypeNamePipe = inject(ClearanceTypeNamePipe);
   private readonly documentRepository = inject(DocumentRepository);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly modalService = inject(NgbModal);
+  private readonly monthNamePipe = inject(MonthNamePipe);
+  private readonly store = inject(Store);
   private readonly toastrService = inject(ToastrService);
   private readonly userService = inject(UserService);
-  private readonly router = inject(Router);
-  private readonly modalService = inject(NgbModal);
-  private readonly MonthNamePipe = inject(MonthNamePipe);
-  private readonly ClearanceTypeNamePipe = inject(ClearanceTypeNamePipe);
 
   faCalendar = faCalendar;
   faCircleInfo = faCircleInfo;
   faCoins = faCoins;
   faDownload = faDownload;
-  faTrashCan = faTrashCan;
   faGear = faGear;
   faPersonCane = faPersonCane;
+  faTrashCan = faTrashCan;
   faUser = faUser;
   faUserAlt = faUserAlt;
   months = DateTimeService.months;
@@ -85,13 +86,13 @@ export class DeploymentReportsListComponent {
       customers: this.apiService.getMinimalCustomerListDeploymentReports(),
     });
 
-    this.listModel$ = combineLatest({ queryParams: this.activeRoute.queryParams, refresh: this.$onRefresh.pipe(startWith({})) }).pipe(
-      map(({ queryParams }) => {
+    this.listModel$ = combineLatest({ state: this.store, refresh: this.$onRefresh.pipe(startWith({})) }).pipe(
+      map(({ state }) => {
         const queryFilter = {
-          year: queryParams['year'] || new Date().getFullYear(),
-          month: queryParams['month'] || new Date().getMonth() + 1,
-          employeeId: queryParams['employee'] || undefined,
-          customerId: queryParams['customer'] || undefined,
+          year: state.deploymentReportList.year,
+          month: state.deploymentReportList.month,
+          employeeId: state.deploymentReportList.employeeId,
+          customerId: state.deploymentReportList.customerId,
         };
         this.filterForm.patchValue(queryFilter, { emitEvent: false });
         return queryFilter;
@@ -108,15 +109,7 @@ export class DeploymentReportsListComponent {
     );
 
     this.filterForm.valueChanges.subscribe(() => {
-      this.router.navigate([], {
-        queryParams: {
-          year: this.filterForm.controls['year'].value,
-          month: this.filterForm.controls['month'].value,
-          employee: this.filterForm.controls['employeeId'].value == '' ? undefined : this.filterForm.controls['employeeId'].value,
-          customer: this.filterForm.controls['customerId'].value == '' ? undefined : this.filterForm.controls['customerId'].value,
-        },
-        queryParamsHandling: 'merge',
-      });
+      this.store.dispatch(DeploymentReportChangeFilterAction(this.filterForm.value));
     });
   }
 
@@ -140,9 +133,9 @@ export class DeploymentReportsListComponent {
     const modalRef = this.modalService.open(NgbdModalConfirm);
     modalRef.result.then(() => this.deleteReport(report));
     modalRef.componentInstance.title = 'Einsatznachweis löschen';
-    modalRef.componentInstance.text = `Soll der Einsatznachweis ${this.ClearanceTypeNamePipe.transform(report.clearanceType)} von ${
+    modalRef.componentInstance.text = `Soll der Einsatznachweis ${this.clearanceTypeNamePipe.transform(report.clearanceType)} von ${
       report.customerName
-    } für ${this.MonthNamePipe.transform(report.month)} ${report.year} wirklich gelöscht werden?`;
+    } für ${this.monthNamePipe.transform(report.month)} ${report.year} wirklich gelöscht werden?`;
   }
 
   private deleteReport(report: DeploymentReportListEntry) {

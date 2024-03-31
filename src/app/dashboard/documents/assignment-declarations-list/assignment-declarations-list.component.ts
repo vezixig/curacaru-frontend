@@ -1,19 +1,21 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { EmployeeBasic, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { AssignmentDeclarationListEntry } from '@curacaru/models/assignment-declaration-list-entry.model';
 import { ApiService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
+import { AssignmentDeclarationListChangeFilterAction } from '@curacaru/state/assignment-declaration-list.state';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faDownload, faGear } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, catchError, combineLatest, debounceTime, finalize, forkJoin, map, startWith, switchMap } from 'rxjs';
+import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin, map, startWith, switchMap, takeUntil } from 'rxjs';
 
 @Component({
   templateUrl: './assignment-declarations-list.component.html',
@@ -21,7 +23,7 @@ import { Observable, Subject, catchError, combineLatest, debounceTime, finalize,
   selector: 'cura-assignment-declarations',
   standalone: true,
 })
-export class AssignmentDeclarationsListComponent {
+export class AssignmentDeclarationsListComponent implements OnDestroy {
   faCalendar = faCalendar;
   faCircleInfo = faCircleInfo;
   faDownload = faDownload;
@@ -39,15 +41,17 @@ export class AssignmentDeclarationsListComponent {
   readonly isLoading = signal(false);
 
   private readonly $onRefresh = new Subject();
-  private readonly onRefresh$ = this.$onRefresh.asObservable();
-  private readonly activeRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
   private readonly documentRepository = inject(DocumentRepository);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly modalService = inject(NgbModal);
+  private readonly onRefresh$ = this.$onRefresh.asObservable();
   private readonly router = inject(Router);
+  private readonly store = inject(Store);
   private readonly toastrService = inject(ToastrService);
   private readonly userService = inject(UserService);
-  private readonly modalService = inject(NgbModal);
+
+  private destroyed$ = new Subject();
 
   constructor() {
     this.filterForm = this.formBuilder.group({
@@ -56,9 +60,9 @@ export class AssignmentDeclarationsListComponent {
       customerId: [undefined],
     });
 
-    this.filterForm.controls['year'].valueChanges.subscribe((year) => this.onSelectedYearChange(year));
-    this.filterForm.controls['customerId'].valueChanges.subscribe((customerId) => this.onSelectedCustomerChange(customerId));
-    this.filterForm.controls['employeeId'].valueChanges.subscribe((employeeId) => this.onSelectedEmployeeChange(employeeId));
+    this.filterForm.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe((filter) => {
+      this.store.dispatch(AssignmentDeclarationListChangeFilterAction(filter));
+    });
 
     this.filterModel$ = forkJoin({
       user: this.userService.user$,
@@ -66,12 +70,12 @@ export class AssignmentDeclarationsListComponent {
       customers: this.apiService.getMinimalCustomerList(InsuranceStatus.Statutory),
     });
 
-    this.listModel$ = combineLatest({ _: this.onRefresh$.pipe(startWith(null)), queryParams: this.activeRoute.queryParams }).pipe(
-      map(({ queryParams }) => {
+    this.listModel$ = combineLatest({ _: this.onRefresh$.pipe(startWith(null)), state: this.store }).pipe(
+      map(({ state }) => {
         const queryFilter = {
-          year: queryParams['year'] || new Date().getFullYear(),
-          employeeId: queryParams['employee'] || undefined,
-          customerId: queryParams['customer'] || undefined,
+          year: state.assignmentDeclarationList.year,
+          employeeId: state.assignmentDeclarationList.employeeId,
+          customerId: state.assignmentDeclarationList.customerId,
         };
         this.filterForm.patchValue(queryFilter, { emitEvent: false });
         return queryFilter;
@@ -86,6 +90,10 @@ export class AssignmentDeclarationsListComponent {
         )
       )
     );
+  }
+  ngOnDestroy(): void {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 
   onDeleteAssignmentDeclaration(declaration: AssignmentDeclarationListEntry) {

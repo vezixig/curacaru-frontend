@@ -9,7 +9,7 @@ import { provideToastr } from 'ngx-toastr';
 import { ManagerGuard } from './guards/manger.guard';
 import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { appStore } from './state/app.store';
+import { appStore } from './app.store';
 
 export const appConfig: ApplicationConfig = {
   providers: [

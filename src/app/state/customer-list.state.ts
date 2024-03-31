@@ -1,4 +1,4 @@
-import { Action, ActionReducer, createAction, createReducer, on, props } from '@ngrx/store';
+import { createAction, createReducer, on, props } from '@ngrx/store';
 import { UUID } from 'angular2-uuid';
 
 export interface CustomerListState {
