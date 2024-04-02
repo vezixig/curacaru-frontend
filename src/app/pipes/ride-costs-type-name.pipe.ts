@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, type PipeTransform } from '@angular/core';
 import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
 
 @Pipe({
@@ -11,7 +11,7 @@ export class RideCostsTypeNamePipe implements PipeTransform {
       case RideCostsType.Inclusive:
         return 'Inklusive';
       case RideCostsType.FlatRate:
-        return 'je Einsatz (pauschale)';
+        return 'je Einsatz (Pauschale)';
       case RideCostsType.Kilometer:
         return 'je Kilometer';
       case RideCostsType.None:

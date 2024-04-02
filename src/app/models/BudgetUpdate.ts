@@ -1,4 +1,4 @@
-import { UUID } from 'angular2-uuid';
+import { type UUID } from 'angular2-uuid';
 
 export interface BudgetUpdate {
   id: UUID;

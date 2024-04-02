@@ -11,14 +11,16 @@
       <div class="card mx-auto text-danger" style="width: 20rem">
         <div class="card-header bg-danger text-white">Fehler</div>
         <div class="card-body">
-          <p style="text-align: center">Ein unerwarteter Fehler ist aufgetreten: {{ error.status }} {{ error.statusText }}</p>
+          <p style="text-align: center">Ein unerwarteter Fehler ist aufgetreten: {{ error.status }} {{ error.statusText
+            }}</p>
         </div>
       </div>
       }
     </div>
   </div>
 </div>
-} @if (hasCompany) {
+}
+@if (hasCompany) {
 <div class="bg-white">
   <cura-topbar />
   <main style="height: calc(100dvh - 60px)">
@@ -32,6 +34,8 @@
     </div>
   </main>
 </div>
-} @else { @if (!isLoading) {
+}
+@else { @if (!isLoading) {
 <cura-signup style="height: 100vh" (signUpCompleted)="handleSignUpCompleted()"></cura-signup>
-} }
+}
+}

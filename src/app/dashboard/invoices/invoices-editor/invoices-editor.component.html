@@ -54,37 +54,70 @@
       />
     </div>
 
+    @if(model.deploymentReport != null) {
+
     <label class="mt-2 fw-light">Stunden (gesamt), Stundenlohn Unternehmen, Zwischensumme</label>
     <p class="ms-2 mt-1 m-0 fs-6">
-      5.50 h x 48,00 € =
-      <span style="text-decoration-line: underline; text-decoration-style: single">264,00 €</span>
+      {{ totalDuration() | number : "1.2-2" }} h x {{ model.company.pricePerHour | currency }} =
+      <span style="text-decoration-line: underline; text-decoration-style: single">{{
+        totalDuration() * model.company.pricePerHour | currency
+      }}</span>
     </p>
-    <label class="mt-2 fw-light">Anfahrtskosten {{ model.company.rideCostsType | rideCostsTypeName }}</label>
 
+    <label class="mt-2 fw-light">Anfahrtskosten {{ model.company.rideCostsType | rideCostsTypeName }}</label>
     <p class="ms-2 mt-1 m-0 fs-6">
-      @if(model.company.rideCostsType == rideCostsType.Inclusive || model.company.rideCostsType == rideCostsType.None) { - } 
-      @else if(model.company.rideCostsType == rideCostsType.FlatRate) {
-      {{ model.deploymentReport.times.length }} Einsätze x {{ model.company.rideCosts }} € =
-      <!-- <span style="text-decoration-line: underline; text-decoration-style: single">125,00 €</span> -->
+      @if(model.company.rideCostsType == rideCostsType.Inclusive || model.company.rideCostsType == rideCostsType.None) { - }
+      <!--- ride costs per appointment -->
+      @if(model.company.rideCostsType == rideCostsType.FlatRate) {
+      {{ model.deploymentReport.times.length }} {{ model.deploymentReport.times.length === 1 ? "Einsatz" : "Einsätze" }} x
+      {{ model.company.rideCosts | currency }} =
+      <span style="text-decoration-line: underline; text-decoration-style: single">{{ rideCosts() | currency }}</span>
+      }
+      <!--- ride costs per km -->
+      @if(model.company.rideCostsType == rideCostsType.Kilometer) {
+      {{ totalDistance() | number : "1.2-2" }} km x {{ model.company.rideCosts | currency }} =
+      <span style="text-decoration-line: underline; text-decoration-style: single">{{ rideCosts() | currency }}</span>
       }
     </p>
     <label class="mt-2 fw-light">Rechnungsbetrag</label>
-    <p style="text-decoration-line: underline; text-decoration-style: double" class="ms-2 mt-1 m-0 fs-5">389,00 €</p>
+    <p style="text-decoration-line: underline; text-decoration-style: double" class="ms-2 mt-1 m-0 fs-5">
+      {{ rideCosts() + totalDuration() * model.company.pricePerHour | currency }}
+    </p>
 
     <div class="row g-2 mt-3">
       <div class="col">
-        <button class="form-control btn btn-outline-primary" type="button">
-          <span>Unterschrift Mitarbeiter</span>
-        </button>
+        <button class="form-control btn btn-outline-primary" type="button" (click)="openOffCanvas(signature)">Unterschrift Mitarbeiter</button>
       </div>
 
       <div class="col">
-        <button type="submit" class="form-control btn btn-primary text-white">Rechnung erstellen</button>
+        <button type="submit" [disabled]="invoiceForm.invalid" class="form-control btn btn-primary text-white">Rechnung erstellen</button>
       </div>
       <div class="col">
         <button type="button" routerLink=".." class="form-control btn btn-outline-secondary">Verwerfen</button>
       </div>
     </div>
+
+    <ng-template #signature let-offcanvas>
+      <div class="offcanvas-header offcanvas-signature" style="height: 60px">
+        <h4 class="h-underline text-center w-100">Managerunterschrift</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
+      </div>
+      <div class="offcanvas.body container" style="height: calc(100% - 70px)">
+        <cura-signature
+          #signature
+          [signatureName]="model.user.firstName + ' ' + model.user.lastName"
+          (signatureTaken)="onSigned($event)"
+        ></cura-signature>
+      </div>
+    </ng-template>
+
+    } @else {
+    <div class="row m-1">
+      <div class="alert alert-secondary mt-3" role="alert">
+        <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat und Abrechnungsoption wurde kein Einsatznachweis erstellt.
+      </div>
+    </div>
+    }
   </form>
   }
 </div>

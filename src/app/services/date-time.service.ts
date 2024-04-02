@@ -30,6 +30,10 @@ export class DateTimeService {
     return date ? `${date.year}-${date.month.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}` : '';
   }
 
+  static toStringFromDate(data: Date): string {
+    return `${data.getFullYear()}-${(data.getMonth() + 1).toString().padStart(2, '0')}-${data.getDate().toString().padStart(2, '0')}`;
+  }
+
   static toDate(date: NgbDate | null): Date {
     return date ? new Date(date.year, date.month - 1, date.day, 12) : new Date();
   }
