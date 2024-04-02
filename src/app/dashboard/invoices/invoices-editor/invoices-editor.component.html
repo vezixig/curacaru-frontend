@@ -1,0 +1,90 @@
+<div class="row">
+  <h4 class="h-underline">Rechnung erstellen</h4>
+
+  @if(model$ | async; as model) {
+
+  <form [formGroup]="invoiceForm" class="p-0" (ngSubmit)="onSave()">
+    <label class="mt-2 fw-light" for="inputYear">Jahr und Monat der Leistungserbringung</label>
+    <div class="input-group">
+      <input
+        id="inputYear"
+        class="form-control"
+        type="number"
+        formControlName="year"
+        [ngClass]="{ 'is-invalid': invoiceForm.controls['year'].invalid }"
+      />
+      <select id="selectMonth" class="form-control" formControlName="month">
+        @for (month of months; track month) {
+        <option [value]="month.value">{{ month.name }}</option>
+        }
+      </select>
+    </div>
+
+    <label for="selectCustomer" class="mt-2 fw-light">Kunde</label>
+    <select id="selectCustomer" class="form-select" formControlName="customerId">
+      <option></option>
+      @for (customer of model.customers; track customer) {
+      <option [value]="customer.customerId">{{ customer.customerName }}</option>
+      }
+    </select>
+
+    <label for="selectClearanceType" class="mt-2 fw-light">Abrechnungsoption</label>
+    <select id="selectClearanceType" class="form-select" formControlName="clearanceType">
+      <option value="3">Selbstzahler</option>
+      <option value="0">Entlastungsbetrag §45b SGB XI</option>
+      <option value="1">..% Pflegesachleistungen §36 SGB XI (max. 40%)</option>
+      <option value="2">Verhinderungspflege § 39 SGB XI</option>
+    </select>
+
+    <label for="inputInvoiceNumber" class="mt-2 fw-light">Rechnungsnummer und Datum</label>
+    <div class="input-group">
+      <input
+        id="inputInvoiceNumber"
+        class="form-control"
+        type="text"
+        formControlName="invoiceNumber"
+        [ngClass]="{ 'is-invalid': invoiceForm.controls['invoiceNumber'].invalid }"
+      />
+      <input
+        id="inputInvoiceDate"
+        class="form-control"
+        type="date"
+        formControlName="invoiceDate"
+        [ngClass]="{ 'is-invalid': invoiceForm.controls['invoiceDate'].invalid }"
+      />
+    </div>
+
+    <label class="mt-2 fw-light">Stunden (gesamt), Stundenlohn Unternehmen, Zwischensumme</label>
+    <p class="ms-2 mt-1 m-0 fs-6">
+      5.50 h x 48,00 € =
+      <span style="text-decoration-line: underline; text-decoration-style: single">264,00 €</span>
+    </p>
+    <label class="mt-2 fw-light">Anfahrtskosten {{ model.company.rideCostsType | rideCostsTypeName }}</label>
+
+    <p class="ms-2 mt-1 m-0 fs-6">
+      @if(model.company.rideCostsType == rideCostsType.Inclusive || model.company.rideCostsType == rideCostsType.None) { - } 
+      @else if(model.company.rideCostsType == rideCostsType.FlatRate) {
+      {{ model.deploymentReport.times.length }} Einsätze x {{ model.company.rideCosts }} € =
+      <!-- <span style="text-decoration-line: underline; text-decoration-style: single">125,00 €</span> -->
+      }
+    </p>
+    <label class="mt-2 fw-light">Rechnungsbetrag</label>
+    <p style="text-decoration-line: underline; text-decoration-style: double" class="ms-2 mt-1 m-0 fs-5">389,00 €</p>
+
+    <div class="row g-2 mt-3">
+      <div class="col">
+        <button class="form-control btn btn-outline-primary" type="button">
+          <span>Unterschrift Mitarbeiter</span>
+        </button>
+      </div>
+
+      <div class="col">
+        <button type="submit" class="form-control btn btn-primary text-white">Rechnung erstellen</button>
+      </div>
+      <div class="col">
+        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary">Verwerfen</button>
+      </div>
+    </div>
+  </form>
+  }
+</div>

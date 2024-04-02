@@ -101,6 +101,3 @@ export class CustomerListComponent implements OnDestroy {
       });
   }
 }
-function provideEffects(appEffects: any): readonly any[] | import('@angular/core').Type<any> {
-  throw new Error('Function not implemented.');
-}
