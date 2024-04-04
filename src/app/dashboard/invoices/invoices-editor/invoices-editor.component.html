@@ -54,8 +54,7 @@
       />
     </div>
 
-    @if(model.deploymentReport != null) {
-
+    @if(model.deploymentReport != null) { @if( model.deploymentReport.hasInvoice == false) {
     <label class="mt-2 fw-light">Stunden (gesamt), Stundenlohn Unternehmen, Zwischensumme</label>
     <p class="ms-2 mt-1 m-0 fs-6">
       {{ totalDuration() | number : "1.2-2" }} h x {{ model.company.pricePerHour | currency }} =
@@ -110,8 +109,13 @@
         ></cura-signature>
       </div>
     </ng-template>
-
     } @else {
+    <div class="row m-1">
+      <div class="alert alert-warning mt-3" role="alert">
+        <fa-icon [icon]="faCircleExclamation" [fixedWidth]="true" /> Die Rechnung für diesen Einsatznachweis wurde bereits erstellt.
+      </div>
+    </div>
+    } } @if(model.deploymentReport === null) {
     <div class="row m-1">
       <div class="alert alert-secondary mt-3" role="alert">
         <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat und Abrechnungsoption wurde kein Einsatznachweis erstellt.

@@ -1,7 +1,7 @@
 import { CommonModule, formatDate } from '@angular/common';
 import { Component, type OnDestroy, inject, signal, TemplateRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { type Observable, Subject, combineLatest, map, mergeMap, of, takeUntil, tap } from 'rxjs';
 import { InvoiceRepository } from '../invoice.repository';
@@ -11,39 +11,44 @@ import { DocumentRepository } from '@curacaru/services/repositories/document.rep
 import { type DeploymentReportTime } from '@curacaru/models/deployment-report-time.model';
 import { FormControl } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { Signature } from '@curacaru/shared/signature/signature.component';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { UUID } from 'angular2-uuid';
+import { InvoiceAddModel } from '@curacaru/dashboard/invoices/models/invoice-add.model';
 
 @Component({
-  imports: [ReactiveFormsModule, CommonModule, RideCostsTypeNamePipe, FontAwesomeModule, Signature],
+  imports: [ReactiveFormsModule, CommonModule, RideCostsTypeNamePipe, FontAwesomeModule, RouterModule, Signature],
 
   standalone: true,
   selector: 'cura-invoices-editor',
   templateUrl: './invoices-editor.component.html',
 })
-export class InvoicesEditorComponent implements OnDestroy {
-  private readonly formsBuilder = inject<FormBuilder>(FormBuilder);
+export class InvoicesEditorComponent {
+  /* injections */
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
-  private readonly userService = inject(UserService);
-  private readonly router = inject(Router);
-  private readonly invoiceRepository = inject(InvoiceRepository);
   private readonly documentRepository = inject(DocumentRepository);
+  private readonly formsBuilder = inject(FormBuilder);
+  private readonly invoiceRepository = inject(InvoiceRepository);
   private readonly offcanvasService = inject(NgbOffcanvas);
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
 
+  /* relays */
+  faCircleExclamation = faCircleExclamation;
   faCircleInfo = faCircleInfo;
-  totalDistance = signal(0);
-  totalDuration = signal(0);
-  rideCosts = signal(0);
-
   months = DateTimeService.months;
   rideCostsType = RideCostsType;
 
+  /* properties */
   readonly invoiceForm;
-  model$: Observable<any>;
+  readonly model$: Observable<any>;
+  readonly rideCosts = signal(0);
+  readonly totalDistance = signal(0);
+  readonly totalDuration = signal(0);
 
-  private readonly destroy$ = new Subject();
+  private reportId?: UUID;
 
   constructor() {
     this.invoiceForm = this.formsBuilder.group({
@@ -56,7 +61,7 @@ export class InvoicesEditorComponent implements OnDestroy {
       signature: ['', [Validators.required]],
     });
 
-    this.invoiceForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(
+    this.invoiceForm.valueChanges.subscribe(
       async () =>
         await this.router.navigate([], {
           queryParams: {
@@ -104,30 +109,34 @@ export class InvoicesEditorComponent implements OnDestroy {
             )
             .pipe(map((deploymentReport) => ({ ...next, deploymentReport })));
         } else {
-          return of({ ...next, deploymentReport: null });
+          return of({ ...next, deploymentReport: undefined });
         }
       }),
       tap((next) => {
+        this.reportId = next.deploymentReport?.reportId;
         if (next.deploymentReport != null) {
           this.totalDuration.set(next.deploymentReport.times.reduce((acc: number, time: DeploymentReportTime) => acc + time.duration, 0));
-          this.totalDistance.set(next.deploymentReport.times.reduce((acc: number, time: DeploymentReportTime) => acc + time.distance, 0));
           if (next.company.rideCostsType === RideCostsType.FlatRate) {
             this.rideCosts.set(next.deploymentReport.times.length * next.company.rideCosts);
           } else if (next.company.rideCostsType === RideCostsType.Kilometer) {
+            this.totalDistance.set(next.deploymentReport.times.reduce((acc: number, time: DeploymentReportTime) => acc + time.distance, 0));
             this.rideCosts.set(this.totalDistance() * next.company.rideCosts);
           }
         }
       })
     );
   }
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
-  }
 
   onSave(): void {
-    console.log(this.invoiceForm.value);
-    alert('SAVE');
+    const model: InvoiceAddModel = {
+      deploymentReportId: this.reportId!,
+      invoiceDate: this.invoiceForm.controls.invoiceDate.value!,
+      invoiceNumber: this.invoiceForm.controls.invoiceNumber.value!,
+      signature: this.invoiceForm.controls.signature.value!,
+    };
+
+    console.log(model);
+    this.invoiceRepository.addInvoice(model).subscribe(() => this.router.navigate(['invoices/list']));
   }
 
   openOffCanvas(template: TemplateRef<any>) {

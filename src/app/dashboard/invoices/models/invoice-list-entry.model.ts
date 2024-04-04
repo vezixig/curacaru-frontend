@@ -8,4 +8,5 @@ export interface InvoiceListEntry {
   customerId: UUID;
   clearanceType: ClearanceType;
   invoiceNumber: string;
+  invoiceId?: UUID;
 }

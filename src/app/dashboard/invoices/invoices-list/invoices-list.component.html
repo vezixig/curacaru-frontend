@@ -81,6 +81,7 @@
         <td>{{ invoice.invoiceNumber }}</td>
         <td class="text-center">
           <div class="btn-group" role="group">
+            @if(!invoice.invoiceId) {
             <button
               type="button"
               [routerLink]="['/dashboard/invoices/new']"
@@ -90,12 +91,15 @@
             >
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
-            <!-- @if (model.user.isManager) {
-            <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
+            } @else {
+            <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadInvoice(invoice)">
+              <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+            </button>
+            @if(model.user.isManager) {
+            <button type="button" (click)="onDeleteInvoice(invoice)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </button>
-
-            } -->
+            } }
           </div>
         </td>
       </tr>

@@ -34,8 +34,13 @@ export class DateTimeService {
     return `${data.getFullYear()}-${(data.getMonth() + 1).toString().padStart(2, '0')}-${data.getDate().toString().padStart(2, '0')}`;
   }
 
-  static toDate(date: NgbDate | null): Date {
-    return date ? new Date(date.year, date.month - 1, date.day, 12) : new Date();
+  static toDate(date: NgbDate | null | string): Date {
+    if (typeof date === 'string') {
+      const dateParts = date.split('-');
+      return new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+    } else {
+      return date ? new Date(date.year, date.month - 1, date.day, 12) : new Date();
+    }
   }
 
   static toTime(value: NgbTime | string): Time {
