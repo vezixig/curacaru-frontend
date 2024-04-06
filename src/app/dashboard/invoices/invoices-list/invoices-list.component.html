@@ -107,5 +107,46 @@
     </tbody>
   </table>
 
+  <div class="d-md-none p-0">
+    @for (invoice of model.invoices; track invoice) {
+    <div class="card my-3">
+      <div class="card-header d-flex">
+        <img class="me-2" width="10" [class.bg-success]="invoice.invoiceNumber" [class.bg-danger]="!invoice.invoiceNumber" />
+        <span class="lead text-truncate">{{ invoice.customerName }}</span>
+        <div class="btn-group ms-auto" role="group">
+          @if(invoice.invoiceNumber) {
+          <button type="button" class="btn btn-outline-secondary btn-sm" title="Rechnung herunterladen" (click)="onDownloadInvoice(invoice)">
+            <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+          </button>
+          } @else {
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            title="Rechnung erstellen"
+            [routerLink]="['/dashboard/documents/assignment-declarations/sign']"
+            [queryParams]="{ year: invoice.year, month: invoice.month, customerId: invoice.customerId, clearanceType: invoice.clearanceType }"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+          } @if(model.user.isManager && invoice.invoiceNumber) {
+          <a (click)="onDeleteInvoice(invoice)" class="btn btn-outline-secondary btn-sm" title="Rechnung löschen">
+            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+          </a>
+          }
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="card-text list-unstyled">
+          <li class="pb-2">{{ invoice.clearanceType | clearanceTypeName }}</li>
+          <li><fa-icon [icon]="faCalendar" [fixedWidth]="true" /> {{ invoice.month | monthName }} {{ invoice.year }}</li>
+          @if (invoice.invoiceNumber) {
+          <li><fa-icon [icon]="faHashtag" [fixedWidth]="true" /> {{ invoice.invoiceNumber }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+    }
+  </div>
+
   }
 </div>

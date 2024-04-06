@@ -1,15 +1,15 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, combineLatest, map, startWith, switchMap, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
 import { InvoiceRepository } from '../invoice.repository';
 import { InvoiceListEntry } from '../models/invoice-list-entry.model';
 import { InvoicesChangeFilterAction } from '@curacaru/state/invoices-list.state';
-import { faDownload, faGear, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faGear, faHashtag, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 import { ClearanceTypeNamePipe } from '@curacaru/pipes/clarance-type-name.pipe';
@@ -17,6 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
+import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   imports: [AsyncPipe, ClearanceTypeNamePipe, CommonModule, FontAwesomeModule, MonthNamePipe, ReactiveFormsModule, RouterModule],
@@ -38,6 +39,8 @@ export class InvoicesListComponent {
   faGear = faGear;
   faDownload = faDownload;
   faTrashCan = faTrashCan;
+  faCalendar = faCalendar;
+  faHashtag = faHashtag;
   months = DateTimeService.months;
 
   /** Properties */
