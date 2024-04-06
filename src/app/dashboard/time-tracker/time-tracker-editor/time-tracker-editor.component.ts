@@ -134,7 +134,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
               totalWorkedHours: result.workTime.map(this.timeDiff).reduce((acc, value) => acc + value / 60, 0),
               canSign: result.workTime.length > 0 && result.workTime.findIndex((o) => o.isDone == false) == -1,
               employeeName: result.employee.firstName + ' ' + result.employee.lastName,
-              userName: next.firstName,
+              userName: next.firstName + ' ' + next.lastName,
               hasUndoneAppointments: result.workTime.findIndex((o) => o.isDone == false) > -1,
             };
           }),

@@ -171,6 +171,9 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
         complete: () => {
           if (this.isNew) {
             this.isLoading = false;
+            if (this.appointmentForm.get('customerId')?.value) {
+              this.onCustomerChanged(this.appointmentForm.get('customerId')?.value, true);
+            }
           } else {
             this.loadAppointment();
           }

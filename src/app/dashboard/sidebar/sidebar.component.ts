@@ -7,6 +7,7 @@ import {
   faBuilding,
   faCalendar,
   faCoins,
+  faFileInvoiceDollar,
   faFileLines,
   faFileSignature,
   faPersonCane,
@@ -28,6 +29,7 @@ export class SidebarComponent {
   faBuilding = faBuilding;
   faCalendar = faCalendar;
   faCoins = faCoins;
+  faFileInvoiceDollar = faFileInvoiceDollar;
   faFileLines = faFileLines;
   faPersonCane = faPersonCane;
   faPersonShelter = faPersonShelter;

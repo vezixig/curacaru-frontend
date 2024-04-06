@@ -22,7 +22,7 @@ export class DocumentRepository extends BaseRepository {
     return this.client.get(`${this.apiUrl}/documents/deployment-reports/${year}/${month}/${customerId}/${clearanceType}/document`, {
       responseType: 'blob',
     });
-  }
+  } 
 
   saveDeploymentReport(report: DeploymentReportSaveModel) {
     report.clearanceType = +report.clearanceType;

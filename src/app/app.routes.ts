@@ -134,6 +134,21 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'dashboard/invoices',
+    canActivate: [ManagerGuard],
+    children: [
+      { path: '', redirectTo: 'list', pathMatch: 'full' },
+      {
+        path: 'list',
+        loadComponent: () => import('@curacaru/dashboard/invoices/invoices-list/invoices-list.component').then((o) => o.InvoicesListComponent),
+      },
+      {
+        path: 'new',
+        loadComponent: () => import('@curacaru/dashboard/invoices/invoices-editor/invoices-editor.component').then((o) => o.InvoicesEditorComponent),
+      },
+    ],
+  },
+  {
     path: 'dashboard/time-tracker',
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
