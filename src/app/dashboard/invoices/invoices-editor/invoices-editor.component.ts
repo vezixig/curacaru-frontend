@@ -16,6 +16,7 @@ import { Signature } from '@curacaru/shared/signature/signature.component';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { InvoiceAddModel } from '@curacaru/dashboard/invoices/models/invoice-add.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   imports: [ReactiveFormsModule, CommonModule, RideCostsTypeNamePipe, FontAwesomeModule, RouterModule, Signature],
@@ -33,6 +34,7 @@ export class InvoicesEditorComponent {
   private readonly invoiceRepository = inject(InvoiceRepository);
   private readonly offcanvasService = inject(NgbOffcanvas);
   private readonly router = inject(Router);
+  private readonly toastrService = inject(ToastrService);
   private readonly userService = inject(UserService);
 
   /* relays */
@@ -43,6 +45,7 @@ export class InvoicesEditorComponent {
 
   /* properties */
   readonly invoiceForm;
+  readonly isSaving = signal(false);
   readonly model$: Observable<any>;
   readonly rideCosts = signal(0);
   readonly totalDistance = signal(0);
@@ -128,6 +131,7 @@ export class InvoicesEditorComponent {
   }
 
   onSave(): void {
+    this.isSaving.set(true);
     const model: InvoiceAddModel = {
       deploymentReportId: this.reportId!,
       invoiceDate: this.invoiceForm.controls.invoiceDate.value!,
@@ -135,8 +139,13 @@ export class InvoicesEditorComponent {
       signature: this.invoiceForm.controls.signature.value!,
     };
 
-    console.log(model);
-    this.invoiceRepository.addInvoice(model).subscribe(() => this.router.navigate(['invoices/list']));
+    this.invoiceRepository.addInvoice(model).subscribe({
+      next: (next) => this.router.navigate(['dashboard/invoices/list']),
+      error: (error) => {
+        this.isSaving.set(false);
+        this.toastrService.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
+      },
+    });
   }
 
   openOffCanvas(template: TemplateRef<any>) {

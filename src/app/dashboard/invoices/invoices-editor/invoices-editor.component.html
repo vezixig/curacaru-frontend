@@ -85,11 +85,15 @@
 
     <div class="row g-2 mt-3">
       <div class="col">
-        <button class="form-control btn btn-outline-primary" type="button" (click)="openOffCanvas(signature)">Unterschrift Mitarbeiter</button>
+        <button class="form-control btn btn-outline-primary" type="button" (click)="openOffCanvas(signature)">Unterschrift Manager</button>
       </div>
 
       <div class="col">
-        <button type="submit" [disabled]="invoiceForm.invalid" class="form-control btn btn-primary text-white">Rechnung erstellen</button>
+        <button type="submit" [disabled]="invoiceForm.invalid || isSaving()" class="form-control btn btn-primary text-white">
+          Rechnung erstellen @if (isSaving()) {
+          <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+          }
+        </button>
       </div>
       <div class="col">
         <button type="button" routerLink=".." class="form-control btn btn-outline-secondary">Verwerfen</button>
