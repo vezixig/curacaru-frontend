@@ -127,7 +127,9 @@
           [value]="clearanceType.reliefAmount"
           [disabled]="isExpired || (!canClearReliefAmount && !isPlanning)"
         />
-        <label class="form-check-label" for="radioReliefAmount"> Entlastungsbetrag §45b SGB XI</label>
+        <label class="form-check-label" for="radioReliefAmount">
+          Entlastungsbetrag §45b SGB XI <span class="fw-light">{{ selectedCustomer?.reliefAmount | currency }}</span>
+        </label>
       </div>
       } @if(selectedCustomer?.doClearanceCareBenefit || existingAppointment?.clearanceType == clearanceType.careBenefit) {
       <div class="form-check">
@@ -142,7 +144,9 @@
           [value]="clearanceType.careBenefit"
           [disabled]="isExpired || (!canClearCareBenefit && !isPlanning)"
         />
-        <label class="form-check-label" for="radioCareBenefit"> ..% Pflegesachleistungen §36 SGB XI (max. 40%)</label>
+        <label class="form-check-label" for="radioCareBenefit">
+          ..% Pflegesachleistungen §36 SGB XI (max. 40%) <span class="fw-light">{{ selectedCustomer?.careBenefitAmount | currency }}</span>
+        </label>
       </div>
       } @if(selectedCustomer?.doClearancePreventiveCare || existingAppointment?.clearanceType == clearanceType.preventiveCare) {
       <div class="form-check">
@@ -157,7 +161,9 @@
           [value]="clearanceType.preventiveCare"
           [disabled]="isExpired || (!canClearPreventiveCare && !isPlanning)"
         />
-        <label class="form-check-label" for="radioPreventiveCare"> Verhinderungspflege § 39 SGB XI</label>
+        <label class="form-check-label" for="radioPreventiveCare">
+          Verhinderungspflege § 39 SGB XI <span class="fw-light">{{ selectedCustomer?.preventiveCareAmount | currency }}</span>
+        </label>
       </div>
       } @if(selectedCustomer?.doClearanceSelfPayment || existingAppointment?.clearanceType == clearanceType.selfPayment) {
       <div class="form-check">
@@ -172,7 +178,9 @@
           [value]="clearanceType.selfPayment"
           [disabled]="isExpired || (!canClearSelfPayment && !isPlanning)"
         />
-        <label class="form-check-label" for="radioSelfPayment"> Selbstzahler</label>
+        <label class="form-check-label" for="radioSelfPayment">
+          Selbstzahler <span class="fw-light">{{ selectedCustomer?.selfPayAmount | currency }}</span>
+        </label>
       </div>
       } @if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
       <div class="alert alert-warning mt-2" role="alert">

@@ -92,11 +92,23 @@
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
             } @else {
-            <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadInvoice(invoice)">
+            <button
+              [disabled]="isLoading()"
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              title="Einsatznachweis herunterladen"
+              (click)="onDownloadInvoice(invoice)"
+            >
               <fa-icon [icon]="faDownload" [fixedWidth]="true" />
             </button>
             @if(model.user.isManager) {
-            <button type="button" (click)="onDeleteInvoice(invoice)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
+            <button
+              [disabled]="isLoading()"
+              type="button"
+              (click)="onDeleteInvoice(invoice)"
+              class="btn btn-outline-secondary btn-sm"
+              title="Kunden löschen"
+            >
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </button>
             } }
@@ -115,7 +127,13 @@
         <span class="lead text-truncate">{{ invoice.customerName }}</span>
         <div class="btn-group ms-auto" role="group">
           @if(invoice.invoiceNumber) {
-          <button type="button" class="btn btn-outline-secondary btn-sm" title="Rechnung herunterladen" (click)="onDownloadInvoice(invoice)">
+          <button
+            type="button"
+            [disabled]="isLoading()"
+            class="btn btn-outline-secondary btn-sm"
+            title="Rechnung herunterladen"
+            (click)="onDownloadInvoice(invoice)"
+          >
             <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           </button>
           } @else {
@@ -123,15 +141,21 @@
             type="button"
             class="btn btn-outline-secondary btn-sm"
             title="Rechnung erstellen"
-            [routerLink]="['/dashboard/documents/assignment-declarations/sign']"
+            [routerLink]="['/dashboard/invoices/new']"
             [queryParams]="{ year: invoice.year, month: invoice.month, customerId: invoice.customerId, clearanceType: invoice.clearanceType }"
           >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
           } @if(model.user.isManager && invoice.invoiceNumber) {
-          <a (click)="onDeleteInvoice(invoice)" class="btn btn-outline-secondary btn-sm" title="Rechnung löschen">
+          <button
+            [disabled]="isLoading()"
+            type="button"
+            (click)="onDeleteInvoice(invoice)"
+            class="btn btn-outline-secondary btn-sm"
+            title="Rechnung löschen"
+          >
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-          </a>
+          </button>
           }
         </div>
       </div>

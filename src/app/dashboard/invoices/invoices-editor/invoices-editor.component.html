@@ -85,7 +85,18 @@
 
     <div class="row g-2 mt-3">
       <div class="col">
-        <button class="form-control btn btn-outline-primary" type="button" (click)="openOffCanvas(signature)">Unterschrift Manager</button>
+        <button
+          [disabled]="invoiceForm.get('signature')?.value != ''"
+          [class.btn-outline-primary]="!invoiceForm.get('signature')?.value"
+          [class.btn-outline-success]="invoiceForm.get('signature')?.value"
+          class="form-control btn"
+          type="button"
+          (click)="openOffCanvas(signature)"
+        >
+          Unterschrift Manager @if(invoiceForm.get('signature')?.value != '') {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
       </div>
 
       <div class="col">

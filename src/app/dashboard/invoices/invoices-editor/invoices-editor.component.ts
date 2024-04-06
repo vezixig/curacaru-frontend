@@ -11,7 +11,7 @@ import { DocumentRepository } from '@curacaru/services/repositories/document.rep
 import { type DeploymentReportTime } from '@curacaru/models/deployment-report-time.model';
 import { FormControl } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { Signature } from '@curacaru/shared/signature/signature.component';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
@@ -38,6 +38,7 @@ export class InvoicesEditorComponent {
   private readonly userService = inject(UserService);
 
   /* relays */
+  faCheck = faCheck;
   faCircleExclamation = faCircleExclamation;
   faCircleInfo = faCircleInfo;
   months = DateTimeService.months;

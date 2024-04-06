@@ -79,6 +79,7 @@ export class InvoicesListComponent {
 
   onDownloadInvoice(invoice: InvoiceListEntry) {
     if (!invoice.invoiceId) return;
+    this.isLoading.set(true);
 
     this.invoiceRepository.getInvoiceDocument(invoice.invoiceId).subscribe({
       next: (result) => {
@@ -88,9 +89,11 @@ export class InvoicesListComponent {
         link.href = url;
         link.download = `Rechnung ${invoice.invoiceNumber}.pdf`;
         link.click();
+        this.isLoading.set(false);
       },
       error: (error) => {
         this.toastrService.error(`Der Einsatznachweis konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
+        this.isLoading.set(false);
       },
     });
   }
