@@ -43,4 +43,10 @@ export interface AppointmentListEntry {
 
   /** A value indicating whether the appointment is planned for the future. */
   isPlanned: boolean;
+
+  /** A value indicating whether the appointment is signed by the employee. */
+  isSignedByEmployee: boolean;
+
+  /** A value indicating whether the appointment is signed by the customer. */
+  isSignedByCustomer: boolean;
 }

@@ -19,6 +19,7 @@ export class SignatureComponent implements AfterViewInit {
   @ViewChild('submitButtonVertical') submitButtonVerticalElement!: ElementRef;
   @Input() maxHeight = 250;
   @Input() signatureName = '';
+  @Input() title = 'Unterschrift';
   @Output() signatureTaken = new EventEmitter<string>();
 
   private readonly toastrService = inject(ToastrService);

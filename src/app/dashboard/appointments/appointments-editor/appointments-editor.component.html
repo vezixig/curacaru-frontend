@@ -128,7 +128,7 @@
           [disabled]="isExpired || (!canClearReliefAmount && !isPlanning)"
         />
         <label class="form-check-label" for="radioReliefAmount">
-          Entlastungsbetrag §45b SGB XI <span class="fw-light">{{ selectedCustomer?.reliefAmount | currency }}</span>
+          Entlastungsbetrag §45b SGB XI <span class="fw-light"> - {{ initialBudget().reliefAmount | currency }}</span>
         </label>
       </div>
       } @if(selectedCustomer?.doClearanceCareBenefit || existingAppointment?.clearanceType == clearanceType.careBenefit) {
@@ -145,7 +145,7 @@
           [disabled]="isExpired || (!canClearCareBenefit && !isPlanning)"
         />
         <label class="form-check-label" for="radioCareBenefit">
-          ..% Pflegesachleistungen §36 SGB XI (max. 40%) <span class="fw-light">{{ selectedCustomer?.careBenefitAmount | currency }}</span>
+          ..% Pflegesachleistungen §36 SGB XI (max. 40%) <span class="fw-light"> - {{ initialBudget().careBenefit | currency }}</span>
         </label>
       </div>
       } @if(selectedCustomer?.doClearancePreventiveCare || existingAppointment?.clearanceType == clearanceType.preventiveCare) {
@@ -162,7 +162,7 @@
           [disabled]="isExpired || (!canClearPreventiveCare && !isPlanning)"
         />
         <label class="form-check-label" for="radioPreventiveCare">
-          Verhinderungspflege § 39 SGB XI <span class="fw-light">{{ selectedCustomer?.preventiveCareAmount | currency }}</span>
+          Verhinderungspflege § 39 SGB XI <span class="fw-light"> - {{ initialBudget().preventiveCare | currency }}</span>
         </label>
       </div>
       } @if(selectedCustomer?.doClearanceSelfPayment || existingAppointment?.clearanceType == clearanceType.selfPayment) {
@@ -179,7 +179,7 @@
           [disabled]="isExpired || (!canClearSelfPayment && !isPlanning)"
         />
         <label class="form-check-label" for="radioSelfPayment">
-          Selbstzahler <span class="fw-light">{{ selectedCustomer?.selfPayAmount | currency }}</span>
+          Selbstzahler <span class="fw-light"> - {{ initialBudget().selfPayment | currency }}</span>
         </label>
       </div>
       } @if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
@@ -199,7 +199,7 @@
     </div>
   </div>
 
-  @if (!isNew && appointmentForm.get('isDone')?.value != true) {
+  @if (!isNew && appointmentForm.get('isDone')?.value != true && canSign()) {
   <div class="row g-2 mt-2">
     <div class="col">
       <button
@@ -287,9 +287,13 @@
 </form>
 
 <ng-template #employeeSignature>
-  <cura-signature [signatureName]="user!.firstName + ' ' + user!.lastName" (signatureTaken)="onEmployeeSigned($event)" />
+  <cura-signature
+    [signatureName]="user!.firstName + ' ' + user!.lastName"
+    title="Mitarbeiterunterschrift"
+    (signatureTaken)="onEmployeeSigned($event)"
+  />
 </ng-template>
 
 <ng-template #customerSignature>
-  <cura-signature [signatureName]="selectedCustomer!.customerName" (signatureTaken)="onCustomerSigned($event)" />
+  <cura-signature [signatureName]="selectedCustomer!.customerName" title="Kundenunterschrift" (signatureTaken)="onCustomerSigned($event)" />
 </ng-template>

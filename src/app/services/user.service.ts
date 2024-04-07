@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { UserEmployee } from '../models/user-employee.model';
 import { ApiService } from './api.service';
-import { Observable, ReplaySubject, map, shareReplay, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, Subject, map, shareReplay, takeUntil } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,16 +9,17 @@ import { Observable, ReplaySubject, map, shareReplay, takeUntil } from 'rxjs';
 export class UserService {
   user$: Observable<UserEmployee>;
   isManager$: Observable<boolean>;
-  clearUser$: ReplaySubject<void> = new ReplaySubject(1);
+  clearUser$ = new Subject();
 
   private apiService = inject(ApiService);
 
   constructor() {
-    this.user$ = this.apiService.getUser().pipe(takeUntil(this.clearUser$), shareReplay(1));
+    this.user$ = this.apiService.getUser().pipe(shareReplay(1), takeUntil(this.clearUser$));
     this.isManager$ = this.user$.pipe(map((user) => user.isManager));
   }
 
   clearUser() {
-    this.clearUser$.next();
+    this.clearUser$.next(true);
+    this.user$ = this.apiService.getUser().pipe(shareReplay(1), takeUntil(this.clearUser$));
   }
 }

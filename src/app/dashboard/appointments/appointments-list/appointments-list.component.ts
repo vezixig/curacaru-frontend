@@ -1,11 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faCheck, faCircleInfo, faFileSignature, faGear, faHouse, faLocationDot, faPhone, faUserAlt } from '@fortawesome/free-solid-svg-icons';
-import { NgbCalendar, NgbCollapseModule, NgbDate, NgbDateParserFormatter, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  faCheck,
+  faCircleInfo,
+  faFileSignature,
+  faGear,
+  faHouse,
+  faLocationDot,
+  faPhone,
+  faUnlock,
+  faUserAlt,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  NgbCalendar,
+  NgbCollapseModule,
+  NgbDate,
+  NgbDateParserFormatter,
+  NgbDatepickerModule,
+  NgbModal,
+  NgbOffcanvas,
+} from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { EMPTY, Observable, Subject, catchError, combineLatest, finalize, forkJoin, map, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
@@ -21,20 +39,23 @@ import { UserEmployee } from '@curacaru/models';
 import { NgbDatePipe } from '@curacaru/pipes/ngb-date-pipe';
 import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
 import { Store } from '@ngrx/store';
+import { AppointmentRepository } from '@curacaru/services/repositories/appointment.repository';
+import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 
 @Component({
   imports: [
     CommonModule,
     FontAwesomeModule,
-    RouterModule,
+    FormsModule,
+    NgbCollapseModule,
+    NgbDatePipe,
     NgbDatepickerModule,
     NgxSkeletonLoaderModule,
-    FormsModule,
-    TimeFormatPipe,
-    ReplacePipe,
-    NgbDatePipe,
-    NgbCollapseModule,
     ReactiveFormsModule,
+    ReplacePipe,
+    RouterModule,
+    SignatureComponent,
+    TimeFormatPipe,
   ],
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
   selector: 'cura-appointments-list',
@@ -44,15 +65,17 @@ import { Store } from '@ngrx/store';
 })
 export class AppointmentsListComponent implements OnDestroy {
   /** injections */
-  public readonly formatter = inject(NgbDateParserFormatter);
   private readonly apiService = inject(ApiService);
+  private readonly appointmentRepository = inject(AppointmentRepository);
   private readonly calendar = inject(NgbCalendar);
   private readonly formBuilder = inject(FormBuilder);
   private readonly locationService = inject(LocationService);
   private readonly modalService = inject(NgbModal);
+  private readonly offcanvasService = inject(NgbOffcanvas);
+  private readonly store = inject(Store<AppointmentListState>);
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
-  private readonly store = inject(Store<AppointmentListState>);
+  public readonly formatter = inject(NgbDateParserFormatter);
 
   /** relays  */
   DateTimeService = DateTimeService;
@@ -66,10 +89,12 @@ export class AppointmentsListComponent implements OnDestroy {
   faLocationDot = faLocationDot;
   faPhone = faPhone;
   faTrashCan = faTrashCan;
+  faUnlock = faUnlock;
   faUser = faUser;
   faUserSolid = faUserAlt;
 
   /** properties  */
+  @ViewChild('signature') signatureTemplate!: TemplateRef<any>;
   hoveredDate: NgbDate | null = null;
   isLoading = true;
   isCollapsed = true;
@@ -77,6 +102,8 @@ export class AppointmentsListComponent implements OnDestroy {
   fromDate?: NgbDate;
   toDate?: NgbDate;
   ngbDatePipe = new NgbDatePipe();
+  readonly signatureName = signal('');
+  readonly signatureTitle = signal('');
 
   readonly filterModel$: Observable<{
     employees: EmployeeBasic[];
@@ -182,6 +209,18 @@ export class AppointmentsListComponent implements OnDestroy {
     this.$onDestroy.complete();
   }
 
+  private signatureTaking?: {
+    appointment: AppointmentListEntry;
+    isEmployee: boolean;
+  };
+
+  onTakeSignature(appointment: AppointmentListEntry, isEmployee: boolean) {
+    this.signatureTaking = { appointment, isEmployee };
+    this.signatureName.set(isEmployee ? appointment.employeeName : appointment.customerName);
+    this.signatureTitle.set(isEmployee ? 'Unterschrift Mitarbeiter' : 'Unterschrift Kunde');
+    this.offcanvasService.open(this.signatureTemplate, { position: 'bottom', panelClass: 'signature-panel' });
+  }
+
   onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
     this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
 
@@ -246,11 +285,38 @@ export class AppointmentsListComponent implements OnDestroy {
         complete: () => {
           this.toastr.success('Termin wurde wieder geöffnet');
           appointment.isDone = false;
+          appointment.isSignedByCustomer = false;
+          appointment.isSignedByEmployee = false;
         },
         error: (error) => {
           this.toastr.error(`Termin konnte nicht wieder geöffnet werden: [${error.status}] ${error.error}`);
         },
       });
+  }
+
+  takeSignature(template: TemplateRef<any>, name: string, isEmployee: boolean) {
+    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
+  }
+
+  onSignatureTaken($event: string) {
+    if (this.signatureTaking == null || $event == '') return;
+
+    var apiCall = this.signatureTaking?.isEmployee
+      ? this.appointmentRepository.addEmployeeSignature(this.signatureTaking.appointment.id!, $event)
+      : this.appointmentRepository.addCustomerSignature(this.signatureTaking.appointment.id!, $event);
+
+    this.appointmentRepository;
+    apiCall.pipe(takeUntil(this.$onDestroy)).subscribe({
+      next: () => {
+        this.signatureTaking?.isEmployee
+          ? (this.signatureTaking.appointment.isSignedByEmployee = true)
+          : (this.signatureTaking!.appointment.isSignedByCustomer = true);
+        this.offcanvasService.dismiss();
+      },
+      error: (error) => {
+        this.toastr.error(`Unterschrift konnte nicht gespeichert werden: [${error.status}] ${error.error}`);
+      },
+    });
   }
 
   private deserializeDates(obj: any): AppointmentListEntry {

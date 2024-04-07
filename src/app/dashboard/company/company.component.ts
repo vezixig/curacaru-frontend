@@ -119,7 +119,7 @@ export class CompanyComponent implements OnDestroy, OnInit {
     this.updateEmployeeSubscription?.unsubscribe();
     this.updateEmployeeSubscription = this.apiService.updateCompany(company).subscribe({
       complete: () => {
-        this.userService.clearUser$.next();
+        this.userService.clearUser();
         this.toastr.success('Änderungen am Unternehmen wurden gespeichert');
         this.LoadCompany();
         this.isSaving = false;

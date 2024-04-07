@@ -216,19 +216,45 @@
           }
         </ul>
       </div>
-      @if (!appointment.isDone && !appointment.isPlanned && !appointment.hasBudgetError && appointment.date <= today) {
       <div class="card-footer">
+        @if(!appointment.isDone && !appointment.isPlanned && !appointment.hasBudgetError && appointment.date <= today &&
+        (!appointment.isSignedByEmployee ||!appointment.isSignedByCustomer)) {
+        <button
+          [disabled]="appointment.isSignedByEmployee"
+          type="button"
+          [class.btn-outline-secondary]="!appointment.isSignedByEmployee"
+          [class.btn-outline-success]="appointment.isSignedByEmployee"
+          class="btn btn-sm"
+          (click)="onTakeSignature(appointment, true)"
+        >
+          <span>Unterschrift Mitarbeiter</span>
+          @if(appointment.isSignedByEmployee) {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
+        <button
+          [disabled]="appointment.isSignedByCustomer"
+          type="button"
+          [class.btn-outline-secondary]="!appointment.isSignedByCustomer"
+          [class.btn-outline-success]="appointment.isSignedByCustomer"
+          class="btn btn-sm ms-2"
+          (click)="onTakeSignature(appointment, false)"
+        >
+          <span>Unterschrift Kunde</span>
+          @if(appointment.isSignedByCustomer) {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
+        } @if (appointment.isSignedByCustomer && appointment.isSignedByEmployee && !appointment.isDone) {
         <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin abschließen">
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen
         </button>
-      </div>
-      } @if (filterModel.user.isManager && appointment.isDone && appointment.date >= beginOfCurrentMonth) {
-      <div class="card-footer">
+        } @if (filterModel.user.isManager && appointment.isDone && appointment.date >= beginOfCurrentMonth) {
         <button type="button" (click)="onReopen(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin wieder öffnen">
-          <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Öffnen
+          <fa-icon [icon]="faUnlock" [fixedWidth]="true" /> Öffnen
         </button>
+        }
       </div>
-      }
     </div>
     }
   </div>
@@ -236,4 +262,8 @@
   } @else {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Termine gefunden.</div>
   } } } }
+
+  <ng-template #signature>
+    <cura-signature [signatureName]="signatureName()" [title]="signatureTitle()" (signatureTaken)="onSignatureTaken($event)" />
+  </ng-template>
 </div>

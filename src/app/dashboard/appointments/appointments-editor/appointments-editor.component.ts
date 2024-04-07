@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, TemplateRef, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, TemplateRef, inject, signal } from '@angular/core';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -57,6 +57,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   appointmentForm: FormGroup;
   canFinish = false;
   canOpen = false;
+  canSign = signal(false);
   customers: MinimalCustomerListEntry[] = [];
   employees: EmployeeBasic[] = [];
   hasBudgetError = false;
@@ -71,6 +72,13 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   selectedCustomer?: CustomerBudget;
   today = new Date();
   user?: UserEmployee;
+
+  initialBudget = signal({
+    careBenefit: 0,
+    preventiveCare: 0,
+    reliefAmount: 0,
+    selfPayment: 0,
+  });
 
   private readonly offcanvasService = inject(NgbOffcanvas);
   private readonly appointmentRepository = inject(AppointmentRepository);
@@ -224,6 +232,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
           this.canFinish = !this.isNew && !result.isDone && result.isSignedByCustomer && result.isSignedByEmployee && result.date <= this.today;
+          this.canSign.set(!this.isNew && result.date <= this.today);
           this.canOpen = (this.user?.isManager ?? false) && !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId, true);
@@ -436,6 +445,13 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       .getCustomerWithBudget(customerId)
       .pipe(takeUntil(this.$onDestroy))
       .subscribe((customer) => {
+        this.initialBudget.set({
+          careBenefit: customer.careBenefitAmount,
+          preventiveCare: customer.preventiveCareAmount,
+          reliefAmount: customer.reliefAmount,
+          selfPayment: customer.selfPayAmount,
+        });
+
         if (!this.isNew) {
           switch (this.existingAppointment?.clearanceType) {
             case ClearanceType.careBenefit:
