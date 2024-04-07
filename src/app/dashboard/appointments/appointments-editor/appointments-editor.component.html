@@ -286,22 +286,10 @@
   </div>
 </form>
 
-<ng-template #employeeSignature let-offcanvas>
-  <div class="offcanvas-header offcanvas-signature" style="height: 60px">
-    <h4 class="h-underline text-center w-100">Mitarbeiterunterschrift</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
-  </div>
-  <div class="offcanvas.body container" style="height: calc(100% - 70px)">
-    <cura-signature #signature [signatureName]="user ? user.firstName + ' ' + user.lastName : ''" (signatureTaken)="onEmployeeSigned($event)" />
-  </div>
+<ng-template #employeeSignature>
+  <cura-signature [signatureName]="user!.firstName + ' ' + user!.lastName" (signatureTaken)="onEmployeeSigned($event)" />
 </ng-template>
 
-<ng-template #customerSignature let-offcanvas>
-  <div class="offcanvas-header offcanvas-signature" style="height: 60px">
-    <h4 class="h-underline text-center w-100">Kundenunterschrift</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
-  </div>
-  <div class="offcanvas.body container" style="height: calc(100% - 70px)">
-    <cura-signature #signature [signatureName]="selectedCustomer?.customerName ?? ''" (signatureTaken)="onCustomerSigned($event)"></cura-signature>
-  </div>
+<ng-template #customerSignature>
+  <cura-signature [signatureName]="selectedCustomer!.customerName" (signatureTaken)="onCustomerSigned($event)" />
 </ng-template>

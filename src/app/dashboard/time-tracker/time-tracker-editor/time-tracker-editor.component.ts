@@ -1,5 +1,5 @@
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
+import { Component, OnDestroy, TemplateRef, inject, signal } from '@angular/core';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { AsyncPipe, CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -17,8 +17,8 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faEraser, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { finalize, map, mergeMap, shareReplay, startWith, tap } from 'rxjs/operators';
 import { WorkingTimeService } from '@curacaru/services/working-time.service';
-import { Signature } from '@curacaru/shared/signature/signature.component';
 import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
+import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 
 @Component({
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
@@ -37,7 +37,7 @@ import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
     NgxSkeletonLoaderModule,
     ReactiveFormsModule,
     RouterModule,
-    Signature,
+    SignatureComponent,
     TimeFormatPipe,
   ],
 })
@@ -169,7 +169,6 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   onSigned($event: string) {
     this.reportForm.get('signature')!.setValue($event);
     this.onSave();
-    this.offcanvasService.dismiss();
   }
 
   private buildForm(): FormGroup {

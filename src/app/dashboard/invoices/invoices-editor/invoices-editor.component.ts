@@ -1,9 +1,9 @@
 import { CommonModule, formatDate } from '@angular/common';
-import { Component, type OnDestroy, inject, signal, TemplateRef } from '@angular/core';
+import { Component, inject, signal, TemplateRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
-import { type Observable, Subject, combineLatest, map, mergeMap, of, takeUntil, tap } from 'rxjs';
+import { type Observable, combineLatest, map, mergeMap, of, tap } from 'rxjs';
 import { InvoiceRepository } from '../invoice.repository';
 import { RideCostsTypeNamePipe } from '@curacaru/pipes/ride-costs-type-name.pipe';
 import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
@@ -12,14 +12,14 @@ import { type DeploymentReportTime } from '@curacaru/models/deployment-report-ti
 import { FormControl } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheck, faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
-import { Signature } from '@curacaru/shared/signature/signature.component';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { InvoiceAddModel } from '@curacaru/dashboard/invoices/models/invoice-add.model';
 import { ToastrService } from 'ngx-toastr';
+import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 
 @Component({
-  imports: [ReactiveFormsModule, CommonModule, RideCostsTypeNamePipe, FontAwesomeModule, RouterModule, Signature],
+  imports: [ReactiveFormsModule, CommonModule, RideCostsTypeNamePipe, FontAwesomeModule, RouterModule, SignatureComponent],
 
   standalone: true,
   selector: 'cura-invoices-editor',

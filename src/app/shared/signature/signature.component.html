@@ -1,15 +1,23 @@
-<div class="wrapper">
-  @if (isHorizontal()) {
-  <button #submitButtonHorizontal class="form-control btn text-white btn-primary submitButtonHorizontal" (click)="onAcceptSignature()">
-    Bestätigen
-  </button>
-  } @else {
-  <button #submitButtonVertical class="form-control btn text-white btn-primary submitButtonVertical" (click)="onAcceptSignature()">Bestätigen</button>
-  }
-  <canvas ngbAutofocus #canvas [height]="canvasHeight()" [width]="canvasWidth()"></canvas>
-  <fa-icon [icon]="faEraser" (click)="signaturePad.clear()" class="icon-eraser" />
-  <div class="tool-wrapper" [style.width.px]="canvasWidth()" [style.height.px]="canvasHeight()">
-    <p class="signing-name">{{ signatureName }}</p>
-    <p class="sign-here">Bitte hier unterschreiben</p>
+<div class="offcanvas-header offcanvas-signature" style="height: 60px">
+  <h4 class="h-underline text-center w-100">Mitarbeiterunterschrift</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="onDismiss()"></button>
+</div>
+<div class="offcanvas.body container" style="height: calc(100% - 70px)">
+  <div class="wrapper">
+    @if (isHorizontal()) {
+    <button #submitButtonHorizontal class="form-control btn text-white btn-primary submitButtonHorizontal" (click)="onAcceptSignature()">
+      Bestätigen
+    </button>
+    } @else {
+    <button #submitButtonVertical class="form-control btn text-white btn-primary submitButtonVertical" (click)="onAcceptSignature()">
+      Bestätigen
+    </button>
+    }
+    <canvas ngbAutofocus #canvas [height]="canvasHeight()" [width]="canvasWidth()"></canvas>
+    <fa-icon [icon]="faEraser" (click)="signaturePad.clear()" class="icon-eraser" />
+    <div class="tool-wrapper" [style.width.px]="canvasWidth()" [style.height.px]="canvasHeight()">
+      <p class="signing-name">{{ signatureName }}</p>
+      <p class="sign-here">Bitte hier unterschreiben</p>
+    </div>
   </div>
 </div>

@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, inject, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEraser } from '@fortawesome/free-solid-svg-icons';
+import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, delay, fromEvent, startWith, takeUntil } from 'rxjs';
 import SignaturePad from 'signature_pad';
@@ -12,7 +13,7 @@ import SignaturePad from 'signature_pad';
   styleUrls: ['./signature.component.scss'],
   imports: [FontAwesomeModule],
 })
-export class Signature implements AfterViewInit {
+export class SignatureComponent implements AfterViewInit {
   @ViewChild('canvas') canvasElement!: ElementRef;
   @ViewChild('submitButtonHorizontal') submitButtonHorizontalElement!: ElementRef;
   @ViewChild('submitButtonVertical') submitButtonVerticalElement!: ElementRef;
@@ -21,6 +22,7 @@ export class Signature implements AfterViewInit {
   @Output() signatureTaken = new EventEmitter<string>();
 
   private readonly toastrService = inject(ToastrService);
+  private readonly offCanvasService = inject(NgbOffcanvas);
 
   signaturePad!: SignaturePad;
   private readonly $onDestroy = new Subject();
@@ -51,6 +53,10 @@ export class Signature implements AfterViewInit {
       });
   }
 
+  onDismiss() {
+    this.offCanvasService.dismiss();
+  }
+
   onAcceptSignature() {
     if (this.signaturePad.isEmpty()) {
       this.toastrService.warning('Bitte unterschreibe erst bevor du fortfährst');
@@ -58,6 +64,7 @@ export class Signature implements AfterViewInit {
     }
 
     this.signatureTaken.emit(this.signaturePad.toDataURL());
+    this.offCanvasService.dismiss();
   }
 
   clear(): void {

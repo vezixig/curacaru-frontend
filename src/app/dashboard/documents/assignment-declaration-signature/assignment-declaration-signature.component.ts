@@ -7,7 +7,7 @@ import { Customer, MinimalCustomerListEntry, UserEmployee } from '@curacaru/mode
 import { FallbackSpacePipe } from '@curacaru/pipes/fallback-space.pipe';
 import { ApiService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
-import { Signature } from '@curacaru/shared/signature/signature.component';
+import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { ValidateTrue } from '@curacaru/validators/true.validator';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
@@ -17,7 +17,16 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable, combineLatest, distinctUntilKeyChanged, filter, finalize, map, merge, mergeMap, of, startWith, tap } from 'rxjs';
 
 @Component({
-  imports: [AsyncPipe, CommonModule, ReactiveFormsModule, FallbackSpacePipe, RouterModule, FontAwesomeModule, Signature, NgbDatepickerModule],
+  imports: [
+    AsyncPipe,
+    CommonModule,
+    ReactiveFormsModule,
+    FallbackSpacePipe,
+    RouterModule,
+    FontAwesomeModule,
+    SignatureComponent,
+    NgbDatepickerModule,
+  ],
   selector: 'cura-assignment-declaration-signature',
   standalone: true,
   templateUrl: './assignment-declaration-signature.component.html',

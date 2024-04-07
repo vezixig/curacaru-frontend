@@ -8,7 +8,7 @@ import { DeploymentReport } from '@curacaru/models/deployment-report-view.model'
 import { TimeFormatPipe } from '@curacaru/pipes/time.pipe';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
-import { Signature } from '@curacaru/shared/signature/signature.component';
+import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheck, faCircleInfo, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
@@ -17,7 +17,7 @@ import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map
 
 @Component({
   selector: 'deployment-report-signature',
-  imports: [ReactiveFormsModule, CommonModule, TimeFormatPipe, FontAwesomeModule, Signature, RouterModule],
+  imports: [ReactiveFormsModule, CommonModule, TimeFormatPipe, FontAwesomeModule, SignatureComponent, RouterModule],
   standalone: true,
   templateUrl: './deployment-report-signature.component.html',
   styleUrls: ['./deployment-report-signature.component.scss'],

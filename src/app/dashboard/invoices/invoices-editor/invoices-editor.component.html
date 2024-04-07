@@ -111,19 +111,10 @@
       </div>
     </div>
 
-    <ng-template #signature let-offcanvas>
-      <div class="offcanvas-header offcanvas-signature" style="height: 60px">
-        <h4 class="h-underline text-center w-100">Managerunterschrift</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
-      </div>
-      <div class="offcanvas.body container" style="height: calc(100% - 70px)">
-        <cura-signature
-          #signature
-          [signatureName]="model.user.firstName + ' ' + model.user.lastName"
-          (signatureTaken)="onSigned($event)"
-        ></cura-signature>
-      </div>
+    <ng-template #signature>
+      <cura-signature [signatureName]="model.user.firstName + ' ' + model.user.lastName" (signatureTaken)="onSigned($event)" />
     </ng-template>
+
     } @else {
     <div class="row m-1">
       <div class="alert alert-warning mt-3" role="alert">
