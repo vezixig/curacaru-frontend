@@ -169,8 +169,12 @@
         </ul>
       </div>
     </div>
+
     }
   </div>
 
-  }
+  <!-- show info if no invoices were found -->
+  @if(model.invoices.length == 0) {
+  <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Rechnungen gefunden.</div>
+  } }
 </div>

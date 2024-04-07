@@ -227,7 +227,7 @@
           class="btn btn-sm"
           (click)="onTakeSignature(appointment, true)"
         >
-          <span>Unterschrift Mitarbeiter</span>
+          <span><fa-icon [icon]="faSignature" [fixedWidth]="true" /> Mitarbeiter</span>
           @if(appointment.isSignedByEmployee) {
           <fa-icon [icon]="faCheck" class="text-success ms-2" />
           }
@@ -240,7 +240,7 @@
           class="btn btn-sm ms-2"
           (click)="onTakeSignature(appointment, false)"
         >
-          <span>Unterschrift Kunde</span>
+          <span><fa-icon [icon]="faSignature" [fixedWidth]="true" /> Kunde</span>
           @if(appointment.isSignedByCustomer) {
           <fa-icon [icon]="faCheck" class="text-success ms-2" />
           }

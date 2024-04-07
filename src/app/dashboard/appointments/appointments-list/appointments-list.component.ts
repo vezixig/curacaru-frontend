@@ -12,6 +12,7 @@ import {
   faHouse,
   faLocationDot,
   faPhone,
+  faSignature,
   faUnlock,
   faUserAlt,
 } from '@fortawesome/free-solid-svg-icons';
@@ -92,6 +93,7 @@ export class AppointmentsListComponent implements OnDestroy {
   faUnlock = faUnlock;
   faUser = faUser;
   faUserSolid = faUserAlt;
+  faSignature = faSignature;
 
   /** properties  */
   @ViewChild('signature') signatureTemplate!: TemplateRef<any>;

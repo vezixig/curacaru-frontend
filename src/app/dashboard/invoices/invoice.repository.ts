@@ -20,6 +20,9 @@ export class InvoiceRepository extends BaseRepository {
    * @returns an invoice list
    */
   getInvoiceList(year: number, month: number, customerId?: UUID) {
+    if (customerId) {
+      return this.client.get<InvoiceListEntry[]>(`${this.apiUrl}/invoices/${year}/${month}/${customerId}`);
+    }
     return this.client.get<InvoiceListEntry[]>(`${this.apiUrl}/invoices/${year}/${month}`);
   }
 

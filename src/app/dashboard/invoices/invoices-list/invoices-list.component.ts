@@ -9,7 +9,7 @@ import { Observable, Subject, combineLatest, map, startWith, switchMap, tap } fr
 import { InvoiceRepository } from '../invoice.repository';
 import { InvoiceListEntry } from '../models/invoice-list-entry.model';
 import { InvoicesChangeFilterAction } from '@curacaru/state/invoices-list.state';
-import { faDownload, faGear, faHashtag, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faDownload, faGear, faHashtag, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 import { ClearanceTypeNamePipe } from '@curacaru/pipes/clarance-type-name.pipe';
@@ -36,11 +36,12 @@ export class InvoicesListComponent {
   private readonly modalService = inject(NgbModal);
 
   /** Relays */
-  faGear = faGear;
-  faDownload = faDownload;
-  faTrashCan = faTrashCan;
   faCalendar = faCalendar;
+  faCircleInfo = faCircleInfo;
+  faDownload = faDownload;
+  faGear = faGear;
   faHashtag = faHashtag;
+  faTrashCan = faTrashCan;
   months = DateTimeService.months;
 
   /** Properties */
@@ -66,12 +67,13 @@ export class InvoicesListComponent {
       user: this.userService.user$,
       customers: this.apiService.getMinimalCustomerList(),
       state: this.store,
-      refrehs: this.$onRefresh.pipe(startWith(true)),
+      refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
+      tap((result) => console.log(result.state)),
       tap((result) => this.filterForm.patchValue(result.state.invoicesList, { emitEvent: false })),
       switchMap((result) =>
         this.invoiceRepository
-          .getInvoiceList(result.state.invoicesList.year, result.state.invoicesList.month)
+          .getInvoiceList(result.state.invoicesList.year, result.state.invoicesList.month, result.state.invoicesList.customerId)
           .pipe(map((invoices) => ({ user: result.user, customers: result.customers, invoices })))
       )
     );

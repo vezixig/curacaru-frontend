@@ -6,26 +6,20 @@ $primary: #ff7f02;
 @import "ngx-toastr/toastr-bs5-alert";
 
 body {
-  height: 100vh;
-  height: 100svh;
   height: 100dvh;
-  min-height: 100vh;
-  min-height: 100svh;
   min-height: 100dvh;
+  height: -webkit-fill-available;
   background-color: #eee;
-  overscroll-behavior: none;
 }
 
 html {
-  height: -webkit-fill-available;
+  background-color: #aaa;
 }
 
 main {
   display: flex;
   flex-wrap: nowrap;
   height: 100%;
-  height: -webkit-fill-available;
-  max-height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
 }
