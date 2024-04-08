@@ -6,25 +6,28 @@ $primary: #ff7f02;
 @import "ngx-toastr/toastr-bs5-alert";
 
 body {
-  height: 100dvh;
-  min-height: 100dvh;
+  height: 100lvh;
+  min-height: 100lvh;
   height: -webkit-fill-available;
   background-color: #eee;
 }
 
 html {
+  height: 100lvh;
+  min-height: 100lvh;
+  height: -webkit-fill-available;
   background-color: #aaa;
 }
 
 main {
   display: flex;
   flex-wrap: nowrap;
-  height: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  min-height: 100lvh;
+  padding-top: 60px;
 }
 
 select {
+  /* important on safari to hide too long text */
   overflow-x: hidden;
 }
 
@@ -75,4 +78,19 @@ select {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.btn-primary:focus,
+.btn-outline-primary:focus {
+  color: #ff7f02 !important;
+}
+
+.btn-primary:hover,
+.btn-outline-primary:hover,
+.btn-outline-primary:hover:focus {
+  color: #fff !important;
+}
+
+.btn-outline-primary:active {
+  color: #fff !important;
 }
