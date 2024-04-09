@@ -56,6 +56,7 @@
         <th scope="col">Jahr</th>
         <th scope="col">Monat</th>
         <th scope="col">Kunde</th>
+        <th scope="col">Bearbeitung</th>
         <th scope="col">Abrechnungsoption</th>
         <th class="text-center" scope="col">Status</th>
         <th scope="col">Rechnungsnr.</th>
@@ -68,6 +69,7 @@
         <td>{{ invoice.year }}</td>
         <td>{{ invoice.month | monthName }}</td>
         <td>{{ invoice.customerName }}</td>
+        <td>{{ invoice.employeeName }}</td>
         <td>{{ invoice.clearanceType | clearanceTypeName }}</td>
         <td class="text-center">
           <div

@@ -94,7 +94,7 @@ export class InvoicesListComponent {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toastrService.error(`Der Einsatznachweis konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
+        this.toastrService.error(`Die Rechnung konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
         this.isLoading.set(false);
       },
     });

@@ -54,6 +54,9 @@
       />
     </div>
 
+    <label class="mt-2 fw-light">Bearbeitet von</label>
+    <p class="ms-2 mt-1 m-0 fs-6">{{ model.user.firstName }} {{ model.user.lastName }}</p>
+
     @if(model.deploymentReport != null) { @if( model.deploymentReport.hasInvoice == false) {
     <label class="mt-2 fw-light">Stunden (gesamt), Stundenlohn Unternehmen, Zwischensumme</label>
     <p class="ms-2 mt-1 m-0 fs-6">
