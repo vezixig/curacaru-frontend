@@ -87,6 +87,12 @@
       </div>
     </div>
 
+    @if(!isDone && (blockingAppointment$ | async)) {
+    <div class="alert alert-warning mt-2" role="alert">
+      <fa-icon [icon]="faCircleExclamation" /> Der Termin überschneidet sich mit einem anderen Termin und kann daher nicht angelegt werden
+    </div>
+    }
+
     <!-- Notes -->
     <div class="form-group mb-2">
       <label for="inputNotes">Notizen:</label>
@@ -184,7 +190,8 @@
       </div>
       } @if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
       <div class="alert alert-warning mt-2" role="alert">
-        Das Budget für diesen Monat ist bereits aufgebraucht, weshalb der Termin leider nicht {{ isNew ? "angelegt" : "gespeichert" }} werden kann.
+        <fa-icon [icon]="faCircleExclamation" /> Das Budget für diesen Monat ist bereits aufgebraucht, weshalb der Termin leider nicht
+        {{ isNew ? "angelegt" : "gespeichert" }} werden kann.
       </div>
       } @if (isPlanning) {
       <div class="alert alert-secondary mt-2" role="alert">

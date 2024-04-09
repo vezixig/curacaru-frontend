@@ -10,7 +10,7 @@ import {
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Subject, Subscription, forkJoin, map, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, forkJoin, map, switchMap, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
@@ -52,8 +52,10 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCircleInfo = faCircleInfo;
   faCircleExclamation = faCircleExclamation;
   RideCostType = RideCostsType;
+
   clearanceType = ClearanceType;
 
+  blockingAppointment$: Observable<boolean>;
   appointmentForm: FormGroup;
   canFinish = false;
   canOpen = false;
@@ -85,6 +87,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   private readonly activeRoute = inject(ActivatedRoute);
 
   private $onDestroy = new Subject();
+  private $onTimeChanged = new Subject();
 
   private appointmentId?: UUID;
 
@@ -101,6 +104,19 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private userService: UserService
   ) {
+    this.blockingAppointment$ = this.$onTimeChanged.pipe(
+      debounceTime(300),
+      switchMap(() =>
+        this.appointmentRepository.getIsBlockingAppointment(
+          this.appointmentForm.get('employeeId')?.value,
+          DateTimeService.toDate(this.appointmentForm.get('date')?.value),
+          DateTimeService.toTime(this.appointmentForm.get('timeStart')?.value),
+          DateTimeService.toTime(this.appointmentForm.get('timeEnd')?.value),
+          this.appointmentId
+        )
+      )
+    );
+
     this.appointmentForm = this.formBuilder.group({
       customerId: ['', [Validators.required]],
       date: ['', { Validators: Validators.required, updateOn: 'blur' }],
@@ -119,8 +135,13 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
     this.appointmentForm.get('distanceToCustomer')?.valueChanges.subscribe(() => this.calculatePrice());
     this.appointmentForm.get('date')?.valueChanges.subscribe((value) => this.onDateChanged(value));
-    this.appointmentForm.get('timeEnd')?.valueChanges.subscribe(() => this.calculatePrice());
-    this.appointmentForm.get('timeStart')?.valueChanges.subscribe(() => this.calculatePrice());
+    this.appointmentForm.get('timeEnd')?.valueChanges.subscribe(() => this.onTimeChanged());
+    this.appointmentForm.get('timeStart')?.valueChanges.subscribe(() => this.onTimeChanged());
+  }
+
+  onTimeChanged() {
+    this.calculatePrice();
+    this.$onTimeChanged.next(true);
   }
 
   selectedClearanceType?: ClearanceType;
@@ -485,6 +506,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       date = this.minDate;
     }
     this.isPlanning = this.nextMonth.before(date) || this.nextMonth.equals(date);
+    this.$onTimeChanged.next(true);
     this.calculatePrice();
   }
 
