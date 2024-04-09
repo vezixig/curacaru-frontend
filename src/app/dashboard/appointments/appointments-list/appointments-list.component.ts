@@ -196,7 +196,16 @@ export class AppointmentsListComponent implements OnDestroy {
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )
-          .pipe(map((appointments) => ({ appointments: appointments.map(this.deserializeDates) })));
+          .pipe(
+            map((appointments) => ({
+              appointments: appointments.map(this.deserializeDates).map((appointment) => {
+                appointment.canSign =
+                  appointment.employeeReplacementId == next.filter.user.id ||
+                  (!appointment.employeeReplacementId && appointment.employeeId == next.filter.user.id);
+                return appointment;
+              }),
+            }))
+          );
       }),
       catchError((error) => {
         this.toastr.error(`Termine konnten nicht abgerufen werden: [${error.status}] ${error.error}`);

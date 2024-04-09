@@ -11,11 +11,20 @@ export interface AppointmentListEntry {
   /** The date of the appointment. */
   date: Date;
 
+  /** A value indicating whether the customer can sign. */
+  canSign: boolean;
+
   /** The name of the employee. */
   employeeName: string;
 
+  /** The id of the employee. */
+  employeeId: UUID;
+
   /** The name of the employee replacement. */
   employeeReplacementName?: string;
+
+  /** The id of the employee replacement. */
+  employeeReplacementId?: UUID;
 
   /** The id of the appointment. */
   id: UUID;

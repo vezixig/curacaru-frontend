@@ -10,7 +10,7 @@ import {
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Observable, Subject, Subscription, debounceTime, forkJoin, map, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, filter, forkJoin, map, switchMap, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
@@ -106,15 +106,25 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   ) {
     this.blockingAppointment$ = this.$onTimeChanged.pipe(
       debounceTime(300),
-      switchMap(() =>
-        this.appointmentRepository.getIsBlockingAppointment(
-          this.appointmentForm.get('employeeId')?.value,
+      filter(() => {
+        const employeeId = this.appointmentForm.get('employeeId')?.value;
+        const timeStartValue = this.appointmentForm.get('timeStart')?.value;
+        const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
+        return employeeId != null && employeeId != '' && timeStartValue != null && timeStartValue != '' && timeEndValue != null && timeEndValue != '';
+      }),
+      switchMap(() => {
+        const employeeId =
+          this.appointmentForm.get('employeeReplacementId')?.value != '' && this.appointmentForm.get('employeeReplacementId')?.value != null
+            ? this.appointmentForm.get('employeeReplacementId')?.value
+            : this.appointmentForm.get('employeeId')?.value;
+        return this.appointmentRepository.getIsBlockingAppointment(
+          employeeId,
           DateTimeService.toDate(this.appointmentForm.get('date')?.value),
           DateTimeService.toTime(this.appointmentForm.get('timeStart')?.value),
           DateTimeService.toTime(this.appointmentForm.get('timeEnd')?.value),
           this.appointmentId
-        )
-      )
+        );
+      })
     );
 
     this.appointmentForm = this.formBuilder.group({
@@ -133,6 +143,8 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     });
 
     this.appointmentForm.get('customerId')?.valueChanges.subscribe((value) => this.onCustomerChanged(value));
+    this.appointmentForm.get('employeeId')?.valueChanges.subscribe(() => this.$onTimeChanged.next(true));
+    this.appointmentForm.get('employeeReplacementId')?.valueChanges.subscribe(() => this.$onTimeChanged.next(true));
     this.appointmentForm.get('distanceToCustomer')?.valueChanges.subscribe(() => this.calculatePrice());
     this.appointmentForm.get('date')?.valueChanges.subscribe((value) => this.onDateChanged(value));
     this.appointmentForm.get('timeEnd')?.valueChanges.subscribe(() => this.onTimeChanged());
@@ -253,7 +265,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
           this.canFinish = !this.isNew && !result.isDone && result.isSignedByCustomer && result.isSignedByEmployee && result.date <= this.today;
-          this.canSign.set(!this.isNew && result.date <= this.today);
+          this.canSign.set(!this.isNew && result.date <= this.today && this.user?.id === result.employeeId);
           this.canOpen = (this.user?.isManager ?? false) && !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId, true);

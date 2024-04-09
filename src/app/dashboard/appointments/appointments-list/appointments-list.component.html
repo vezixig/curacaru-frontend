@@ -217,7 +217,7 @@
         </ul>
       </div>
       <div class="card-footer">
-        @if(!appointment.isDone && !appointment.isPlanned && !appointment.hasBudgetError && appointment.date <= today &&
+        @if(appointment.canSign && !appointment.isDone && !appointment.isPlanned && !appointment.hasBudgetError && appointment.date <= today &&
         (!appointment.isSignedByEmployee ||!appointment.isSignedByCustomer)) {
         <button
           [disabled]="appointment.isSignedByEmployee"
