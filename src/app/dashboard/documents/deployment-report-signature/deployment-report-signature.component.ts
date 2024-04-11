@@ -1,19 +1,22 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, TemplateRef, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ClearanceType } from '@curacaru/enums/clearance-type';
+import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { Customer, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
+import { DeploymentReportTime } from '@curacaru/models/deployment-report-time.model';
 import { DeploymentReport } from '@curacaru/models/deployment-report-view.model';
 import { TimeFormatPipe } from '@curacaru/pipes/time.pipe';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCheck, faCircleInfo, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { faCheck, faCircleInfo, faExclamationTriangle, faGear, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { UUID } from 'angular2-uuid';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map, mergeMap, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map, mergeMap, startWith, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'deployment-report-signature',
@@ -31,13 +34,17 @@ export class DeploymentReportSignatureComponent {
   private readonly offcanvasService = inject(NgbOffcanvas);
   private readonly router = inject(Router);
   private readonly toastrService = inject(ToastrService);
+  private readonly modalService = inject(NgbModal);
 
   private readonly destroy$ = new Subject<void>();
+  private readonly $onRefresh = new Subject();
 
   months = DateTimeService.months;
   today = DateTimeService.today;
   faCircleInfo = faCircleInfo;
   faCheck = faCheck;
+  faTrashCan = faTrashCan;
+  faGear = faGear;
   faExclamationTriangle = faExclamationTriangle;
 
   readonly dataModel$: Observable<{
@@ -76,7 +83,12 @@ export class DeploymentReportSignatureComponent {
 
     this.filterModel$ = this.apiService.getMinimalCustomerListDeploymentReports().pipe(map((customers) => ({ customers })));
 
-    this.dataModel$ = combineLatest({ filter: this.filterModel$, queryParams: this.activatedRoute.queryParams, user: this.userService.user$ }).pipe(
+    this.dataModel$ = combineLatest({
+      filter: this.filterModel$,
+      queryParams: this.activatedRoute.queryParams,
+      user: this.userService.user$,
+      update: this.$onRefresh.pipe(startWith({})),
+    }).pipe(
       tap((next) => {
         this.documentForm.controls['year'].setValue(next.queryParams['year'] || new Date().getFullYear(), { emitEvent: false });
         this.documentForm.controls['month'].setValue(next.queryParams['month'] || new Date().getMonth() + 1, { emitEvent: false });
@@ -103,6 +115,31 @@ export class DeploymentReportSignatureComponent {
 
   openOffCanvas(template: TemplateRef<any>) {
     this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
+  }
+
+  onDeleteAppointment(appointment: DeploymentReportTime) {
+    const modalRef = this.modalService.open(NgbdModalConfirm);
+    modalRef.result.then(() => {
+      this.deleteAppointment(appointment.appointmentId);
+    });
+    modalRef.componentInstance.title = 'Termin löschen';
+
+    const date = DateTimeService.toLocalDateString(DateTimeService.toDate(appointment.date));
+    const start = DateTimeService.toTimeString(appointment.start, false);
+    const end = DateTimeService.toTimeString(appointment.end, false);
+    modalRef.componentInstance.text = `Soll der Termin am ${date} von ${start}-${end} wirklich gelöscht werden?`;
+  }
+
+  private deleteAppointment(appointmentId: UUID) {
+    this.apiService.deleteAppointment(appointmentId).subscribe({
+      complete: () => {
+        this.toastrService.success(`Der Termin wurde gelöscht.`);
+        this.$onRefresh.next(true);
+      },
+      error: (error) => {
+        this.toastrService.error(`Termin konnte nicht gelöscht werden: [${error.status}] ${error.error}`);
+      },
+    });
   }
 
   onSave() {

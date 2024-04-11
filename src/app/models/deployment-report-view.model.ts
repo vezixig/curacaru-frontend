@@ -5,6 +5,7 @@ export interface DeploymentReport {
   employeeName: string;
   hasInvoice: boolean;
   hasUnfinishedAppointment: boolean;
+  hasPlannedAppointment: boolean;
   isCreated: boolean;
   replacementEmployeeNames: string;
   reportId: UUID;

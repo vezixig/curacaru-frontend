@@ -258,7 +258,7 @@ export class AppointmentsListComponent implements OnDestroy {
   onDelete(appointment: AppointmentListEntry) {
     const modalRef = this.modalService.open(NgbdModalConfirm);
     modalRef.result.then(() => {
-      this.deleteEmployee(appointment);
+      this.deleteAppointment(appointment);
     });
     modalRef.componentInstance.title = 'Termin löschen';
 
@@ -344,7 +344,7 @@ export class AppointmentsListComponent implements OnDestroy {
     return obj;
   }
 
-  private deleteEmployee(appointment: AppointmentListEntry) {
+  private deleteAppointment(appointment: AppointmentListEntry) {
     this.apiService
       .deleteAppointment(appointment.id)
       .pipe(takeUntil(this.$onDestroy))
