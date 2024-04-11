@@ -10,7 +10,7 @@ import {
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Observable, Subject, Subscription, debounceTime, filter, forkJoin, map, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, filter, forkJoin, map, switchMap, takeUntil, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UUID } from 'angular2-uuid';
 
@@ -124,6 +124,9 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           DateTimeService.toTime(this.appointmentForm.get('timeEnd')?.value),
           this.appointmentId
         );
+      }),
+      tap((isBlocking) => {
+        this.appointmentForm.get('isNotBlockingAppointment')?.setValue(!isBlocking);
       })
     );
 
@@ -137,6 +140,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       isSignedByCustomer: [false],
       isSignedByEmployee: [false],
       isDone: [false],
+      isNotBlockingAppointment: [false, [Validators.requiredTrue]],
       notes: [''],
       timeEnd: ['', [Validators.required]],
       timeStart: ['', [Validators.required]],
@@ -172,7 +176,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   }
 
   openOffCanvas(template: TemplateRef<any>) {
-    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
+    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel', backdrop: 'static' });
   }
 
   ngOnInit() {

@@ -56,7 +56,7 @@
         </thead>
         <tbody>
           @for(time of dataModel.document.times; track time) {
-          <tr class="d-flex">
+          <tr class="d-flex" [class.table-warning]="!time.isDone">
             <td class="col-4 col-md-3">{{ time.date | date }}</td>
             <td class="col-3 d-none d-md-table-cell">{{ time.start | timeFormat }} Uhr</td>
             <td class="col-3 d-none d-md-table-cell">{{ time.end | timeFormat }} Uhr</td>

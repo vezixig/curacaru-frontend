@@ -229,7 +229,7 @@ export class AppointmentsListComponent implements OnDestroy {
     this.signatureTaking = { appointment, isEmployee };
     this.signatureName.set(isEmployee ? appointment.employeeName : appointment.customerName);
     this.signatureTitle.set(isEmployee ? 'Unterschrift Mitarbeiter' : 'Unterschrift Kunde');
-    this.offcanvasService.open(this.signatureTemplate, { position: 'bottom', panelClass: 'signature-panel' });
+    this.offcanvasService.open(this.signatureTemplate, { position: 'bottom', panelClass: 'signature-panel', backdrop: 'static' });
   }
 
   onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>

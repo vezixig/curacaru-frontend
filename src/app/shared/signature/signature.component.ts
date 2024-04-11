@@ -68,6 +68,14 @@ export class SignatureComponent implements AfterViewInit {
     this.offCanvasService.dismiss();
   }
 
+  preventDefault(e: Event) {
+    e = e || window.event;
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+    e.returnValue = false;
+  }
+
   clear(): void {
     this.signaturePad.clear();
   }

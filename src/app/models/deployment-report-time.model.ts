@@ -6,4 +6,5 @@ export interface DeploymentReportTime {
   end: Time;
   duration: number;
   distance: number;
+  isDone: boolean;
 }

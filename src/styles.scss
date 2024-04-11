@@ -6,24 +6,38 @@ $primary: #ff7f02;
 @import "ngx-toastr/toastr-bs5-alert";
 
 body {
-  height: 100lvh;
-  min-height: 100lvh;
   height: -webkit-fill-available;
-  background-color: #eee;
+  background-color: #fff;
+  height: 100%;
+  overflow: hidden;
 }
 
 html {
-  height: 100lvh;
-  min-height: 100lvh;
   height: -webkit-fill-available;
   background-color: #aaa;
+  height: 100%;
+  overflow: hidden;
+}
+
+.noSelect {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
 main {
   display: flex;
   flex-wrap: nowrap;
-  min-height: 100lvh;
-  padding-top: 60px;
+  height: calc(100% - 60px);
+  overflow-y: auto;
+  position: absolute;
+  top: 60px;
+  width: 100%;
 }
 
 select {
