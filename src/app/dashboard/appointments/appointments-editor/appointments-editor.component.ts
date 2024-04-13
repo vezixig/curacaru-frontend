@@ -219,6 +219,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             if (this.appointmentForm.get('customerId')?.value) {
               this.onCustomerChanged(this.appointmentForm.get('customerId')?.value, true);
             }
+            this.onDateChanged(this.appointmentForm.get('date')?.value);
           } else {
             this.loadAppointment();
           }
