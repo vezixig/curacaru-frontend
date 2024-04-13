@@ -19,8 +19,8 @@
   <table class="d-none d-md-table table table-striped">
     <thead>
       <tr>
-        <th scope="col">Vorname</th>
         <th scope="col">Nachname</th>
+        <th scope="col">Vorname</th>
         <th scope="col">Telefonnummer</th>
         <th scope="col">PLZ</th>
         <th scope="col">Stadt</th>
@@ -31,8 +31,8 @@
     <tbody>
       @for (customer of model.customers; track customer) {
       <tr>
-        <td>{{ customer.firstName }}</td>
         <td>{{ customer.lastName }}</td>
+        <td>{{ customer.firstName }}</td>
         <td>{{ customer.phone }}</td>
         <td>{{ customer.zipCode }}</td>
         <td>{{ customer.city }}</td>
@@ -64,7 +64,7 @@
     @for (customer of model.customers; track customer) {
     <div class="card my-3">
       <div class="card-header d-flex">
-        <span class="lead text-truncate">{{ customer.firstName }} {{ customer.lastName }}</span>
+        <span class="lead text-truncate">{{ customer.lastName }}, {{ customer.firstName }}</span>
         <div class="btn-group ms-auto" role="group">
           @if (customer.latitude != 0 && customer.longitude != 0) {
           <a (click)="onCustomerAddressClick(customer)" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">

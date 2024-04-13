@@ -58,12 +58,12 @@
         <tbody>
           @for(time of dataModel.document.times; track time) {
           <tr class="d-flex" [class.table-warning]="!time.isDone && !time.isPlanned" [class.table-secondary]="time.isPlanned">
-            <td class="col-3 col-md-2">{{ time.date | date }}</td>
+            <td class="col-3 col-md-3">{{ time.date | date : "dd.MM.yy" }}</td>
             <td class="col-3 d-none d-md-table-cell">{{ time.start | timeFormat }} Uhr</td>
             <td class="col-3 d-none d-md-table-cell">{{ time.end | timeFormat }} Uhr</td>
             <td class="col-4 d-md-none">{{ time.start | timeFormat }}-{{ time.end | timeFormat }}</td>
             <td class="col-3 d-md-none text-end">{{ time.duration | number : "1.2-2" }} h</td>
-            <td class="col-3 d-none d-md-table-cell">{{ time.duration | number : "1.2-2" }} h</td>
+            <td class="col-2 d-none d-md-table-cell">{{ time.duration | number : "1.2-2" }} h</td>
             <td class="col text-center">
               <div class="btn-group" role="group">
                 @if(time.isPlanned) {

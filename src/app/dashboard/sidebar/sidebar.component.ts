@@ -17,6 +17,7 @@ import {
   faUsersGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'cura-sidebar',
@@ -37,6 +38,7 @@ export class SidebarComponent {
   faStopwatch = faStopwatch;
   faUserClock = faUserClock;
   faUsersGear = faUsersGear;
+  version = environment.version;
 
   private offcanvasService = inject(NgbOffcanvas);
   private userService = inject(UserService);

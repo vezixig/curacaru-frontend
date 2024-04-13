@@ -21,6 +21,7 @@ export class TopbarComponent {
   faBars = faBars;
   faDoorOpen = faDoorOpen;
   faUser = faUser;
+  version = environment.version;
 
   closeResult = '';
   user$: Observable<UserEmployee>;

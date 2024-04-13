@@ -8,7 +8,7 @@
 
         <img src="../assets/img/logo_text.png" alt="Logo" height="30" class="d-none d-lg-inline-block align-text-top" />
         <img src="../assets/img/logo.svg" alt="Logo" height="30" width="30" class="mx-2 d-lg-none d-inline-block align-text-top" />
-        <span class="d-none d-lg-inline-block" style="font-size: 0.5em; opacity: 0.5; margin-right: 20px">0.1</span>
+        <span class="d-none d-lg-inline-block" style="font-size: 0.5em; opacity: 0.5; margin-right: 20px">{{ version }}</span>
       </div>
 
       @if (user$ | async; as user) {

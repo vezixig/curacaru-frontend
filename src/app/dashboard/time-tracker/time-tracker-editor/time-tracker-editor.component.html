@@ -73,7 +73,7 @@
       }
 
       <p class="mt-3">
-        Summe der Arbeitszeiten: <span class="ms-2 fw-bold">{{ model.totalWorkedHours }} Stunden</span>
+        Summe der Arbeitszeiten: <span class="ms-2 fw-bold">{{ model.totalWorkedHours | number : "1.2-2" }} Stunden</span>
       </p>
 
       @if (model.report && !model.report.signatureManagerDate ) {

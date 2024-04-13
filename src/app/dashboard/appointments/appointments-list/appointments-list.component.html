@@ -77,7 +77,7 @@
       <select id="selectCustomer" class="form-select" name="customerSelect" formControlName="customerId">
         <option></option>
         @for (customer of filterModel.customers; track customer) {
-        <option [value]="customer.id">{{ customer.firstName }} {{ customer.lastName }}</option>
+        <option [value]="customer.id">{{ customer.lastName }}, {{ customer.firstName }}</option>
         }
       </select>
     </div>
