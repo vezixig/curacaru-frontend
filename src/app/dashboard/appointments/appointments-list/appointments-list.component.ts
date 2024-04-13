@@ -159,7 +159,6 @@ export class AppointmentsListComponent implements OnDestroy {
       .get('customerId')!
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
-        console.log(next);
         this.store.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: next }));
       });
 

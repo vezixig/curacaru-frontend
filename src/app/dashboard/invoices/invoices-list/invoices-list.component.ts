@@ -69,7 +69,6 @@ export class InvoicesListComponent {
       state: this.store,
       refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
-      tap((result) => console.log(result.state)),
       tap((result) => this.filterForm.patchValue(result.state.invoicesList, { emitEvent: false })),
       switchMap((result) =>
         this.invoiceRepository

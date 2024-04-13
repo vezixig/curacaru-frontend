@@ -188,19 +188,19 @@
           Selbstzahler <span class="fw-light"> - {{ initialBudget().selfPayment | currency }}</span>
         </label>
       </div>
-      } @if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
-      <div class="alert alert-warning mt-2" role="alert">
-        <fa-icon [icon]="faCircleExclamation" /> Das Budget für diesen Monat ist bereits aufgebraucht, weshalb der Termin leider nicht
-        {{ isNew ? "angelegt" : "gespeichert" }} werden kann.
-      </div>
       } @if (isPlanning) {
       <div class="alert alert-secondary mt-2" role="alert">
         <fa-icon [icon]="faCircleInfo" /> Dieser Termin wird für einen zukünftigen Monat geplant und erst dann mit dem gewählten Budget verrechnet.
       </div>
-      } @if (hasBudgetError) {
+      } @else if (hasBudgetError) {
       <div class="alert alert-danger mt-2" role="alert">
         <fa-icon [icon]="faCircleExclamation" /> Die automatische Verrechnung konnte nicht durchgeführt werden, da das gewählte Budget aufgebraucht
         ist.
+      </div>
+      } @else if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
+      <div class="alert alert-warning mt-2" role="alert">
+        <fa-icon [icon]="faCircleExclamation" /> Das Budget für diesen Monat ist bereits aufgebraucht, weshalb der Termin leider nicht
+        {{ isNew ? "angelegt" : "gespeichert" }} werden kann.
       </div>
       }
     </div>
