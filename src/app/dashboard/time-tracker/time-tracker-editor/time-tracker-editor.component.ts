@@ -13,12 +13,15 @@ import { TimeFormatPipe } from '@curacaru/pipes/time.pipe';
 import { ToastrService } from 'ngx-toastr';
 import { UserEmployee } from '@curacaru/models';
 import { WorkingHours } from '@curacaru/models/working-hours.model';
-import { faCalendar } from '@fortawesome/free-regular-svg-icons';
-import { faCircleInfo, faEraser, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { faEraser, faGear } from '@fortawesome/free-solid-svg-icons';
 import { finalize, map, mergeMap, shareReplay, startWith, tap } from 'rxjs/operators';
 import { WorkingTimeService } from '@curacaru/services/working-time.service';
 import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
+import { AppointmentService } from '@curacaru/services/appointment.service';
+import { AppointmentBase } from '@curacaru/models/appointment-base.model';
+import { InfoComponent } from '@curacaru/shared/info-box/info.component';
 
 @Component({
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
@@ -27,6 +30,7 @@ import { SignatureComponent } from '@curacaru/shared/signature/signature.compone
   templateUrl: './time-tracker-editor.component.html',
   imports: [
     AsyncPipe,
+    InfoComponent,
     CommonModule,
     DatePipe,
     DecimalPipe,
@@ -50,15 +54,16 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   private readonly userService = inject(UserService);
   private readonly workingTimeService = inject(WorkingTimeService);
   private readonly offcanvasService = inject(NgbOffcanvas);
+  private readonly appointmentService = inject(AppointmentService);
 
   private readonly user$: Observable<UserEmployee>;
   private readonly $onDestroy = new Subject();
 
   faCalendar = faCalendar;
+  faGear = faGear;
+  faTrashCan = faTrashCan;
   faEraser = faEraser;
-  faTriangleExclamation = faTriangleExclamation;
   months = DateTimeService.months;
-  faCircleInfo = faCircleInfo;
 
   readonly canvasWidth = signal(120);
   readonly isLoadingWorkingHours = signal(false);
@@ -73,9 +78,12 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     employeeName: string;
     userName: string;
     hasUndoneAppointments: boolean;
+    hasPlannedAppointments: boolean;
   }>;
   readonly reportForm: FormGroup;
   readonly today = new Date();
+
+  private readonly $onRefresh = new Subject();
 
   constructor() {
     this.reportForm = this.buildForm();
@@ -88,7 +96,11 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     );
 
     // retrieve working hours
-    this.model$ = combineLatest({ user: this.user$, queryParams: this.activatedRoute.queryParams }).pipe(
+    this.model$ = combineLatest({
+      user: this.user$,
+      queryParams: this.activatedRoute.queryParams,
+      refresh: this.$onRefresh.pipe(startWith({})),
+    }).pipe(
       map((result) => {
         this.reportForm.controls['month'].setValue(parseInt(result.queryParams['month']) || new Date().getMonth() + 1);
         this.reportForm.controls['year'].setValue(parseInt(result.queryParams['year']) || new Date().getFullYear());
@@ -135,7 +147,8 @@ export class TimeTrackerEditorComponent implements OnDestroy {
               canSign: result.workTime.length > 0 && result.workTime.findIndex((o) => o.isDone == false) == -1,
               employeeName: result.employee.firstName + ' ' + result.employee.lastName,
               userName: next.firstName + ' ' + next.lastName,
-              hasUndoneAppointments: result.workTime.findIndex((o) => o.isDone == false) > -1,
+              hasUndoneAppointments: result.workTime.findIndex((o) => o.isDone == false && o.isPlanned == false) > -1,
+              hasPlannedAppointments: result.workTime.findIndex((o) => o.isPlanned == true) > -1,
             };
           }),
           finalize(() => {
@@ -169,6 +182,12 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   onSigned($event: string) {
     this.reportForm.get('signature')!.setValue($event);
     this.onSave();
+  }
+
+  onDeleteAppointment(workingHours: WorkingHours) {
+    var appointment: AppointmentBase = { ...workingHours, date: DateTimeService.toDate(workingHours.date.toString()) };
+    console.log(appointment);
+    this.appointmentService.DeleteAppointment(appointment, this.$onRefresh);
   }
 
   private buildForm(): FormGroup {

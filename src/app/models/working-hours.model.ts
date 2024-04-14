@@ -1,9 +1,7 @@
-import { Time } from '@angular/common';
+import { AppointmentBase } from './appointment-base.model';
 
-export interface WorkingHours {
+export interface WorkingHours extends AppointmentBase {
   workDuration: number;
-  date: Date;
-  timeStart: Time;
-  timeEnd: Time;
   isDone: boolean;
+  isPlanned: boolean;
 }

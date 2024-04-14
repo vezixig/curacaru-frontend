@@ -94,20 +94,11 @@
 
     <!-- unfinished appointments message -->
     @if(dataModel.document.hasUnfinishedAppointment) {
-    <div class="row">
-      <div class="alert alert-warning mt-1" role="alert">
-        <fa-icon [icon]="faExclamationTriangle" [fixedWidth]="true" /> Es gibt noch nicht abgeschlossene Termine für diesen Monat.
-      </div>
-    </div>
+    <cura-info type="warning">Es gibt noch nicht abgeschlossene Termine für diesen Monat.</cura-info>
     }
-
     <!-- planned appointments message -->
     @if(dataModel.document.hasPlannedAppointment) {
-    <div class="row">
-      <div class="alert alert-secondary mt-1" role="alert">
-        <fa-icon [icon]="faExclamationTriangle" [fixedWidth]="true" /> Es gibt noch geplante, nicht eingetragene Termine für diesen Monat.
-      </div>
-    </div>
+    <cura-info>Es gibt noch geplante, nicht eingetragene Termine für diesen Monat.</cura-info>
     }
 
     <!-- created message-->
@@ -158,11 +149,7 @@
       </div>
     </div>
     } @else {
-    <div class="row">
-      <div class="alert alert-secondary mt-3" role="alert">
-        <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Der Einsatznachweis für diesen Monat wurde bereits erfasst.
-      </div>
-    </div>
+    <cura-info>Der Einsatznachweis für diesen Monat wurde bereits erfasst.</cura-info>
     }
 
     <ng-template #employeeSignature>
@@ -177,11 +164,7 @@
     </ng-template>
 
     } @else {
-    <div class="row">
-      <div class="alert alert-secondary mt-3" role="alert">
-        <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat wurden keine Termine mit der gewählten Abrechnungsoption erfasst.
-      </div>
-    </div>
+    <cura-info>Für diesen Monat wurden keine Termine mit der gewählten Abrechnungsoption erfasst.</cura-info>
     } }
   </form>
 

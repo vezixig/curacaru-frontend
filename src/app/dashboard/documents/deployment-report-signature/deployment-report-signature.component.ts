@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, TemplateRef, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -10,9 +10,10 @@ import { DeploymentReport } from '@curacaru/models/deployment-report-view.model'
 import { TimeFormatPipe } from '@curacaru/pipes/time.pipe';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
+import { InfoComponent } from '@curacaru/shared/info-box/info.component';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCheck, faCircleInfo, faExclamationTriangle, faGear, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faGear, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { ToastrService } from 'ngx-toastr';
@@ -20,7 +21,7 @@ import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map
 
 @Component({
   selector: 'deployment-report-signature',
-  imports: [ReactiveFormsModule, CommonModule, TimeFormatPipe, FontAwesomeModule, SignatureComponent, RouterModule],
+  imports: [ReactiveFormsModule, InfoComponent, CommonModule, TimeFormatPipe, FontAwesomeModule, SignatureComponent, RouterModule],
   standalone: true,
   templateUrl: './deployment-report-signature.component.html',
   styleUrls: ['./deployment-report-signature.component.scss'],
@@ -41,11 +42,9 @@ export class DeploymentReportSignatureComponent {
 
   months = DateTimeService.months;
   today = DateTimeService.today;
-  faCircleInfo = faCircleInfo;
   faCheck = faCheck;
   faTrashCan = faTrashCan;
   faGear = faGear;
-  faExclamationTriangle = faExclamationTriangle;
 
   readonly dataModel$: Observable<{
     document?: DeploymentReport;

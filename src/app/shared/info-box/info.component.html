@@ -1,0 +1,11 @@
+<div
+  class="alert alert-secondary mt-1"
+  role="alert"
+  [class.alert-secondary]="type() === 'info'"
+  [class.alert-warning]="type() === 'warning'"
+  [class.alert-error]="type() === 'error'"
+  [class.alert-success]="type() === 'success'"
+>
+  <fa-icon [icon]="icon()" [fixedWidth]="true" class="me-1" />
+  <ng-content></ng-content>
+</div>
