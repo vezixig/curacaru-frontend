@@ -20,6 +20,8 @@ export const DeploymentReportChangeFilterAction = createAction(
   props<{ employeeId?: UUID; customerId?: UUID; year: number; month: number }>()
 );
 
+export const DeploymentReportChangeCustomerAction = createAction('[Deployment Report List] Change customer', props<{ customerId?: UUID }>());
+
 export const deploymentReportListReducer = createReducer(
   initialState,
   on(DeploymentReportChangeFilterAction, (state, args) => ({
@@ -28,5 +30,9 @@ export const deploymentReportListReducer = createReducer(
     employeeId: args.employeeId,
     year: args.year,
     month: args.month,
+  })),
+  on(DeploymentReportChangeCustomerAction, (state, args) => ({
+    ...state,
+    customerId: args.customerId,
   }))
 );

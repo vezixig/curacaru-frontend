@@ -51,7 +51,19 @@
             <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
               <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
             </button>
-
+            <!-- quick actions -->
+            <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
+              <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
+                <fa-icon [icon]="faEllipsis" [fixedWidth]="true" />
+              </button>
+              <div class="dropdown-menu" ngbDropdownMenu>
+                <button ngbDropdownItem (click)="onCustomerAddressClick(customer)">Navigation zum Kunden</button>
+                <button ngbDropdownItem (click)="onShowAppointments(customer)">Termine</button>
+                <button ngbDropdownItem [routerLink]="['/dashboard/budgets', customer.id]">Budgets</button>
+                <button ngbDropdownItem (click)="onShowDeploymentReports(customer)">Einsatznachweise</button>
+                <button ngbDropdownItem (click)="onShowInvoices(customer)">Rechnungen</button>
+              </div>
+            </div>
             }
           </div>
         </td>
@@ -87,6 +99,17 @@
           <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </button>
+          <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
+            <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
+              <fa-icon [icon]="faEllipsis" [fixedWidth]="true" />
+            </button>
+            <div class="dropdown-menu" ngbDropdownMenu>
+              <button ngbDropdownItem (click)="onShowAppointments(customer)">Termine</button>
+              <button ngbDropdownItem [routerLink]="['/dashboard/budgets', customer.id]">Budgets</button>
+              <button ngbDropdownItem (click)="onShowDeploymentReports(customer)">Einsatznachweise</button>
+              <button ngbDropdownItem (click)="onShowInvoices(customer)">Rechnungen</button>
+            </div>
+          </div>
           }
         </div>
       </div>

@@ -1,9 +1,9 @@
 import { Component, OnDestroy, inject, signal } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faCircleInfo, faGear, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { faCircleInfo, faEllipsis, faGear, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, combineLatest, map, takeUntil, tap } from 'rxjs';
@@ -17,9 +17,12 @@ import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { ChangeEmployeeFilterAction } from '@curacaru/state/customer-list.state';
 import { UUID } from 'angular2-uuid';
+import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
+import { DeploymentReportChangeCustomerAction, DeploymentReportListState } from '@curacaru/state/deployment-report-list.state';
+import { InvoiceChangeCustomerAction, InvoicesListState } from '@curacaru/state/invoices-list.state';
 
 @Component({
-  imports: [FontAwesomeModule, NgxSkeletonLoaderModule, ReplacePipe, RouterModule, FormsModule, AsyncPipe],
+  imports: [FontAwesomeModule, NgxSkeletonLoaderModule, NgbDropdownModule, ReplacePipe, RouterModule, FormsModule, AsyncPipe],
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
@@ -33,13 +36,18 @@ export class CustomerListComponent implements OnDestroy {
   faTrashCan = faTrashCan;
   faUser = faUser;
   faCircleInfo = faCircleInfo;
+  faEllipsis = faEllipsis;
 
   private readonly apiService = inject(ApiService);
+  private readonly appointmentListStore = inject(Store<AppointmentListState>);
+  private readonly deploymentReportListStore = inject(Store<DeploymentReportListState>);
+  private readonly invoiceListStore = inject(Store<InvoicesListState>);
+  private readonly locationService = inject(LocationService);
   private readonly modalService = inject(NgbModal);
+  private readonly router = inject(Router);
+  private readonly store = inject(Store);
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
-  private readonly locationService = inject(LocationService);
-  private readonly store = inject(Store);
 
   model$ = new Observable<{ customers: CustomerListEntry[]; employees: EmployeeBasic[]; user: UserEmployee }>();
   isLoading = signal(false);
@@ -86,6 +94,21 @@ export class CustomerListComponent implements OnDestroy {
     modalRef.result.then(() => this.deleteEmployee(customer));
     modalRef.componentInstance.title = 'Kunden löschen';
     modalRef.componentInstance.text = `Soll ${customer.firstName} ${customer.lastName} wirklich gelöscht werden?`;
+  }
+
+  onShowAppointments(customer: CustomerListEntry) {
+    this.appointmentListStore.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: customer.id }));
+    this.router.navigate(['/dashboard/appointments']);
+  }
+
+  onShowDeploymentReports(customer: CustomerListEntry) {
+    this.deploymentReportListStore.dispatch(DeploymentReportChangeCustomerAction({ customerId: customer.id }));
+    this.router.navigate(['/dashboard/documents/deployment-reports']);
+  }
+
+  onShowInvoices(customer: CustomerListEntry) {
+    this.invoiceListStore.dispatch(InvoiceChangeCustomerAction({ customerId: customer.id }));
+    this.router.navigate(['/dashboard/invoices']);
   }
 
   private deleteEmployee(customer: CustomerListEntry) {

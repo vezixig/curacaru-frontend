@@ -15,12 +15,18 @@ export const initialState: InvoicesListState = {
 
 export const InvoicesChangeFilterAction = createAction('[Invoices List] Change filter', props<{ year: number; month: number; customerId?: UUID }>());
 
+export const InvoiceChangeCustomerAction = createAction('[Invoices List] Change customer', props<{ customerId?: UUID }>());
+
 export const invoicesListReducer = createReducer(
   initialState,
   on(InvoicesChangeFilterAction, (state, args) => ({
     ...state,
     year: args.year,
     month: args.month,
+    customerId: args.customerId,
+  })),
+  on(InvoiceChangeCustomerAction, (state, args) => ({
+    ...state,
     customerId: args.customerId,
   }))
 );
