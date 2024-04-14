@@ -24,12 +24,14 @@ import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
 import { ClearanceType } from '@curacaru/enums/clearance-type';
-import { faCheck, faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { AppointmentRepository } from '@curacaru/services/repositories/appointment.repository';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
+import { InfoComponent } from '@curacaru/shared/info-box/info.component';
 
 @Component({
   imports: [
+    InfoComponent,
     CommonModule,
     FontAwesomeModule,
     FormsModule,
@@ -49,8 +51,6 @@ import { SignatureComponent } from '@curacaru/shared/signature/signature.compone
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
   faCheck = faCheck;
-  faCircleInfo = faCircleInfo;
-  faCircleExclamation = faCircleExclamation;
   RideCostType = RideCostsType;
 
   clearanceType = ClearanceType;

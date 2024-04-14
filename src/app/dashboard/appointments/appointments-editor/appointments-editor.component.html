@@ -88,9 +88,7 @@
     </div>
 
     @if(!isDone && (blockingAppointment$ | async)) {
-    <div class="alert alert-warning mt-2" role="alert">
-      <fa-icon [icon]="faCircleExclamation" /> Der Termin überschneidet sich mit einem anderen Termin und kann daher nicht angelegt werden
-    </div>
+    <cura-info type="warning">Der Termin überschneidet sich mit einem anderen Termin und kann daher nicht angelegt werden</cura-info>
     }
 
     <!-- Notes -->
@@ -131,7 +129,7 @@
           name="clearanceType"
           type="radio"
           [value]="clearanceType.reliefAmount"
-          [disabled]="isExpired || (!canClearReliefAmount && !isPlanning)"
+          [disabled]="isDone || isExpired || (!canClearReliefAmount && !isPlanning)"
         />
         <label class="form-check-label" for="radioReliefAmount">
           Entlastungsbetrag §45b SGB XI <span class="fw-light"> - {{ initialBudget().reliefAmount | currency }}</span>
@@ -148,7 +146,7 @@
           name="clearanceType"
           type="radio"
           [value]="clearanceType.careBenefit"
-          [disabled]="isExpired || (!canClearCareBenefit && !isPlanning)"
+          [disabled]="isDone || isExpired || (!canClearCareBenefit && !isPlanning)"
         />
         <label class="form-check-label" for="radioCareBenefit">
           ..% Pflegesachleistungen §36 SGB XI (max. 40%) <span class="fw-light"> - {{ initialBudget().careBenefit | currency }}</span>
@@ -165,7 +163,7 @@
           name="clearanceType"
           type="radio"
           [value]="clearanceType.preventiveCare"
-          [disabled]="isExpired || (!canClearPreventiveCare && !isPlanning)"
+          [disabled]="isDone || isExpired || (!canClearPreventiveCare && !isPlanning)"
         />
         <label class="form-check-label" for="radioPreventiveCare">
           Verhinderungspflege § 39 SGB XI <span class="fw-light"> - {{ initialBudget().preventiveCare | currency }}</span>
@@ -182,26 +180,20 @@
           name="clearanceType"
           type="radio"
           [value]="clearanceType.selfPayment"
-          [disabled]="isExpired || (!canClearSelfPayment && !isPlanning)"
+          [disabled]="isDone || isExpired || (!canClearSelfPayment && !isPlanning)"
         />
         <label class="form-check-label" for="radioSelfPayment">
           Selbstzahler <span class="fw-light"> - {{ initialBudget().selfPayment | currency }}</span>
         </label>
       </div>
       } @if (isPlanning) {
-      <div class="alert alert-secondary mt-2" role="alert">
-        <fa-icon [icon]="faCircleInfo" /> Dieser Termin wird für einen zukünftigen Monat geplant und erst dann mit dem gewählten Budget verrechnet.
-      </div>
+      <cura-info>Dieser Termin wird für einen zukünftigen Monat geplant und erst dann mit dem gewählten Budget verrechnet.</cura-info>
       } @else if (hasBudgetError) {
-      <div class="alert alert-danger mt-2" role="alert">
-        <fa-icon [icon]="faCircleExclamation" /> Die automatische Verrechnung konnte nicht durchgeführt werden, da das gewählte Budget aufgebraucht
-        ist.
-      </div>
+      <cura-info type="error">Die automatische Verrechnung konnte nicht durchgeführt werden, da das gewählte Budget aufgebraucht ist.</cura-info>
       } @else if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
-      <div class="alert alert-warning mt-2" role="alert">
-        <fa-icon [icon]="faCircleExclamation" /> Das Budget für diesen Monat ist bereits aufgebraucht, weshalb der Termin leider nicht
-        {{ isNew ? "angelegt" : "gespeichert" }} werden kann.
-      </div>
+      <cura-info type="warning">
+        Das Budget für diesen Monat ist bereits aufgebraucht, weshalb der Termin leider nicht {{ isNew ? "angelegt" : "gespeichert" }} werden kann.
+      </cura-info>
       }
     </div>
   </div>
