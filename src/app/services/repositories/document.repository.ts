@@ -22,7 +22,7 @@ export class DocumentRepository extends BaseRepository {
     return this.client.get(`${this.apiUrl}/documents/deployment-reports/${year}/${month}/${customerId}/${clearanceType}/document`, {
       responseType: 'blob',
     });
-  } 
+  }
 
   saveDeploymentReport(report: DeploymentReportSaveModel) {
     report.clearanceType = +report.clearanceType;
@@ -84,15 +84,11 @@ export class DocumentRepository extends BaseRepository {
   /**
    * Gets the list of assignment declarations
    * @param year the year to get the list for
-   * @param customerId an optional customer id to filter by
    * @param employeeId an optional employee id to filter by
    * @returns a list of assignment declarations
    */
-  getAssignmentDeclarationList(year: number, customerId?: UUID, employeeId?: UUID) {
+  getAssignmentDeclarationList(year: number, employeeId?: UUID) {
     const options = { params: new HttpParams().set('year', year) };
-    if (customerId) {
-      options.params = options.params.set('customerId', customerId.toString());
-    }
     if (employeeId) {
       options.params = options.params.set('employeeId', employeeId.toString());
     }

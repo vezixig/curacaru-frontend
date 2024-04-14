@@ -32,7 +32,6 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
   faUser = faUser;
 
   readonly filterModel$: Observable<{
-    customers: MinimalCustomerListEntry[];
     employees: EmployeeBasic[];
     user: UserEmployee;
   }>;
@@ -57,7 +56,6 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
     this.filterForm = this.formBuilder.group({
       year: [new Date().getFullYear(), [Validators.required, Validators.min(2020), Validators.max(2999)]],
       employeeId: [undefined],
-      customerId: [undefined],
     });
 
     this.filterForm.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe((filter) => {
@@ -67,7 +65,6 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
     this.filterModel$ = forkJoin({
       user: this.userService.user$,
       employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getMinimalCustomerList(InsuranceStatus.Statutory),
     });
 
     this.listModel$ = combineLatest({ _: this.onRefresh$.pipe(startWith(null)), state: this.store }).pipe(
@@ -75,14 +72,13 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
         const queryFilter = {
           year: state.assignmentDeclarationList.year,
           employeeId: state.assignmentDeclarationList.employeeId,
-          customerId: state.assignmentDeclarationList.customerId,
         };
         this.filterForm.patchValue(queryFilter, { emitEvent: false });
         return queryFilter;
       }),
       debounceTime(300),
       switchMap((filter) =>
-        this.documentRepository.getAssignmentDeclarationList(filter.year, filter.customerId, filter.employeeId).pipe(
+        this.documentRepository.getAssignmentDeclarationList(filter.year, filter.employeeId).pipe(
           catchError(() => {
             this.toastrService.error('Die Liste mit Abtretungserklärungen konnte nicht geladen werden');
             return [];
