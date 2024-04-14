@@ -149,6 +149,11 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'dashboard/profile',
+    pathMatch: 'full',
+    loadComponent: () => import('@curacaru/dashboard/profile/profile.component').then((o) => o.ProfileComponent),
+  },
+  {
     path: 'dashboard/time-tracker',
     children: [
       { path: '', redirectTo: 'list', pathMatch: 'full' },

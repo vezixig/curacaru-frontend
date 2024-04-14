@@ -7,7 +7,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UserEmployee } from '../../models/user-employee.model';
 import { UserService } from '../../services/user.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 
@@ -15,7 +15,7 @@ import { AsyncPipe } from '@angular/common';
   selector: 'cura-topbar',
   standalone: true,
   templateUrl: './topbar.component.html',
-  imports: [NgbDropdownModule, FontAwesomeModule, AsyncPipe],
+  imports: [NgbDropdownModule, FontAwesomeModule, AsyncPipe, RouterModule],
 })
 export class TopbarComponent {
   faBars = faBars;

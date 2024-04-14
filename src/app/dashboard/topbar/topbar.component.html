@@ -23,14 +23,15 @@
             <fa-icon [icon]="faUser" />
           </a>
           <div ngbDropdownMenu aria-labelledby="buttonDropDown">
+            <button [routerLink]="['/dashboard/profile']" ngbDropdownItem><fa-icon [icon]="faUser" [fixedWidth]="true" /> Konto</button>
             <button (click)="handleLogout()" ngbDropdownItem><fa-icon [icon]="faDoorOpen" [fixedWidth]="true" /> Abmelden</button>
             <div class="dropdown-divider"></div>
-            <span ngbDropdownItem
-              >Angemeldet als:<br />
-              {{ user?.firstName }} {{ user?.lastName }}</span
-            >
+            <p class="my-1 mx-3">
+              Angemeldet als:<br />
+              {{ user?.firstName }} {{ user?.lastName }}
+            </p>
             @if (user?.isManager) {
-            <span ngbDropdownItem class="text-primary">Manager</span>
+            <p class="text-primary my-1 mx-3">Manager</p>
             }
           </div>
         </div>
