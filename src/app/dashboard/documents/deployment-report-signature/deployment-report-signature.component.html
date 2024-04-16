@@ -159,7 +159,7 @@
 
     <ng-template #customerSignature>
       <cura-signature
-        [signatureName]="dataModel.customer.firstName + ' ' + dataModel.customer.lastName"
+        [signatureName]="dataModel.customer.lastName + ', ' + dataModel.customer.firstName"
         (signatureTaken)="onCustomerSigned($event)"
       />
     </ng-template>

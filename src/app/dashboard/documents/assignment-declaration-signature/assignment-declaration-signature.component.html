@@ -88,7 +88,7 @@
   </form>
 
   <ng-template #signature>
-    <cura-signature [signatureName]="dataModel.customer?.firstName + ' ' + dataModel.customer?.lastName" (signatureTaken)="onSigned($event)" />
+    <cura-signature [signatureName]="dataModel.customer?.lastName + ', ' + dataModel.customer?.firstName" (signatureTaken)="onSigned($event)" />
   </ng-template>
   }
 </div>
