@@ -119,7 +119,7 @@
           <button
             [disabled]="!reportForm.valid || isSaving()"
             type="submit"
-            class="form-control btn btn-primary text-white"
+            class="form-control btn btn-primary text-white h-100"
             (click)="openOffCanvas(signature)"
           >
             @if (isSaving()) {
@@ -129,7 +129,7 @@
           </button>
         </div>
         <div class="col">
-          <button type="button" [routerLink]="['/dashboard/time-tracker']" class="form-control btn btn-outline-secondary">Verwerfen</button>
+          <button type="button" [routerLink]="['/dashboard/time-tracker']" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
         </div>
       </div>
     </div>

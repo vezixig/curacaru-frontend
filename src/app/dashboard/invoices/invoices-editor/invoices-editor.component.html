@@ -92,7 +92,7 @@
           [disabled]="invoiceForm.get('signature')?.value != ''"
           [class.btn-outline-primary]="!invoiceForm.get('signature')?.value"
           [class.btn-outline-success]="invoiceForm.get('signature')?.value"
-          class="form-control btn"
+          class="form-control btn h-100"
           type="button"
           (click)="openOffCanvas(signature)"
         >
@@ -103,14 +103,14 @@
       </div>
 
       <div class="col">
-        <button type="submit" [disabled]="invoiceForm.invalid || isSaving()" class="form-control btn btn-primary text-white">
+        <button type="submit" [disabled]="invoiceForm.invalid || isSaving()" class="form-control btn btn-primary text-white h-100">
           Rechnung erstellen @if (isSaving()) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
           }
         </button>
       </div>
       <div class="col">
-        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary">Verwerfen</button>
+        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
       </div>
     </div>
 

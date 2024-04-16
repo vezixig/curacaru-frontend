@@ -286,7 +286,7 @@
 
     <div class="row g-2 mt-2">
       <div class="col">
-        <button [disabled]="!customerForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary form-control text-white">
+        <button [disabled]="!customerForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary form-control text-white h-100">
           @if (isSaving) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
           }
@@ -297,7 +297,7 @@
         </button>
       </div>
       <div class="col">
-        <button type="button" [routerLink]="['/dashboard/customers']" class="form-control btn btn-outline-secondary">Verwerfen</button>
+        <button type="button" [routerLink]="['/dashboard/customers']" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
       </div>
     </div>
   </form>

@@ -111,6 +111,8 @@
       </div>
       <div class="col-5 d-flex align-items-center">den {{ today | date }}</div>
     </div>
+
+    <!-- buttons -->
     <div class="row g-2 mt-2">
       <div class="col">
         <button
@@ -119,7 +121,7 @@
           (click)="openOffCanvas(employeeSignature)"
           [class.btn-outline-primary]="documentForm.get('signatureEmployee')?.value == ''"
           [class.btn-outline-success]="documentForm.get('signatureEmployee')?.value != ''"
-          class="form-control btn"
+          class="form-control btn h-100"
         >
           <span>Unterschrift Mitarbeiter</span>
           @if(documentForm.get('signatureEmployee')?.value != '') {
@@ -134,7 +136,7 @@
           (click)="openOffCanvas(customerSignature)"
           [class.btn-outline-primary]="documentForm.get('signatureCustomer')?.value == ''"
           [class.btn-outline-success]="documentForm.get('signatureCustomer')?.value != ''"
-          class="form-control btn"
+          class="form-control btn h-100"
         >
           <span>Unterschrift Kunde</span>
           @if(documentForm.get('signatureCustomer')?.value != '') {
@@ -143,10 +145,12 @@
         </button>
       </div>
       <div class="col">
-        <button [disabled]="documentForm.invalid" type="submit" class="form-control btn btn-primary text-white">Einsatznachweis erstellen</button>
+        <button [disabled]="documentForm.invalid" type="submit" class="form-control btn btn-primary text-white h-100">
+          Einsatznachweis erstellen
+        </button>
       </div>
       <div class="col">
-        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary">Verwerfen</button>
+        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
       </div>
     </div>
     } @else {
