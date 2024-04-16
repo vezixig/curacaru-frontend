@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import {
+  faCakeCandles,
   faCheck,
   faCircleInfo,
   faFileSignature,
@@ -81,6 +82,7 @@ export class AppointmentsListComponent implements OnDestroy {
   /** relays  */
   DateTimeService = DateTimeService;
   beginOfCurrentMonth = DateTimeService.beginOfCurrentMonth;
+  faCakeCandles = faCakeCandles;
   faCalendar = faCalendar;
   faCheck = faCheck;
   faCircleInfo = faCircleInfo;
@@ -89,11 +91,11 @@ export class AppointmentsListComponent implements OnDestroy {
   faHouse = faHouse;
   faLocationDot = faLocationDot;
   faPhone = faPhone;
+  faSignature = faSignature;
   faTrashCan = faTrashCan;
   faUnlock = faUnlock;
   faUser = faUser;
   faUserSolid = faUserAlt;
-  faSignature = faSignature;
 
   /** properties  */
   @ViewChild('signature') signatureTemplate!: TemplateRef<any>;

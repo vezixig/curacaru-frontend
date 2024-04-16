@@ -5,11 +5,11 @@
   </button>
 
   <div class="col p-0 pe-1">
-    <label>Jahr</label>
+    <label class="fw-light">Jahr</label>
     <input type="number" [min]="2020" [max]="2100" class="form-control" [ngModel]="selectedYear()" (ngModelChange)="onSelectedYearChange($event)" />
   </div>
   <div class="col p-0 ps-1">
-    <label>Monat</label>
+    <label class="fw-light">Monat</label>
     <select class="form-control" [ngModel]="selectedMonth()" (ngModelChange)="onSelectedMonthChange($event)">
       @for (month of months; track month) {
       <option [value]="month.value">{{ month.name }}</option>

@@ -3,7 +3,7 @@
 
   <form (ngSubmit)="handleSave()" [formGroup]="customerForm">
     <div class="form-group mb-4">
-      <label for="selectAssociatedEmployeeId">Bearbeitet von:</label>
+      <label class="fw-light" for="selectAssociatedEmployeeId">Bearbeitet von:</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -26,7 +26,7 @@
 
     <!-- salutation, first and lastname -->
     <div class="d-none d-md-block form-group mb-2">
-      <label for="selectSalutation">Anrede, Vor- und Nachname</label>
+      <label class="fw-light" for="selectSalutation">Anrede, Vor- und Nachname</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -62,7 +62,7 @@
     </div>
 
     <div class="d-md-none form-group mb-2">
-      <label for="selectSalutation">Anrede</label>
+      <label class="fw-light" for="selectSalutation">Anrede</label>
       <select class="form-select" id="selectSalutation" formControlName="salutation">
         <option value="0">Frau</option>
         <option value="1">Herr</option>
@@ -84,7 +84,7 @@
 
     <!-- zip code and city-->
     <div class="form-group mb-2">
-      <label for="inputZipCode">Postleitzahl</label>
+      <label class="fw-light" for="inputZipCode">Postleitzahl</label>
 
       @if (isLoading) {
       <ngx-skeleton-loader />
@@ -113,7 +113,7 @@
 
     <!-- Notfallkontakt -->
     <div class="form-group mb-2">
-      <label for="inputEmergencyContactName">Notfallkontakt Name und Telefonnummer</label>
+      <label class="fw-light" for="inputEmergencyContactName">Kontaktperson und Telefonnummer</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -132,7 +132,7 @@
 
     <!-- Versicherung -->
     <div class="d-none d-md-block form-group mb-3">
-      <label for="inputInsurance">Krankenkasse, Versichertennummer und Status</label>
+      <label class="fw-light" for="inputInsurance">Krankenkasse, Versichertennummer und Status</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -189,7 +189,7 @@
     </div>
 
     <div class="d-md-none form-group mb-2">
-      <label for="inputInsurance">Versicherung</label>
+      <label class="fw-light" for="inputInsurance">Versicherung</label>
       <input
         [disabled]="!isManager"
         id="inputInsurance"
@@ -221,7 +221,7 @@
     />
 
     <div class="form-group mb-2 d-md-none">
-      <label for="inputInsuranceStatus">Versicherungsstatus</label>
+      <label class="fw-light" for="inputInsuranceStatus">Versicherungsstatus</label>
       <select
         class="form-select"
         formControlName="insuranceStatus"
@@ -241,7 +241,7 @@
 
     <!-- Pflegegrad -->
     <div class="form-group mb-3">
-      <label for="selectCareLevel">Pflegegrad</label>
+      <label class="fw-light" for="selectCareLevel">Pflegegrad</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -265,7 +265,7 @@
     </div>
 
     <div class="form-group">
-      <label>Abrechnungsoptionen</label>
+      <label class="fw-light">Abrechnungsoptionen</label>
       <div class="form-check">
         <input class="form-check-input" type="checkbox" formControlName="doClearanceSelfPayment" id="checkDoClearanceSelfPayment" />
         <label class="form-check-label" for="checkDoClearanceSelfPayment"> Selbstzahler</label>

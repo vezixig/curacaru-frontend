@@ -8,7 +8,7 @@
   <form [formGroup]="filterForm" class="p-0">
     <div class="row gx-3">
       <div class="col col-12 col-md">
-        <label for="inputYear">Jahr</label>
+        <label class="fw-light" for="inputYear">Jahr</label>
         <div class="input-group">
           <input
             id="inputYear"
@@ -22,7 +22,7 @@
 
       @if (filterModel.user.isManager) {
       <div class="col col-12 col-md">
-        <label for="selectEmployee">Mitarbeiter</label>
+        <label class="fw-light" for="selectEmployee">Mitarbeiter</label>
         <select id="selectEmployee" class="form-select" formControlName="employeeId">
           <option></option>
           @for (employee of filterModel.employees; track employee) {

@@ -17,7 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
-import { faCalendar } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faUser } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   imports: [AsyncPipe, ClearanceTypeNamePipe, CommonModule, FontAwesomeModule, MonthNamePipe, ReactiveFormsModule, RouterModule],
@@ -42,6 +42,7 @@ export class InvoicesListComponent {
   faGear = faGear;
   faHashtag = faHashtag;
   faTrashCan = faTrashCan;
+  faUser = faUser;
   months = DateTimeService.months;
 
   /** Properties */

@@ -2,6 +2,9 @@ import { Time } from '@angular/common';
 import { UUID } from 'angular2-uuid';
 
 export interface AppointmentListEntry {
+  /** Indicates whether the day of the appointment is the customer's birthday. */
+  isBirthday: boolean;
+
   /** The city the appointment is taking place. */
   city: string;
 

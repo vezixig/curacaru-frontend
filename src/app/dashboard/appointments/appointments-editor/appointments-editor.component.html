@@ -3,7 +3,7 @@
     <h4 class="h-underline">Termin {{ isNew ? "anlegen" : "bearbeiten" }}</h4>
     <!-- Customer -->
     <div class="form-group mb-2">
-      <label for="selectCustomer">Kunde:</label>
+      <label class="fw-light" for="selectCustomer">Kunde:</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -25,7 +25,7 @@
 
     <!-- Employee -->
     <div class="form-group mb-2">
-      <label for="selectEmployeeId">Bearbeitet von:</label>
+      <label class="fw-light" for="selectEmployeeId">Bearbeitet von:</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -47,7 +47,7 @@
 
     <!-- Employee replacement -->
     <div class="form-group mb-2">
-      <label for="selectEmployeeReplacementId">Vertreten von:</label>
+      <label class="fw-light" for="selectEmployeeReplacementId">Vertreten von:</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -62,7 +62,7 @@
 
     <!-- Date  -->
     <div class="form-group mb-2">
-      <label for="date">Datum:</label>
+      <label class="fw-light" for="date">Datum:</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
@@ -78,11 +78,11 @@
     <!-- Time  -->
     <div class="row">
       <div class="col-auto">
-        <label for="date">Von:</label>
+        <label class="fw-light" for="date">Von:</label>
         <ngb-timepicker formControlName="timeStart" [minuteStep]="5" />
       </div>
       <div class="col-auto">
-        <label for="date">Bis:</label>
+        <label class="fw-light" for="date">Bis:</label>
         <ngb-timepicker formControlName="timeEnd" [minuteStep]="5" />
       </div>
     </div>
@@ -93,7 +93,7 @@
 
     <!-- Notes -->
     <div class="form-group mb-2">
-      <label for="inputNotes">Notizen:</label>
+      <label class="fw-light" for="inputNotes">Notizen:</label>
       @if (isLoading) {
       <ngx-skeleton-loader count="4" />
       } @if (!isLoading) {
@@ -104,7 +104,7 @@
     <!-- Distance to customer -->
     @if (user?.companyRideCostsType === RideCostType.Kilometer) {
     <div class="form-group mb-2">
-      <label for="inputDistanceToCustomer">Anfahrtsweg zum Kunden (in km):</label>
+      <label class="fw-light" for="inputDistanceToCustomer">Anfahrtsweg zum Kunden (in km):</label>
       @if (isLoading) {
       <ngx-skeleton-loader count="4" />
       } @if (!isLoading) {
@@ -115,7 +115,7 @@
 
     <!-- used budget -->
     <div class="form-group mb-2">
-      <label for="inputDistanceToCustomer">Abrechnungsoptionen:</label>
+      <label class="fw-light" for="inputDistanceToCustomer">Abrechnungsoptionen:</label>
       @if(selectedCustomer == null) {
       <p class="fw-lighter">Bitte zunächst einen Kunden auswählen.</p>
       } @if(selectedCustomer?.doClearanceReliefAmount || existingAppointment?.clearanceType == clearanceType.reliefAmount) {

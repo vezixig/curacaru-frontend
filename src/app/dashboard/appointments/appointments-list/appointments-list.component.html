@@ -23,7 +23,7 @@
 
   <form [formGroup]="filterForm">
     <div class="form-group p-0">
-      <label for="dpFromDate">Datum</label>
+      <label class="fw-light" for="dpFromDate">Datum</label>
       <div class="input-group">
         <div class="dp-hidden position-absolute">
           <input
@@ -73,7 +73,7 @@
     </div>
 
     <div class="form-group p-0">
-      <label for="selectCustomer">Kunde</label>
+      <label class="fw-light" for="selectCustomer">Kunde</label>
       <select id="selectCustomer" class="form-select" name="customerSelect" formControlName="customerId">
         <option></option>
         @for (customer of filterModel.customers; track customer) {
@@ -84,7 +84,7 @@
 
     @if (filterModel.user.isManager) {
     <div class="form-group p-0">
-      <label for="selectEmployee">Mitarbeiter</label>
+      <label class="fw-light" for="selectEmployee">Mitarbeiter</label>
       <select id="selectEmployee" class="form-select" name="employeeSelect" formControlName="employeeId">
         <option></option>
         @for (employee of filterModel.employees; track employee) {
@@ -101,6 +101,7 @@
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
       <tr>
+        <th scope="col"></th>
         <th class="text-center" scope="col">Datum</th>
         <th class="text-center" scope="col">Uhrzeit</th>
         <th scope="col">Kunde</th>
@@ -115,6 +116,7 @@
     <tbody>
       @for (appointment of dataModel.appointments; track appointment) {
       <tr>
+        <td class="text-center">@if(appointment.isBirthday) { <fa-icon [icon]="faCakeCandles" [fixedWidth]="true" /> }</td>
         <td class="text-center">{{ appointment.date | date : "dd.MM.yyyy" }}</td>
         <td class="text-center">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</td>
         <td>{{ appointment.customerName }}</td>
@@ -175,9 +177,12 @@
           [class.bg-danger]="!(appointment.hasBudgetError || appointment.isPlanned) && !appointment.isDone"
         />
         <span class="text-truncate">
-          <span class="fw-light"> {{ appointment.date | date : "dd.MM.yyyy" }}<br /></span>
+          <span class="fw-light"
+            >{{ appointment.date | date : "dd.MM.yyyy" }} @if(appointment.isBirthday){ <fa-icon [icon]="faCakeCandles" [fixedWidth]="true" /> }<br
+          /></span>
           <span class="fw-bold">{{ appointment.timeStart | timeFormat }}-{{ appointment.timeEnd | timeFormat }}</span>
         </span>
+
         <div class="btn-group ms-auto d-inline" role="group" style="opacity: 0.7">
           @if (appointment.street != '' && appointment.zipCode != '') {
           <a (click)="onOpenAppointmentLocation(appointment)" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
@@ -204,7 +209,9 @@
         </div>
       </div>
       <div class="card-body">
-        <h5 class="card-title">{{ appointment.customerName }}</h5>
+        <h5 class="card-title">
+          {{ appointment.customerName }}
+        </h5>
         <ul class="card-text list-unstyled">
           @if (appointment.employeeReplacementName != '') {
           <li><fa-icon [icon]="faUserSolid" [fixedWidth]="true" /> {{ appointment.employeeReplacementName }}</li>
