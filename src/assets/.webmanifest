@@ -1,9 +1,10 @@
 {
+  "name": "curacaru",
   "icons": [
     {
-      "src": "/assets/img/logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/assets/logo192.png",
+      "sizes": "192x192",
+      "type": "image/png"
     }
   ]
 }

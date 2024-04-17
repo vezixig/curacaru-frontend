@@ -51,8 +51,7 @@ import { InfoComponent } from '@curacaru/shared/info-box/info.component';
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
   faCheck = faCheck;
-  RideCostType = RideCostsType;
-
+  rideCostType = RideCostsType;
   clearanceType = ClearanceType;
 
   blockingAppointment$: Observable<boolean>;
@@ -217,7 +216,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           if (this.isNew) {
             this.isLoading = false;
             if (this.appointmentForm.get('customerId')?.value) {
-              this.onCustomerChanged(this.appointmentForm.get('customerId')?.value, true);
+              this.onCustomerChanged(this.appointmentForm.get('customerId')?.value, false);
             }
             this.onDateChanged(this.appointmentForm.get('date')?.value);
           } else {
