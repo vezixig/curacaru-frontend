@@ -2,93 +2,9 @@
   <h4>Mitarbeiterliste</h4>
   <Button type="button" [routerLink]="['/dashboard/employees/new']" class="btn btn-primary text-white btn-block mb-3">Mitarbeiter hinzufügen</Button>
 
-  <div class="table-responsive">
-    <table class="d-none d-md-table table table-striped" style="table-layout: auto">
-      <thead>
-        <tr>
-          <th scope="col">Vorname</th>
-          <th scope="col">Nachname</th>
-          <th scope="col" class="text-truncate">Telefonnummer</th>
-          <th scope="col">E-Mail</th>
-          <th scope="col">Rolle</th>
-          <th class="text-center" scope="col">Aktion</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (isLoading) { @for (_ of [].constructor(3); track _) {
-        <tr>
-          <td><ngx-skeleton-loader /></td>
-          <td><ngx-skeleton-loader /></td>
-          <td><ngx-skeleton-loader /></td>
-          <td><ngx-skeleton-loader /></td>
-          <td><ngx-skeleton-loader /></td>
-          <td></td>
-        </tr>
-        } } @for (employee of employees; track employee) {
-        <tr>
-          <td>{{ employee.firstName }}</td>
-          <td>{{ employee.lastName }}</td>
-          <td>{{ employee.phoneNumber }}</td>
-          <td style="word-break: break-all" [title]="employee.email">{{ employee.email }}</td>
-          <td>{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</td>
-          <td class="text-center">
-            <div class="btn-group" role="group">
-              <button
-                type="button"
-                [routerLink]="['/dashboard/employees', employee.id]"
-                class="btn btn-outline-secondary btn-sm"
-                title="Mitarbeiter bearbeiten"
-              >
-                <fa-icon [icon]="faGear" [fixedWidth]="true" />
-              </button>
-              <!-- <button type="button" class="btn btn-outline-secondary btn-sm">
-                <fa-icon [icon]="faEllipsis" [fixedWidth]="true" />
-              </button> -->
-              <button type="button" (click)="handleDelete(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
-                <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-              </button>
-            </div>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <div class="d-md-none p-0">
-    @for (employee of employees; track employee) {
-    <div class="card my-2">
-      <div class="card-header d-flex">
-        <span class="lead text-truncate">{{ employee.firstName }} {{ employee.lastName }}</span>
-        <div class="btn-group ms-auto" role="group">
-          @if (employee.phoneNumber != '') {
-          <a href="tel:{{ employee.phoneNumber | replace : ' ' : '' }}" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter anrufen">
-            <fa-icon [icon]="faPhone" [fixedWidth]="true" />
-          </a>
-          }
-          <button
-            type="button"
-            [routerLink]="['/dashboard/employees', employee.id]"
-            class="btn btn-outline-secondary btn-sm"
-            title="Mitarbeiter bearbeiten"
-          >
-            <fa-icon [icon]="faGear" [fixedWidth]="true" />
-          </button>
-          <button type="button" (click)="handleDelete(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
-            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-          </button>
-        </div>
-      </div>
-      <div class="card-body">
-        <ul class="card-text list-unstyled">
-          @if (employee.phoneNumber != '') {
-          <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ employee.phoneNumber }}</li>
-          }
-          <li><fa-icon [icon]="faEnvelope" [fixedWidth]="true" /> {{ employee.email }}</li>
-          <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ employee.isManager ? "Manager" : "Mitarbeiter" }}</li>
-        </ul>
-      </div>
-    </div>
-    }
-  </div>
+  @if(isMobile()) {
+  <cura-employee-list-mobile [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
+  } @else {
+  <cura-employee-list-table [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
+  }
 </div>

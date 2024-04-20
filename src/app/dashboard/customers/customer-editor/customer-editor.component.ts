@@ -61,7 +61,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     private toastr: ToastrService
   ) {
     this.customerForm = this.formBuilder.group({
-      associatedEmployeeId: ['', [Validators.required]],
+      associatedEmployeeId: [null],
       birthDate: ['', [Validators.required]],
       careLevel: [1, [Validators.required]],
       doClearanceCareBenefit: [false],
@@ -150,7 +150,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   handleSave(): void {
     const customer: Customer = {
-      associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value.toString(),
+      associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value?.toString(),
       birthDate: this.customerForm.get('birthDate')?.value,
       careLevel: this.customerForm.get('careLevel')?.value,
       doClearanceCareBenefit: this.customerForm.get('doClearanceCareBenefit')?.value,

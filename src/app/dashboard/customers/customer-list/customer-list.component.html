@@ -1,5 +1,6 @@
 <div class="row">
   @if(model$ | async; as model) {
+
   <h4 [class.h-underline]="!model.user.isManager">Kundenliste</h4>
 
   @if (model.user.isManager) {

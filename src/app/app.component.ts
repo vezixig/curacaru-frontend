@@ -6,6 +6,9 @@ import { switchMap, tap } from 'rxjs';
 import { DashboardComponent } from '@curacaru/dashboard/dashboard.component';
 import { LoginComponent } from '@curacaru/auth/login/login.component';
 import { UserService } from '@curacaru/services';
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faGear, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   imports: [DashboardComponent, LoginComponent],
@@ -20,6 +23,10 @@ export class AppComponent implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private router = inject(Router);
+
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faPhone, faEnvelope, faUser, faGear, faTrashCan);
+  }
 
   ngOnInit(): void {
     this.authService.error$.subscribe((error) => {

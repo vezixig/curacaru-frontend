@@ -12,7 +12,15 @@ import { NgOptimizedImage } from '@angular/common';
 export class LoginComponent {
   constructor(private auth: AuthService) {}
 
-  handleLogin(): void {
+  handleLogin() {
     this.auth.loginWithRedirect();
+  }
+
+  handleRegister() {
+    this.auth.loginWithRedirect({
+      authorizationParams: {
+        screen_hint: 'signup',
+      },
+    });
   }
 }

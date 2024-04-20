@@ -11,5 +11,5 @@ export interface CustomerBudget {
   preventiveCareAmount: number;
   reliefAmount: number;
   selfPayAmount: number;
-  associatedEmployeeId: UUID;
+  associatedEmployeeId?: UUID;
 }

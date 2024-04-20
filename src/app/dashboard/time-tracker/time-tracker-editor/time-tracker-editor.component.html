@@ -1,7 +1,7 @@
 <div class="row">
   <h4 class="h-underline">Arbeitszeiterfassung {{ isNew() ? "erstellen" : "gegenzeichnen" }}</h4>
 
-  <form [formGroup]="reportForm">
+  <form [formGroup]="reportForm" class="p-0">
     <div class="form-group mb-2">
       <label class="fw-light">Mitarbeiter</label>
       <p class="ms-3 mt-1 m-0 fs-6">{{ reportForm.get("employeeName")?.value }}</p>

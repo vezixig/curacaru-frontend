@@ -109,10 +109,10 @@ export class AppointmentsListComponent implements OnDestroy {
   readonly signatureName = signal('');
   readonly signatureTitle = signal('');
 
+  readonly showPriceInfo$: Observable<boolean>;
   readonly filterModel$: Observable<{
     employees: EmployeeBasic[];
     customers: CustomerListEntry[];
-    showPriceInfo: boolean;
     user: UserEmployee;
   }>;
   readonly dataModel$: Observable<{
@@ -125,18 +125,17 @@ export class AppointmentsListComponent implements OnDestroy {
   private $onRefresh = new Subject();
 
   constructor() {
+    this.showPriceInfo$ = this.apiService.getCompanyPrices().pipe(map((result) => result.pricePerHour == 0));
+
     this.filterModel$ = forkJoin({
       employees: this.apiService.getEmployeeBaseList(),
       customers: this.apiService.getCustomerList(),
-      showPriceInfo: this.apiService.getCompanyPrices().pipe(map((result) => result.pricePerHour == 0)),
       user: this.userService.user$,
     }).pipe(
-      tap(() => (this.isLoading = true)),
       catchError((error) => {
         this.toastr.error(`Daten konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
         return EMPTY;
-      }),
-      finalize(() => (this.isLoading = false))
+      })
     );
 
     // Filter Form
@@ -212,7 +211,7 @@ export class AppointmentsListComponent implements OnDestroy {
         this.toastr.error(`Termine konnten nicht abgerufen werden: [${error.status}] ${error.error}`);
         return EMPTY;
       }),
-      finalize(() => (this.isLoading = false))
+      tap(() => (this.isLoading = false))
     );
   }
 

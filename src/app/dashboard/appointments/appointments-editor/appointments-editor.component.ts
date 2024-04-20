@@ -130,7 +130,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     );
 
     this.appointmentForm = this.formBuilder.group({
-      customerId: ['', [Validators.required]],
+      customerId: [null, [Validators.required]],
       date: ['', { Validators: Validators.required, updateOn: 'blur' }],
       distanceToCustomer: [0],
       clearanceType: [null, [Validators.required]],

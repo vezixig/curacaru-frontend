@@ -8,14 +8,15 @@ import { SignupComponent } from '../auth/signup/signup.component';
 import { UserEmployee } from '../models/user-employee.model';
 import { UserService } from '../services/user.service';
 import { ApiService } from '../services/api.service';
+import { LoaderComponent } from '../shared/loader/loader.component';
 
 @Component({
   selector: 'cura-dashboard',
   standalone: true,
-  imports: [TopbarComponent, SidebarComponent, RouterOutlet, SignupComponent, HttpClientModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   providers: [ApiService],
+  imports: [TopbarComponent, SidebarComponent, RouterOutlet, SignupComponent, HttpClientModule, LoaderComponent],
 })
 export class DashboardComponent {
   hasCompany = false;

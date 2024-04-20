@@ -1,0 +1,42 @@
+<div class="table-responsive">
+  <table class="d-none d-md-table table table-striped" style="table-layout: auto">
+    <thead>
+      <tr>
+        <th scope="col">Vorname</th>
+        <th scope="col">Nachname</th>
+        <th scope="col" class="text-truncate">Telefonnummer</th>
+        <th scope="col">E-Mail</th>
+        <th scope="col">Rolle</th>
+        <th class="text-center" scope="col">Aktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (isLoading()) {
+      <cura-loader-tr [columnCount]="6" />
+      } @for (employee of employees(); track employee) {
+      <tr>
+        <td>{{ employee.firstName }}</td>
+        <td>{{ employee.lastName }}</td>
+        <td>{{ employee.phoneNumber }}</td>
+        <td style="word-break: break-all" [title]="employee.email">{{ employee.email }}</td>
+        <td>{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <button
+              type="button"
+              [routerLink]="['/dashboard/employees', employee.id]"
+              class="btn btn-outline-secondary btn-sm"
+              title="Mitarbeiter bearbeiten"
+            >
+              <fa-icon [icon]="['fas', 'gear']" [fixedWidth]="true" />
+            </button>
+            <button type="button" (click)="delete.emit(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+              <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
+            </button>
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,7 @@
+@for(r of rowIterator(); track r) {
+<tr>
+  @for(c of columnIterator(); track c) {
+  <td class="p-1"><ngx-skeleton-loader /></td>
+  }
+</tr>
+}

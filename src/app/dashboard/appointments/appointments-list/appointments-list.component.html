@@ -1,13 +1,11 @@
 <div class="row">
   <h4>Termine</h4>
-
-  @if(filterModel$ | async; as filterModel) { @if(filterModel.showPriceInfo) {
+  @if((showPriceInfo$ |async) === true) {
   <div class="alert alert-secondary">
     <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" />
     <span class="my-3">Bitte fülle erst die <a routerLink="/dashboard/company">Unternehmensdaten</a> aus. Dann kannst du Termine vergeben.</span>
   </div>
   } @else {
-
   <button
     type="button"
     [routerLink]="['/dashboard/appointments/new']"
@@ -20,7 +18,7 @@
   >
     Termin hinzufügen
   </button>
-
+  @if(filterModel$ | async; as filterModel) {
   <form [formGroup]="filterForm">
     <div class="form-group p-0">
       <label class="fw-light" for="dpFromDate">Datum</label>
@@ -96,7 +94,9 @@
     }
   </form>
 
-  @if(dataModel$ | async; as dataModel) { @if(dataModel.appointments.length > 0){
+  @if(dataModel$ | async; as dataModel) {
+  <!-- check if appointments are present -->
+  @if(dataModel.appointments.length > 0 ) {
 
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
@@ -268,7 +268,43 @@
 
   } @else {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Termine gefunden.</div>
-  } } } }
+  } }
+  <!-- show table loader -->
+  @if(isLoading) {
+  <table class="table mt-3">
+    <tbody>
+      <tr>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+      </tr>
+      <tr>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+      </tr>
+      <tr>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+        <td><ngx-skeleton-loader /></td>
+      </tr>
+    </tbody>
+  </table>
+
+  } } @else {
+  <ngx-skeleton-loader [theme]="{ height: '10px', width: '10%', margin: '0' }" />
+  <ngx-skeleton-loader [theme]="{ height: '35px' }" />
+  <ngx-skeleton-loader [theme]="{ height: '10px', width: '10%', margin: '0' }" />
+  <ngx-skeleton-loader [theme]="{ height: '35px' }" />
+  <ngx-skeleton-loader [theme]="{ height: '10px', width: '10%', margin: '0' }" />
+  <ngx-skeleton-loader [theme]="{ height: '35px' }" />
+  }}
 
   <ng-template #signature>
     <cura-signature [signatureName]="signatureName()" [title]="signatureTitle()" (signatureTaken)="onSignatureTaken($event)" />

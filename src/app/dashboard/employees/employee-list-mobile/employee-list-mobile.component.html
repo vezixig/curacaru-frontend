@@ -1,0 +1,36 @@
+<div class="d-md-none p-0">
+  @for (employee of employees(); track employee) {
+  <div class="card my-2">
+    <div class="card-header d-flex">
+      <span class="lead text-truncate">{{ employee.firstName }} {{ employee.lastName }}</span>
+      <div class="btn-group ms-auto" role="group">
+        @if (employee.phoneNumber != '') {
+        <a href="tel:{{ employee.phoneNumber | replace : ' ' : '' }}" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter anrufen">
+          <fa-icon [icon]="['fas', 'phone']" [fixedWidth]="true" />
+        </a>
+        }
+        <button
+          type="button"
+          [routerLink]="['/dashboard/employees', employee.id]"
+          class="btn btn-outline-secondary btn-sm"
+          title="Mitarbeiter bearbeiten"
+        >
+          <fa-icon [icon]="['fas', 'gear']" [fixedWidth]="true" />
+        </button>
+        <button type="button" (click)="delete.emit(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+          <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <ul class="card-text list-unstyled">
+        @if (employee.phoneNumber != '') {
+        <li><fa-icon [icon]="['fas', 'phone']" [fixedWidth]="true" /> {{ employee.phoneNumber }}</li>
+        }
+        <li><fa-icon [icon]="['far', 'envelope']" [fixedWidth]="true" /> {{ employee.email }}</li>
+        <li><fa-icon [icon]="['far', 'user']" [fixedWidth]="true" /> {{ employee.isManager ? "Manager" : "Mitarbeiter" }}</li>
+      </ul>
+    </div>
+  </div>
+  }
+</div>

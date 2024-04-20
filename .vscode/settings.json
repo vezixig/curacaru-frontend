@@ -1,3 +1,13 @@
 {
-  "cSpell.words": ["cura", "iban", "Verhinderungspflege"]
+  "cSpell.words": [
+    "cura",
+    "iban",
+    "Verhinderungspflege"
+  ],
+  "angular-schematics.schematicsDefaultOptions": {
+    "angular-*": {
+      "externalTemplate": true,
+      "skipStyle": true
+    }
+  }
 }
