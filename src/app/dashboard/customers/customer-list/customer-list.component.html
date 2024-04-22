@@ -120,7 +120,9 @@
           <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ customer.phone }}</li>
           }
           <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ customer.street }} - {{ customer.zipCode }} {{ customer.city }}</li>
+          @if (customer.associatedEmployeeName) {
           <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
+          }
         </ul>
       </div>
     </div>

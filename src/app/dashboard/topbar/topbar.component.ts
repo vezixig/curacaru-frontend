@@ -10,6 +10,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   selector: 'cura-topbar',
@@ -21,6 +22,7 @@ export class TopbarComponent {
   faBars = faBars;
   faDoorOpen = faDoorOpen;
   faUser = faUser;
+  faCircleQuestion = faCircleQuestion;
   version = environment.version;
 
   closeResult = '';

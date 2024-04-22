@@ -21,7 +21,7 @@
         <td style="word-break: break-all" [title]="employee.email">{{ employee.email }}</td>
         <td>{{ employee.isManager ? "Manager" : "Mitarbeiter" }}</td>
         <td class="text-center">
-          <div class="btn-group" role="group">
+          <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
             <button
               type="button"
               [routerLink]="['/dashboard/employees', employee.id]"
@@ -33,6 +33,15 @@
             <button type="button" (click)="delete.emit(employee)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
               <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
             </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
+              <fa-icon [icon]="['fas', 'ellipsis']" [fixedWidth]="true" />
+            </button>
+            <div class="dropdown-menu" ngbDropdownMenu>
+              @if(employee.phoneNumber) {
+              <a href="tel:{{ employee.phoneNumber | replace : ' ' : '' }}" ngbDropdownItem title="Mitarbeiter anrufen">Anrufen</a>
+              }
+              <a ngbDropdownItem href="mailto:{{ employee.email }}" target="_blank">E-Mail senden</a>
+            </div>
           </div>
         </td>
       </tr>

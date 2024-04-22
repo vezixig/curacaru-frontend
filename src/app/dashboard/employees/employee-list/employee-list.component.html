@@ -1,10 +1,8 @@
-<div class="row">
-  <h4>Mitarbeiterliste</h4>
-  <Button type="button" [routerLink]="['/dashboard/employees/new']" class="btn btn-primary text-white btn-block mb-3">Mitarbeiter hinzufügen</Button>
+<h4>Mitarbeiterliste</h4>
+<Button type="button" [routerLink]="['/dashboard/employees/new']" class="btn btn-primary mb-3 w-100">Mitarbeiter hinzufügen</Button>
 
-  @if(isMobile()) {
-  <cura-employee-list-mobile [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
-  } @else {
-  <cura-employee-list-table [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
-  }
-</div>
+@if(isMobile()) {
+<cura-employee-list-mobile [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
+} @else {
+<cura-employee-list-table [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
+}

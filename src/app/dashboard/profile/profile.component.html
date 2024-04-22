@@ -15,7 +15,7 @@
 
     <div class="row g-2 mt-3">
       <div class="col">
-        <button [disabled]="isSaving()" type="submit" class="form-control btn btn-primary text-white">
+        <button [disabled]="isSaving()" type="submit" class="form-control btn btn-primary text-white h-100">
           @if (isSaving()) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
           }
@@ -26,14 +26,14 @@
         </button>
       </div>
       <div class="col">
-        <button type="button" [disabled]="isSending()" (click)="onResetPassword()" class="form-control btn btn-outline-primary">
+        <button type="button" [disabled]="isSending()" (click)="onResetPassword()" class="form-control btn btn-outline-primary h-100">
           Passwort ändern @if (isSending()) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
           }
         </button>
       </div>
       <div class="col">
-        <button type="button" [routerLink]="['/dashboard/']" class="form-control btn btn-outline-secondary">Verwerfen</button>
+        <button type="button" [routerLink]="['/dashboard/']" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
       </div>
     </div>
   </form>
