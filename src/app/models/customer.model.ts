@@ -5,7 +5,7 @@ import { Gender } from '@curacaru/enums/gender.enum';
 import { EmployeeBasic } from './employee-basic.model';
 
 export interface Customer {
-  associatedEmployeeId: UUID;
+  associatedEmployeeId?: UUID;
   associatedEmployee?: EmployeeBasic;
   birthDate: Date;
   careLevel: number;

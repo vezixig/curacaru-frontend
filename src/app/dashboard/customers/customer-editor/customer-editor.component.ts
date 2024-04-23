@@ -72,7 +72,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       emergencyContactPhone: [''],
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       insuranceId: [''],
-      insuranceStatus: ['', [Validators.required]],
+      insuranceStatus: this.formBuilder.control<number | null>(null, [Validators.required]),
       insuredPersonNumber: ['', [ValidateInsuredPersonNumber]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       phone: [''],
@@ -149,29 +149,12 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     );
 
   handleSave(): void {
-    const customer: Customer = {
-      associatedEmployeeId: this.customerForm.get('associatedEmployeeId')?.value?.toString(),
-      birthDate: this.customerForm.get('birthDate')?.value,
-      careLevel: this.customerForm.get('careLevel')?.value,
-      doClearanceCareBenefit: this.customerForm.get('doClearanceCareBenefit')?.value,
-      doClearancePreventiveCare: this.customerForm.get('doClearancePreventiveCare')?.value,
-      doClearanceReliefAmount: this.customerForm.get('doClearanceReliefAmount')?.value,
-      doClearanceSelfPayment: this.customerForm.get('doClearanceSelfPayment')?.value,
-      emergencyContactName: this.customerForm.get('emergencyContactName')?.value,
-      emergencyContactPhone: this.customerForm.get('emergencyContactPhone')?.value,
-      firstName: this.customerForm.get('firstName')?.value,
-      id: this.isNew ? undefined : this.customerId,
-      insuranceId: this.customerForm.get('insuranceId')?.value,
-      insuranceStatus: +this.customerForm.get('insuranceStatus')?.value,
-      insuredPersonNumber: this.customerForm.get('insuredPersonNumber')?.value,
-      lastName: this.customerForm.get('lastName')?.value,
-      phone: this.customerForm.get('phone')?.value,
-      salutation: +this.customerForm.get('salutation')?.value,
-      street: this.customerForm.get('street')?.value,
-      zipCode: this.customerForm.get('zipCode')?.value,
-    };
-
+    const customer: Customer = { ...this.customerForm.value };
+    customer.insuranceStatus = customer.insuranceStatus ? +customer.insuranceStatus : undefined;
+    customer.salutation = +customer.salutation;
+    customer.id = this.isNew ? undefined : this.customerId;
     customer.insuranceId = customer.insuranceId === '' ? undefined : customer.insuranceId;
+    customer.associatedEmployeeId = customer.associatedEmployeeId === '' ? undefined : customer.associatedEmployeeId;
 
     this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);
   }

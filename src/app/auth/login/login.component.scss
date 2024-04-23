@@ -1,12 +1,12 @@
 :host {
   background-color: #eee;
-  height: 100lvh;
+  height: 100%;
   display: block;
 }
 
 @media (min-width: 768px) {
   .gradient-form {
-    height: 100vh !important;
+    height: 100% !important;
   }
 }
 @media (min-width: 769px) {

@@ -7,16 +7,8 @@
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
-      <select
-        class="form-select"
-        aria-label="Default select example"
-        id="selectAssociatedEmployeeId"
-        formControlName="associatedEmployeeId"
-        [ngClass]="{
-          'is-valid': customerForm.controls['associatedEmployeeId'].valid,
-          'is-invalid': customerForm.controls['associatedEmployeeId'].invalid && customerForm.controls['associatedEmployeeId'].touched
-        }"
-      >
+      <select class="form-select" aria-label="Default select example" id="selectAssociatedEmployeeId" formControlName="associatedEmployeeId">
+        <option value=""></option>
         @for (employee of employees; track employee) {
         <option [value]="employee.id">{{ employee.name }}</option>
         }
