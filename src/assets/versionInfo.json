@@ -1,0 +1,10 @@
+[
+  {
+    "Version": "0.7.2",
+    "ReleaseDate": "2024-01-01",
+    "Bugfixes": [
+      "Manager können jetzt die Abtretungserklärungen der Mitarbeiter einsehen",
+      "Prüfung der Versichertennummer bei PKV bis auf weiteres deaktiviert"
+    ]
+  }
+]

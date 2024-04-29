@@ -1,18 +1,30 @@
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faCircleInfo, faEllipsis, faGear, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
-import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, map, takeUntil, tap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  combineLatest,
+  delay,
+  filter,
+  finalize,
+  firstValueFrom,
+  last,
+  map,
+  share,
+  shareReplay,
+  skipUntil,
+  startWith,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
-import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
-import { ApiService, LocationService, UserService } from '@curacaru/services';
+import { ApiService, ErrorHandlerService, LocationService, ScreenService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { ChangeEmployeeFilterAction } from '@curacaru/state/customer-list.state';
@@ -20,24 +32,18 @@ import { UUID } from 'angular2-uuid';
 import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
 import { DeploymentReportChangeCustomerAction, DeploymentReportListState } from '@curacaru/state/deployment-report-list.state';
 import { InvoiceChangeCustomerAction, InvoicesListState } from '@curacaru/state/invoices-list.state';
+import { LoaderFilterComponent } from '@curacaru/shared/loader-filter/loader-filter.component';
+import { CustomerListeTableComponent } from '../customer-list-table/customer-list-table.component';
+import { CustomerListMobileComponent } from '../customer-list-mobile/customer-list-mobile.component';
 
 @Component({
-  imports: [FontAwesomeModule, NgxSkeletonLoaderModule, NgbDropdownModule, ReplacePipe, RouterModule, FormsModule, AsyncPipe],
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
   templateUrl: './customer-list.component.html',
+  imports: [FontAwesomeModule, RouterModule, FormsModule, AsyncPipe, LoaderFilterComponent, CustomerListeTableComponent, CustomerListMobileComponent],
 })
-export class CustomerListComponent implements OnDestroy {
-  faGear = faGear;
-  faHouse = faHouse;
-  faLocationDot = faLocationDot;
-  faPhone = faPhone;
-  faTrashCan = faTrashCan;
-  faUser = faUser;
-  faCircleInfo = faCircleInfo;
-  faEllipsis = faEllipsis;
-
+export class CustomerListComponent implements OnDestroy, OnInit {
   private readonly apiService = inject(ApiService);
   private readonly appointmentListStore = inject(Store<AppointmentListState>);
   private readonly deploymentReportListStore = inject(Store<DeploymentReportListState>);
@@ -48,40 +54,69 @@ export class CustomerListComponent implements OnDestroy {
   private readonly store = inject(Store);
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
+  private readonly screenService = inject(ScreenService);
+  private readonly errorHandlerService = inject(ErrorHandlerService);
 
-  model$ = new Observable<{ customers: CustomerListEntry[]; employees: EmployeeBasic[]; user: UserEmployee }>();
-  isLoading = signal(false);
+  user?: UserEmployee;
+  isMobile = this.screenService.isMobile;
+
+  customers = signal<CustomerListEntry[]>([]);
+  filterModel$ = new Observable<{ employees: EmployeeBasic[] }>();
+  isLoading = signal(true);
   selectedEmployeeId = signal<UUID | undefined>(undefined);
 
-  private $onDestroy = new Subject();
-  private customers: CustomerListEntry[] = [];
+  private $onRefresh = new Subject<void>();
+  private $onDestroy = new Subject<void>();
 
   ngOnDestroy(): void {
-    this.$onDestroy.next(true);
+    this.$onDestroy.next();
     this.$onDestroy.complete();
   }
 
-  constructor() {
-    this.isLoading.set(true);
+  async ngOnInit() {
+    this.user = await firstValueFrom(this.userService.user$);
 
-    this.model$ = combineLatest({
-      customers: this.apiService.getCustomerList(),
+    this.filterModel$ = combineLatest({
       employees: this.apiService.getEmployeeBaseList(),
       state: this.store,
-      user: this.userService.user$,
     }).pipe(
-      tap((result) => (result.state.customerList.employeeId != '' ? this.selectedEmployeeId.set(result.state.customerList.employeeId) : '')),
-      map((result) => ({
-        customers: result.customers.filter(
-          (o) => !result.state.customerList.employeeId || o.associatedEmployeeId == result.state.customerList.employeeId
-        ),
-        employees: result.employees,
-        user: result.user,
-      }))
+      tap((o) => (o.state.customerList.employeeId != '' ? this.selectedEmployeeId.set(o.state.customerList.employeeId) : '')),
+      map((o) => {
+        this.$onRefresh.next();
+        return { employees: o.employees };
+      })
     );
+
+    combineLatest({
+      customers: this.apiService.getCustomerList(),
+      state: this.store,
+      refresh: this.$onRefresh,
+    })
+      .pipe(
+        takeUntil(this.$onDestroy),
+        tap(() => {
+          this.customers.set([]);
+          this.isLoading.set(true);
+        }),
+        map((result) => ({
+          customers: result.customers.filter(
+            (o) => !result.state.customerList.employeeId || o.associatedEmployeeId == result.state.customerList.employeeId
+          ),
+        }))
+      )
+      .subscribe({
+        next: (o) => {
+          this.customers.set(o.customers);
+          this.isLoading.set(false);
+        },
+        error: (e) => {
+          this.errorHandlerService.handleError(e);
+          this.isLoading.set(false);
+        },
+      });
   }
 
-  onCustomerAddressClick(customer: CustomerListEntry) {
+  handleNavigate(customer: CustomerListEntry) {
     this.locationService.openLocationLink(`${customer.street} ${customer.zipCode} ${customer.city}`);
   }
 
@@ -96,17 +131,17 @@ export class CustomerListComponent implements OnDestroy {
     modalRef.componentInstance.text = `Soll ${customer.firstName} ${customer.lastName} wirklich gelöscht werden?`;
   }
 
-  onShowAppointments(customer: CustomerListEntry) {
+  handleShowAppointments(customer: CustomerListEntry) {
     this.appointmentListStore.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: customer.id }));
     this.router.navigate(['/dashboard/appointments']);
   }
 
-  onShowDeploymentReports(customer: CustomerListEntry) {
+  handleShowDeploymentReports(customer: CustomerListEntry) {
     this.deploymentReportListStore.dispatch(DeploymentReportChangeCustomerAction({ customerId: customer.id }));
     this.router.navigate(['/dashboard/documents/deployment-reports']);
   }
 
-  onShowInvoices(customer: CustomerListEntry) {
+  handleShowInvoices(customer: CustomerListEntry) {
     this.invoiceListStore.dispatch(InvoiceChangeCustomerAction({ customerId: customer.id }));
     this.router.navigate(['/dashboard/invoices']);
   }
@@ -118,7 +153,7 @@ export class CustomerListComponent implements OnDestroy {
       .subscribe({
         complete: () => {
           this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
-          this.customers = this.customers.filter((e) => e.id !== customer.id);
+          this.$onRefresh.next();
         },
         error: (error) => this.toastr.error(`Mitarbeiter konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
       });

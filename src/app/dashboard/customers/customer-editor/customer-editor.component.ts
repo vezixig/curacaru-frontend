@@ -14,6 +14,8 @@ import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { ValidateInsuredPersonNumber as ValidateInsuredPersonNumber } from '../../../validators/insured-person-number.validator';
 import { UserService } from '../../../services/user.service';
 import { InputComponent } from '@curacaru/shared/input/input.component';
+import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
+import { Gender } from '@curacaru/enums/gender.enum';
 
 @Component({
   providers: [ApiService],
@@ -72,16 +74,16 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       emergencyContactPhone: [''],
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       insuranceId: [''],
-      insuranceStatus: this.formBuilder.control<number | null>(null, [Validators.required]),
+      insuranceStatus: this.formBuilder.nonNullable.control<InsuranceStatus | null>(null, [Validators.required]),
       insuredPersonNumber: ['', [ValidateInsuredPersonNumber]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       phone: [''],
-      salutation: [0],
+      salutation: this.formBuilder.nonNullable.control<Gender | null>(null, [Validators.required]),
       street: ['', [Validators.required, Validators.maxLength(150)]],
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
     });
 
-    this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.onCareLEvelChange(value));
+    this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.handleCareLevelChange(value));
 
     this.isManager$.subscribe((value) => {
       if (!value) {
@@ -114,7 +116,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (this.router.url.endsWith('new')) {
       this.isNew = true;
-      this.onCareLEvelChange(this.customerForm.get('careLevel')?.value);
+      this.handleCareLevelChange(this.customerForm.get('careLevel')?.value);
     } else {
       this.LoadCustomer();
     }
@@ -149,13 +151,10 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     );
 
   handleSave(): void {
-    const customer: Customer = { ...this.customerForm.value };
-    customer.insuranceStatus = customer.insuranceStatus ? +customer.insuranceStatus : undefined;
-    customer.salutation = +customer.salutation;
+    const customer: Customer = { ...this.customerForm.getRawValue() };
     customer.id = this.isNew ? undefined : this.customerId;
     customer.insuranceId = customer.insuranceId === '' ? undefined : customer.insuranceId;
     customer.associatedEmployeeId = customer.associatedEmployeeId === '' ? undefined : customer.associatedEmployeeId;
-
     this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);
   }
 
@@ -202,7 +201,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           zipCode: result.zipCode,
         });
 
-        this.onCareLEvelChange(result.careLevel);
+        this.handleCareLevelChange(result.careLevel);
         this.selectedInsurance = result.insurance;
         this.isLoading = false;
       },
@@ -233,7 +232,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  private onCareLEvelChange(value: any): void {
+  private handleCareLevelChange(value: any): void {
     // If the care level is set to 0, the insurance status must be self payment
     if (value == 0) {
       this.customerForm.get('insuranceStatus')?.setValue(2);
