@@ -1,140 +1,45 @@
-<div class="row">
-  @if(model$ | async; as model) {
+<!-- Header -->
+<h4 [class.h-underline]="!user?.isManager">Kundenliste</h4>
 
-  <h4 [class.h-underline]="!model.user.isManager">Kundenliste</h4>
+@if (user?.isManager) {
+<Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary btn-block mb-3 w-100">Kunden hinzufügen</Button>
+}
 
-  @if (model.user.isManager) {
-  <Button type="button" [routerLink]="['/dashboard/customers/new']" class="btn btn-primary text-white btn-block mb-3">Kunden hinzufügen</Button>
-
-  <div class="form-group p-0">
-    <label class="fw-light" for="dpFromDate">Mitarbeiter</label>
-    <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
-      <option></option>
-      @for (employee of model.employees; track employee) {
-      <option [value]="employee.id">{{ employee.name }}</option>
-      }
-    </select>
-  </div>
-  }
-
-  <table class="d-none d-md-table table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Nachname</th>
-        <th scope="col">Vorname</th>
-        <th scope="col">Telefonnummer</th>
-        <th scope="col">PLZ</th>
-        <th scope="col">Stadt</th>
-        <th scope="col">Bearbeiter</th>
-        <th class="text-center" scope="col">Aktion</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (customer of model.customers; track customer) {
-      <tr>
-        <td>{{ customer.lastName }}</td>
-        <td>{{ customer.firstName }}</td>
-        <td>{{ customer.phone }}</td>
-        <td>{{ customer.zipCode }}</td>
-        <td>{{ customer.city }}</td>
-        <td>{{ customer.associatedEmployeeName }}</td>
-        <td class="text-center">
-          <div class="btn-group" role="group">
-            <button
-              type="button"
-              [routerLink]="['/dashboard/customers', customer.id]"
-              class="btn btn-outline-secondary btn-sm"
-              title="Kunden bearbeiten"
-            >
-              <fa-icon [icon]="faGear" [fixedWidth]="true" />
-            </button>
-            @if (model.user.isManager) {
-            <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
-              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-            </button>
-            <!-- quick actions -->
-            <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
-              <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
-                <fa-icon [icon]="faEllipsis" [fixedWidth]="true" />
-              </button>
-              <div class="dropdown-menu" ngbDropdownMenu>
-                <button ngbDropdownItem (click)="onCustomerAddressClick(customer)">Navigation zum Kunden</button>
-                <button ngbDropdownItem (click)="onShowAppointments(customer)">Termine</button>
-                <button ngbDropdownItem [routerLink]="['/dashboard/budgets', customer.id]">Budgets</button>
-                <button ngbDropdownItem (click)="onShowDeploymentReports(customer)">Einsatznachweise</button>
-                <button ngbDropdownItem (click)="onShowInvoices(customer)">Rechnungen</button>
-              </div>
-            </div>
-            }
-          </div>
-        </td>
-      </tr>
-      }
-    </tbody>
-  </table>
-
-  <div class="d-md-none p-0">
-    @for (customer of model.customers; track customer) {
-    <div class="card my-3">
-      <div class="card-header d-flex">
-        <span class="lead text-truncate">{{ customer.lastName }}, {{ customer.firstName }}</span>
-        <div class="btn-group ms-auto" role="group">
-          @if (customer.latitude != 0 && customer.longitude != 0) {
-          <a (click)="onCustomerAddressClick(customer)" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
-            <fa-icon [icon]="faLocationDot" [fixedWidth]="true" />
-          </a>
-          } @if (customer.phone != '') {
-          <a href="tel:{{ customer.phone | replace : ' ' : '' }}" class="btn btn-outline-secondary btn-sm" title="Kunden anrufen">
-            <fa-icon [icon]="faPhone" [fixedWidth]="true" />
-          </a>
-          }
-          <button
-            type="button"
-            [routerLink]="['/dashboard/customers', customer.id]"
-            class="btn btn-outline-secondary btn-sm"
-            title="Mitarbeiter bearbeiten"
-          >
-            <fa-icon [icon]="faGear" [fixedWidth]="true" />
-          </button>
-          @if (model.user.isManager) {
-          <button type="button" (click)="handleDelete(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
-            <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-          </button>
-          <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
-            <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
-              <fa-icon [icon]="faEllipsis" [fixedWidth]="true" />
-            </button>
-            <div class="dropdown-menu" ngbDropdownMenu>
-              <button ngbDropdownItem (click)="onShowAppointments(customer)">Termine</button>
-              <button ngbDropdownItem [routerLink]="['/dashboard/budgets', customer.id]">Budgets</button>
-              <button ngbDropdownItem (click)="onShowDeploymentReports(customer)">Einsatznachweise</button>
-              <button ngbDropdownItem (click)="onShowInvoices(customer)">Rechnungen</button>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-      <div class="card-body">
-        <ul class="card-text list-unstyled">
-          @if (customer.phone != '') {
-          <li><fa-icon [icon]="faPhone" [fixedWidth]="true" /> {{ customer.phone }}</li>
-          }
-          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ customer.street }} - {{ customer.zipCode }} {{ customer.city }}</li>
-          @if (customer.associatedEmployeeName) {
-          <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
-          }
-        </ul>
-      </div>
-    </div>
+<!-- Filter -->
+@if(filterModel$ | async; as filterModel) {
+<div class="form-group p-0">
+  <label class="fw-light" for="dpFromDate">Mitarbeiter</label>
+  <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onSelectionChanged()">
+    <option></option>
+    @for (employee of filterModel.employees; track employee) {
+    <option [value]="employee.id">{{ employee.name }}</option>
     }
-  </div>
-
-  @if (model.customers.length == 0) {
-  <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Kunden gefunden.</div>
-  } } @else {
-  <h4 class="h-underline">Kundenliste</h4>
-  <ngx-skeleton-loader />
-  <ngx-skeleton-loader />
-  <ngx-skeleton-loader />
-  }
+  </select>
 </div>
+
+<!-- customers -->
+@if(isMobile()) {
+<cura-customer-list-mobile
+  [customers]="customers()"
+  [isLoading]="isLoading()"
+  [isManager]="user!.isManager"
+  (onDelete)="handleDelete($event)"
+  (onNavigate)="handleNavigate($event)"
+  (onShowAppointments)="handleShowAppointments($event)"
+  (onShowDeploymentReports)="handleShowDeploymentReports($event)"
+  (onShowInvoices)="handleShowInvoices($event)"
+/>
+} @else {
+<cura-customer-list-table
+  [customers]="customers()"
+  [isLoading]="isLoading()"
+  [isManager]="user!.isManager"
+  (onDelete)="handleDelete($event)"
+  (onNavigate)="handleNavigate($event)"
+  (onShowAppointments)="handleShowAppointments($event)"
+  (onShowDeploymentReports)="handleShowDeploymentReports($event)"
+  (onShowInvoices)="handleShowInvoices($event)"
+/>
+}
+<!-- filter loader -->
+} @else {<cura-loader-filter />}

@@ -269,7 +269,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           this.selectedClearanceType = result.clearanceType;
           this.isDone = result.isDone;
           this.canFinish = !this.isNew && !result.isDone && result.isSignedByCustomer && result.isSignedByEmployee && result.date <= this.today;
-          this.canSign.set(!this.isNew && result.date <= this.today && this.user?.id === result.employeeId);
+          this.canSign.set(!this.isNew && result.date <= this.today && this.user?.id === (result.employeeReplacementId ?? result.employeeId));
           this.canOpen = (this.user?.isManager ?? false) && !this.isNew && result.isDone && result.date >= DateTimeService.beginOfCurrentMonth;
           this.isLoading = false;
           this.onCustomerChanged(result.customerId, true);

@@ -7,7 +7,7 @@ import { DashboardComponent } from '@curacaru/dashboard/dashboard.component';
 import { LoginComponent } from '@curacaru/auth/login/login.component';
 import { UserService } from '@curacaru/services';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faEllipsis, faGear, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faEllipsis, faGear, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
   private router = inject(Router);
 
   constructor(library: FaIconLibrary) {
-    library.addIcons(faPhone, faEnvelope, faEllipsis, faUser, faGear, faTrashCan);
+    library.addIcons(faPhone, faEnvelope, faEllipsis, faLocationDot, faHouse, faUser, faGear, faTrashCan, faCircleInfo);
   }
 
   ngOnInit(): void {

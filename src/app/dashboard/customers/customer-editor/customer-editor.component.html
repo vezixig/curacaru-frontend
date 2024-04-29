@@ -24,8 +24,8 @@
       } @if (!isLoading) {
       <div class="input-group">
         <select class="form-select" id="selectSalutation" formControlName="salutation">
-          <option value="0">Frau</option>
-          <option value="1">Herr</option>
+          <option [ngValue]="0">Frau</option>
+          <option [ngValue]="1">Herr</option>
         </select>
         <input
           type="text"
@@ -56,8 +56,8 @@
     <div class="d-md-none form-group mb-2">
       <label class="fw-light" for="selectSalutation">Anrede</label>
       <select class="form-select" id="selectSalutation" formControlName="salutation">
-        <option value="0">Frau</option>
-        <option value="1">Herr</option>
+        <option [ngValue]="0">Frau</option>
+        <option [ngValue]="1">Herr</option>
       </select>
     </div>
 
@@ -165,6 +165,7 @@
           class="form-select"
           formControlName="insuranceStatus"
           placeholder="Versicherungsstatus"
+          type="number"
           id="inputEmergencyContactPhone"
           placeholder="Telefonnummer eingeben"
           [ngClass]="{
@@ -172,9 +173,9 @@
             'is-invalid': customerForm.controls['insuranceStatus'].invalid && customerForm.controls['insuranceStatus'].touched
           }"
         >
-          <option value="0">Gesetzlich</option>
-          <option value="1">Privat</option>
-          <option value="2">Selbstzahler</option>
+          <option [ngValue]="0">Gesetzlich</option>
+          <option [ngValue]="1">Privat</option>
+          <option [ngValue]="2">Selbstzahler</option>
         </select>
       </div>
       }
@@ -225,9 +226,9 @@
           'is-invalid': customerForm.controls['insuranceStatus'].invalid && customerForm.controls['insuranceStatus'].touched
         }"
       >
-        <option value="0">Gesetzlich</option>
-        <option value="1">Privat</option>
-        <option value="2">Selbstzahler</option>
+        <option [ngValue]="0">Gesetzlich</option>
+        <option [ngValue]="1">Privat</option>
+        <option [ngValue]="2">Selbstzahler</option>
       </select>
     </div>
 

@@ -16,7 +16,7 @@ export interface Customer {
   insuranceId?: UUID;
   insurance?: Insurance;
   insuredPersonNumber?: string;
-  insuranceStatus?: InsuranceStatus;
+  insuranceStatus: InsuranceStatus;
   lastName: string;
   phone: string;
   /** The salutation of the customer based on the gender */
