@@ -13,6 +13,7 @@ import {
   firstValueFrom,
   last,
   map,
+  mergeMap,
   share,
   shareReplay,
   skipUntil,
@@ -87,12 +88,14 @@ export class CustomerListComponent implements OnDestroy, OnInit {
       })
     );
 
+    const customerRequest = this.$onRefresh.pipe(mergeMap(() => this.apiService.getCustomerList()));
+
     combineLatest({
-      customers: this.apiService.getCustomerList(),
+      customers: customerRequest,
       state: this.store,
-      refresh: this.$onRefresh,
     })
       .pipe(
+        tap(() => console.log('refresh')),
         takeUntil(this.$onDestroy),
         tap(() => {
           this.customers.set([]);
@@ -151,7 +154,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
       .deleteCustomer(customer.id)
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
-        complete: () => {
+        next: () => {
           this.toastr.success(`${customer.firstName} ${customer.lastName} wurde gelöscht.`);
           this.$onRefresh.next();
         },

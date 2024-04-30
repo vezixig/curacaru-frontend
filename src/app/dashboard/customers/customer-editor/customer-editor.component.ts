@@ -75,7 +75,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       insuranceId: [''],
       insuranceStatus: this.formBuilder.nonNullable.control<InsuranceStatus | null>(null, [Validators.required]),
-      insuredPersonNumber: ['', [ValidateInsuredPersonNumber]],
+      insuredPersonNumber: [''],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       phone: [''],
       salutation: this.formBuilder.nonNullable.control<Gender | null>(null, [Validators.required]),
@@ -84,6 +84,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     });
 
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.handleCareLevelChange(value));
+    this.customerForm.get('insuredPersonNumber')?.valueChanges.subscribe(() => this.handleInsuranceInfoChange());
+    this.customerForm.get('insuranceStatus')?.valueChanges.subscribe(() => this.handleInsuranceInfoChange());
 
     this.isManager$.subscribe((value) => {
       if (!value) {
@@ -171,6 +173,16 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         this.isSaving = false;
       },
     });
+  }
+
+  private handleInsuranceInfoChange(): void {
+    const isInsuredPersonNumberValid = ValidateInsuredPersonNumber(this.customerForm.controls['insuredPersonNumber']);
+
+    if (isInsuredPersonNumberValid === null || this.customerForm.get('insuranceStatus')?.value != InsuranceStatus.Statutory) {
+      this.customerForm.get('insuredPersonNumber')?.setErrors(null);
+    } else {
+      this.customerForm.get('insuredPersonNumber')?.setErrors(isInsuredPersonNumberValid);
+    }
   }
 
   private LoadCustomer(): void {
