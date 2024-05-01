@@ -169,5 +169,10 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'dashboard/version',
+    pathMatch: 'full',
+    loadComponent: () => import('@curacaru/dashboard/version-info/version-info.component').then((o) => o.VersionInfoComponent),
+  },
   { path: 'dashboard', redirectTo: 'dashboard/appointments', pathMatch: 'full' },
 ];
