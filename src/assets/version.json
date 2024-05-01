@@ -2,7 +2,14 @@
   {
     "version": "0.8.0",
     "releaseDate": "2024-06-01",
-    "features": ["Seite zur Anzeige der Versionsinformationen hinzugefügt"]
+    "features": ["Seite zur Anzeige der Versionsinformationen hinzugefügt"],
+    "changes": ["Bei Eingabe des Namens einer Versicherung werden jetzt alle passenden Versicherungen angezeigt."]
+  },
+  {
+    "version": "0.7.3",
+    "releaseDate": "2024-04-29",
+    "changes": ["Im Planungsmodus für Termine werden keine 0€ Budgets mehr angezeigt."],
+    "bugfixes": ["Fehlermeldung 'Termin kann nicht vor dem aktuellen Monat liegen' wird nicht mehr beim Öffnen des Termineditors angezeigt"]
   },
   {
     "version": "0.7.2",

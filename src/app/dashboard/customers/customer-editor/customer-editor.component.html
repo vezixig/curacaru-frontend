@@ -137,6 +137,7 @@
           [(ngModel)]="selectedInsurance"
           [inputFormatter]="insuranceFormatter"
           [resultFormatter]="insuranceFormatter"
+          [popupClass]="'overflow-auto height-150'"
           [ngClass]="{
             'is-valid':
               customerForm.controls['insuranceId'].valid &&

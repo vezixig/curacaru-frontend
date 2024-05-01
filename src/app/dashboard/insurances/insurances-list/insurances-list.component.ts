@@ -7,7 +7,7 @@ import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { ToastrService } from 'ngx-toastr';
-import { BehaviorSubject, EMPTY, Subscription, catchError, finalize } from 'rxjs';
+import { BehaviorSubject, EMPTY, Subscription, catchError, debounceTime, finalize } from 'rxjs';
 import { ApiService } from '../../../services/api.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { Insurance } from '../../../models/insurance.model';
@@ -41,6 +41,7 @@ export class InsurancesListComponent implements OnDestroy, OnInit {
     this.getInsurancesSubscription = this.apiService
       .getInsuranceList()
       .pipe(
+        debounceTime(300),
         catchError((error) => {
           this.toastr.error(`Versicherungsliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
           return EMPTY;
