@@ -132,8 +132,9 @@
           [value]="clearanceType.reliefAmount"
           [disabled]="isDone || isExpired || (!canClearReliefAmount && !isPlanning)"
         />
+
         <label class="form-check-label" for="radioReliefAmount">
-          Entlastungsbetrag §45b SGB XI <span class="fw-light"> - {{ initialBudget().reliefAmount | currency }}</span>
+          Entlastungsbetrag §45b SGB XI <span class="fw-light">@if(!isPlanning) {- {{ initialBudget().reliefAmount | currency }}}</span>
         </label>
       </div>
       } @if(selectedCustomer?.doClearanceCareBenefit || existingAppointment?.clearanceType == clearanceType.careBenefit) {
@@ -150,7 +151,8 @@
           [disabled]="isDone || isExpired || (!canClearCareBenefit && !isPlanning)"
         />
         <label class="form-check-label" for="radioCareBenefit">
-          ..% Pflegesachleistungen §36 SGB XI (max. 40%) <span class="fw-light"> - {{ initialBudget().careBenefit | currency }}</span>
+          ..% Pflegesachleistungen §36 SGB XI (max. 40%)
+          <span class="fw-light">@if(!isPlanning) { - {{ initialBudget().careBenefit | currency }}}</span>
         </label>
       </div>
       } @if(selectedCustomer?.doClearancePreventiveCare || existingAppointment?.clearanceType == clearanceType.preventiveCare) {
@@ -167,7 +169,7 @@
           [disabled]="isDone || isExpired || (!canClearPreventiveCare && !isPlanning)"
         />
         <label class="form-check-label" for="radioPreventiveCare">
-          Verhinderungspflege § 39 SGB XI <span class="fw-light"> - {{ initialBudget().preventiveCare | currency }}</span>
+          Verhinderungspflege § 39 SGB XI <span class="fw-light">@if(!isPlanning) { - {{ initialBudget().preventiveCare | currency }}}</span>
         </label>
       </div>
       } @if(selectedCustomer?.doClearanceSelfPayment || existingAppointment?.clearanceType == clearanceType.selfPayment) {
@@ -184,7 +186,7 @@
           [disabled]="isDone || isExpired || (!canClearSelfPayment && !isPlanning)"
         />
         <label class="form-check-label" for="radioSelfPayment">
-          Selbstzahler <span class="fw-light"> - {{ initialBudget().selfPayment | currency }}</span>
+          Selbstzahler <span class="fw-light">@if(!isPlanning) { - {{ initialBudget().selfPayment | currency }}}</span>
         </label>
       </div>
       } @else if (hasBudgetError) {
