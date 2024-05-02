@@ -4,8 +4,13 @@
     "ReleaseDate": "2024-04-29",
     "Bugfixes": [
       "Manager können jetzt die Abtretungserklärungen der Mitarbeiter einsehen",
-      "Prüfung der Versichertennummer bei PKV bis auf weiteres deaktiviert",
       "Gelöschte Kunden werden jetzt direkt aus der Kundenliste entfernt"
-    ]
+    ],
+    "Changes": ["Prüfung der Versichertennummer bei PKV bis auf weiteres deaktiviert"]
+  },
+  {
+    "Version": "0.7.3",
+    "ReleaseDate": "2024-04-29",
+    "Changes": ["Im Planungsmodus werden keine 0€ Budgets mehr angezeigt"]
   }
 ]

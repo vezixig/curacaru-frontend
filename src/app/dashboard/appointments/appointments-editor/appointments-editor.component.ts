@@ -207,7 +207,11 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
             this.appointmentForm.get('customerId')?.setValue(this.activeRoute.snapshot.queryParams['customerId']);
           }
           if (this.activeRoute.snapshot.queryParams['date']) {
-            this.appointmentForm.get('date')?.setValue(DateTimeService.toNgbDate(this.activeRoute.snapshot.queryParams['date']));
+            let routeDate = DateTimeService.toNgbDate(this.activeRoute.snapshot.queryParams['date']);
+            if (routeDate.before(this.minDate)) {
+              routeDate = this.minDate;
+            }
+            this.appointmentForm.get('date')?.setValue(routeDate);
           }
 
           this.companyPrices = result.companyPrices;
@@ -331,7 +335,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       const timeEnd = DateTimeService.toTime(timeEndValue);
       const timeStart = DateTimeService.toTime(timeStartValue);
 
-      const hours = (timeEnd.hours * 60 + timeEnd.minutes - timeStart.hours * 60 + timeStart.minutes) / 60;
+      const hours = (timeEnd.hours * 60 + timeEnd.minutes - timeStart.hours * 60 - timeStart.minutes) / 60;
 
       let rideCosts = 0;
       if (this.companyPrices?.rideCostsType === RideCostsType.FlatRate) {
