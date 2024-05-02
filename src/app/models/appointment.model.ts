@@ -4,7 +4,7 @@ import { UUID } from 'angular2-uuid';
 import { MinimalCustomerListEntry } from './minimal-customer-list-entry.model';
 
 export interface Appointment {
-  clearanceType: ClearanceType;
+  clearanceType?: ClearanceType;
   costs: number;
   costsLastYearBudget: number;
   customerId: UUID;

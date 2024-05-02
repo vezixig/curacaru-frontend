@@ -133,7 +133,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       customerId: [null, [Validators.required]],
       date: ['', { Validators: Validators.required, updateOn: 'blur' }],
       distanceToCustomer: [0],
-      clearanceType: [null, [Validators.required]],
+      clearanceType: [null],
       employeeId: ['', [Validators.required]],
       employeeReplacementId: [''],
       isSignedByCustomer: [false],
@@ -419,7 +419,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
   onSave() {
     const appointment: Appointment = {
-      clearanceType: this.appointmentForm.get('clearanceType')?.value,
+      clearanceType: this.isPlanning ? undefined : this.appointmentForm.get('clearanceType')?.value,
       costs: 0,
       costsLastYearBudget: 0,
       customerId: this.appointmentForm.get('customerId')?.value,
@@ -446,6 +446,11 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
     if (appointment.employeeId === appointment.employeeReplacementId) {
       this.toastr.warning('Mitarbeiter und Vertretung dürfen nicht identisch sein');
+      return;
+    }
+
+    if (!this.isPlanning && !this.selectedClearanceType) {
+      this.toastr.warning('Bitte wähle eine Abrechnungsart aus');
       return;
     }
 

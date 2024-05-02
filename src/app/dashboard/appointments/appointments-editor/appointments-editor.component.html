@@ -114,6 +114,7 @@
     }
 
     <!-- used budget -->
+    @if(!isPlanning) {
     <div class="form-group mb-2">
       <label class="fw-light" for="inputDistanceToCustomer">Abrechnungsoptionen:</label>
       @if(selectedCustomer == null) {
@@ -186,8 +187,6 @@
           Selbstzahler <span class="fw-light"> - {{ initialBudget().selfPayment | currency }}</span>
         </label>
       </div>
-      } @if (isPlanning) {
-      <cura-info>Dieser Termin wird für einen zukünftigen Monat geplant und erst dann mit dem gewählten Budget verrechnet.</cura-info>
       } @else if (hasBudgetError) {
       <cura-info type="error">Die automatische Verrechnung konnte nicht durchgeführt werden, da das gewählte Budget aufgebraucht ist.</cura-info>
       } @else if( !canClearCareBenefit && !canClearPreventiveCare && !canClearReliefAmount && !canClearSelfPayment) {
@@ -196,6 +195,9 @@
       </cura-info>
       }
     </div>
+    } @else {
+    <cura-info>Dieser Termin wird für einen zukünftigen Monat geplant und erst dann automatisch mit den Budgets verrechnet.</cura-info>
+    }
   </div>
 
   @if (!isNew && appointmentForm.get('isDone')?.value != true && canSign()) {
