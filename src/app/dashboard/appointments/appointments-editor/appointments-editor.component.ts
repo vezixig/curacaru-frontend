@@ -335,7 +335,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       const timeEnd = DateTimeService.toTime(timeEndValue);
       const timeStart = DateTimeService.toTime(timeStartValue);
 
-      const hours = (timeEnd.hours * 60 + timeEnd.minutes - timeStart.hours * 60 + timeStart.minutes) / 60;
+      const hours = (timeEnd.hours * 60 + timeEnd.minutes - timeStart.hours * 60 - timeStart.minutes) / 60;
 
       let rideCosts = 0;
       if (this.companyPrices?.rideCostsType === RideCostsType.FlatRate) {
