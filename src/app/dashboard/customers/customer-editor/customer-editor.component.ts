@@ -16,6 +16,7 @@ import { UserService } from '../../../services/user.service';
 import { InputComponent } from '@curacaru/shared/input/input.component';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { Gender } from '@curacaru/enums/gender.enum';
+import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 
 @Component({
   providers: [ApiService],
@@ -34,6 +35,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   isSaving = false;
   isManager$ = this.userService.isManager$;
   isManager: boolean = false;
+  customerStatus = CustomerStatus;
 
   insuranceFormatter = (insurance: Insurance) => insurance.name;
 
@@ -79,6 +81,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
       phone: [''],
       salutation: this.formBuilder.nonNullable.control<Gender | null>(null, [Validators.required]),
+      status: this.formBuilder.control<CustomerStatus | null>(CustomerStatus.Customer),
       street: ['', [Validators.required, Validators.maxLength(150)]],
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
     });
@@ -209,6 +212,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           lastName: result.lastName,
           phone: result.phone,
           salutation: result.salutation,
+          status: result.status,
           street: result.street,
           zipCode: result.zipCode,
         });

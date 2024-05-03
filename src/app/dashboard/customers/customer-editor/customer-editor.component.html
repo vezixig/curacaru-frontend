@@ -2,7 +2,7 @@
   <h4 class="h-underline">Kunden {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
 
   <form (ngSubmit)="handleSave()" [formGroup]="customerForm">
-    <div class="form-group mb-4">
+    <div class="form-group mb-2">
       <label class="fw-light" for="selectAssociatedEmployeeId">Bearbeitet von:</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
@@ -15,6 +15,22 @@
       </select>
       }
     </div>
+
+    <div class="form-group mb-2">
+      <label class="fw-light" for="selectCustomerStatus">Kundenstatus:</label>
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @if (!isLoading) {
+      <select class="form-select" aria-label="Default select example" id="selectCustomerStatus" formControlName="status">
+        <option [ngValue]="null"></option>
+        <option [ngValue]="customerStatus.Interested">Interessent</option>
+        <option [ngValue]="customerStatus.Customer">Kunde</option>
+        <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>
+      </select>
+      }
+    </div>
+
+    <div class="mb-4"></div>
 
     <!-- salutation, first and lastname -->
     <div class="d-none d-md-block form-group mb-2">

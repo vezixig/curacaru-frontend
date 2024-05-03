@@ -3,12 +3,14 @@ import { Insurance } from './insurance.model';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { Gender } from '@curacaru/enums/gender.enum';
 import { EmployeeBasic } from './employee-basic.model';
+import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 
 export interface Customer {
   associatedEmployeeId?: UUID;
   associatedEmployee?: EmployeeBasic;
   birthDate: Date;
   careLevel: number;
+  status?: CustomerStatus;
   emergencyContactName: string;
   emergencyContactPhone: string;
   firstName: string;
