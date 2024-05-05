@@ -128,10 +128,18 @@
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
+
+      <ng-template #rt let-r="result" let-t="term">
+        <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+        <br />
+        <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
+      </ng-template>
+
       <div class="input-group">
         <input
           [disabled]="!isManager"
           id="inputInsurance"
+          [resultTemplate]="rt"
           type="text"
           class="form-control"
           [(ngModel)]="selectedInsurance"
@@ -145,7 +153,7 @@
             'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
           }"
           [ngbTypeahead]="search"
-          placeholder="Krankenkasse"
+          placeholder="Krankenkasse oder IK-Nummer"
           [editable]="false"
           [ngModelOptions]="{ standalone: true }"
         />
@@ -178,7 +186,7 @@
           <option [ngValue]="2">Selbstzahler</option>
         </select>
       </div>
-      }
+      } @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
     </div>
 
     <div class="d-md-none form-group mb-2">
@@ -203,6 +211,7 @@
         [editable]="false"
         [ngModelOptions]="{ standalone: true }"
       />
+      @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
     </div>
     <cura-input
       class="d-md-none"
