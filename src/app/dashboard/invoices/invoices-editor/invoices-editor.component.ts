@@ -60,7 +60,7 @@ export class InvoicesEditorComponent {
       month: [new Date().getMonth() + 1, [Validators.required, Validators.min(1), Validators.max(12)]],
       customerId: new FormControl<string>('', [Validators.required]),
       clearanceType: [undefined, [Validators.required]],
-      invoiceNumber: ['', [Validators.required]],
+      invoiceNumber: ['', [Validators.required, Validators.maxLength(50)]],
       invoiceDate: [formatDate(new Date(), 'yyyy-MM-dd', 'de'), [Validators.required]],
       signature: ['', [Validators.required]],
     });

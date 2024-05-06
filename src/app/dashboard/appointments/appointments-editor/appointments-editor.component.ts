@@ -140,7 +140,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       isSignedByEmployee: [false],
       isDone: [false],
       isNotBlockingAppointment: [false, [Validators.requiredTrue]],
-      notes: [''],
+      notes: ['', [Validators.maxLength(500)]],
       timeEnd: ['', [Validators.required]],
       timeStart: ['', [Validators.required]],
     });

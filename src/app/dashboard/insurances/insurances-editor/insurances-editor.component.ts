@@ -38,9 +38,9 @@ export class InsurancesEditorComponent implements OnInit, OnDestroy {
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
     this.insuranceForm = this.formBuilder.group({
-      name: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.maxLength(150)]],
       institutionCode: ['', [ValidateInstitutionCode]],
-      street: [''],
+      street: ['', [Validators.maxLength(150)]],
       zipCode: [''],
     });
 

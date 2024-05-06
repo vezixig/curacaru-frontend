@@ -18,6 +18,7 @@ export class InputComponent {
   @Input() placeholder: string = '';
   @Input() info: string = '';
   @Input() prefix: string = '';
+  @Input() maxLength: number = 9999;
 
   @Output() change = new EventEmitter();
 }

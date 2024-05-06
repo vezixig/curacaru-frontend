@@ -25,6 +25,7 @@
         }"
         class="form-control"
         formControlName="ownerName"
+        maxlength="150"
         id="inputOwnerName"
         placeholder="Namen eingeben"
       />
@@ -45,6 +46,7 @@
         }"
         class="form-control"
         formControlName="street"
+        maxlength="150"
         id="inputStreet"
         placeholder="Straße und Hausnummer eingeben"
       />
@@ -83,6 +85,7 @@
       <ngx-skeleton-loader />
       } @else {
       <input
+        maxlength="150"
         type="text"
         [ngClass]="{
           'is-valid': companyForm.controls['serviceId'].valid && companyForm.controls['serviceId'].touched,
@@ -123,7 +126,7 @@
       <ngx-skeleton-loader />
       } @else {
       <input
-        maxlength="10"
+        maxlength="9"
         type="text"
         [ngClass]="{
           'is-valid': companyForm.controls['institutionCode'].valid && companyForm.controls['institutionCode'].touched,
@@ -144,7 +147,7 @@
       <ngx-skeleton-loader />
       } @else {
       <input
-        maxlength="13"
+        maxlength="150"
         type="text"
         [ngClass]="{
           'is-valid': companyForm.controls['taxNumber'].valid && companyForm.controls['taxNumber'].touched,
@@ -170,6 +173,8 @@
           class="form-control"
           formControlName="iban"
           id="inputIban"
+          maxlength="32"
+          3
           [ngClass]="{
             'is-valid': companyForm.controls['iban'].valid && companyForm.controls['iban'].touched,
             'is-invalid': companyForm.controls['iban'].invalid && companyForm.controls['iban'].touched
@@ -178,6 +183,7 @@
         />
         <input
           type="text"
+          maxlength="11"
           [ngClass]="{
             'is-valid': companyForm.controls['bic'].valid && companyForm.controls['bic'].touched,
             'is-invalid': companyForm.controls['bic'].invalid && companyForm.controls['bic'].touched
