@@ -37,7 +37,7 @@ import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
-import { UserEmployee } from '@curacaru/models';
+import { MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { NgbDatePipe } from '@curacaru/pipes/ngb-date-pipe';
 import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
 import { Store } from '@ngrx/store';
@@ -112,7 +112,7 @@ export class AppointmentsListComponent implements OnDestroy {
   readonly showPriceInfo$: Observable<boolean>;
   readonly filterModel$: Observable<{
     employees: EmployeeBasic[];
-    customers: CustomerListEntry[];
+    customers: MinimalCustomerListEntry[];
     user: UserEmployee;
   }>;
   readonly dataModel$: Observable<{
@@ -129,7 +129,7 @@ export class AppointmentsListComponent implements OnDestroy {
 
     this.filterModel$ = forkJoin({
       employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getCustomerList(),
+      customers: this.apiService.getMinimalCustomerList(),
       user: this.userService.user$,
     }).pipe(
       catchError((error) => {
