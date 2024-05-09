@@ -1,26 +1,9 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import {
-  Observable,
-  Subject,
-  combineLatest,
-  delay,
-  filter,
-  finalize,
-  firstValueFrom,
-  last,
-  map,
-  mergeMap,
-  share,
-  shareReplay,
-  skipUntil,
-  startWith,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { Observable, Subject, combineLatest, firstValueFrom, map, mergeMap, startWith, takeUntil, tap } from 'rxjs';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
@@ -36,16 +19,29 @@ import { InvoiceChangeCustomerAction, InvoicesListState } from '@curacaru/state/
 import { LoaderFilterComponent } from '@curacaru/shared/loader-filter/loader-filter.component';
 import { CustomerListeTableComponent } from '../customer-list-table/customer-list-table.component';
 import { CustomerListMobileComponent } from '../customer-list-mobile/customer-list-mobile.component';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
+import { Page } from '@curacaru/models/page.model';
+import { start } from '@popperjs/core';
 
 @Component({
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
   templateUrl: './customer-list.component.html',
-  imports: [FontAwesomeModule, RouterModule, FormsModule, AsyncPipe, LoaderFilterComponent, CustomerListeTableComponent, CustomerListMobileComponent],
+  imports: [
+    FontAwesomeModule,
+    RouterModule,
+    FormsModule,
+    AsyncPipe,
+    PagingComponent,
+    LoaderFilterComponent,
+    CustomerListeTableComponent,
+    CustomerListMobileComponent,
+  ],
 })
 export class CustomerListComponent implements OnDestroy, OnInit {
   private readonly apiService = inject(ApiService);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly appointmentListStore = inject(Store<AppointmentListState>);
   private readonly deploymentReportListStore = inject(Store<DeploymentReportListState>);
   private readonly invoiceListStore = inject(Store<InvoicesListState>);
@@ -62,6 +58,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   isMobile = this.screenService.isMobile;
 
   customers = signal<CustomerListEntry[]>([]);
+  page = signal<Page<CustomerListEntry> | undefined>(undefined);
   filterModel$ = new Observable<{ employees: EmployeeBasic[] }>();
   isLoading = signal(true);
   selectedEmployeeId = signal<UUID | undefined>(undefined);
@@ -83,33 +80,30 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     }).pipe(
       tap((o) => (o.state.customerList.employeeId != '' ? this.selectedEmployeeId.set(o.state.customerList.employeeId) : '')),
       map((o) => {
-        this.$onRefresh.next();
+        if (this.activatedRoute.snapshot.queryParams['p'] == 1) {
+          this.$onRefresh.next();
+        }
+        this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
         return { employees: o.employees };
       })
     );
 
-    const customerRequest = this.$onRefresh.pipe(mergeMap(() => this.apiService.getCustomerList()));
-
     combineLatest({
-      customers: customerRequest,
-      state: this.store,
+      route: this.activatedRoute.queryParams,
+      refrsh: this.$onRefresh.pipe(startWith({})),
     })
       .pipe(
-        tap(() => console.log('refresh')),
         takeUntil(this.$onDestroy),
         tap(() => {
           this.customers.set([]);
           this.isLoading.set(true);
         }),
-        map((result) => ({
-          customers: result.customers.filter(
-            (o) => !result.state.customerList.employeeId || o.associatedEmployeeId == result.state.customerList.employeeId
-          ),
-        }))
+        mergeMap((o) => this.apiService.getCustomerList(o.route['p'] ?? 1, this.selectedEmployeeId()))
       )
       .subscribe({
         next: (o) => {
-          this.customers.set(o.customers);
+          this.customers.set(o.items);
+          this.page.set(o);
           this.isLoading.set(false);
         },
         error: (e) => {
@@ -123,7 +117,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     this.locationService.openLocationLink(`${customer.street} ${customer.zipCode} ${customer.city}`);
   }
 
-  onSelectionChanged() {
+  onEmployeeChanged() {
     this.store.dispatch(ChangeEmployeeFilterAction({ employeeId: this.selectedEmployeeId() == '' ? undefined : this.selectedEmployeeId() }));
   }
 

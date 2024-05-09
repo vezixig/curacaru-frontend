@@ -88,12 +88,12 @@ export class ApiService {
   getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`);
 
   /** Gets the list of appointments from the API filtered by the query */
-  getAppointmentList(from: NgbDate, to: NgbDate, page: number, pageSize: number, customer?: number, employee?: number) {
+  getAppointmentList(from: NgbDate, to: NgbDate, page: number, customer?: number, employee?: number) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('from', DateTimeService.toDateString(from));
     options.params = options.params.append('to', DateTimeService.toDateString(to));
     options.params = options.params.append('page', page);
-    options.params = options.params.append('pageSize', pageSize);
+    options.params = options.params.append('pageSize', 20);
     if (employee) {
       options.params = options.params.append('employeeId', employee.toString());
     }
@@ -116,7 +116,15 @@ export class ApiService {
   getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`);
 
   /** Gets the list of customers from the API */
-  getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`);
+  getCustomerList(page: number, employeeId?: UUID) {
+    const options = { params: new HttpParams() };
+    options.params = options.params.append('page', page);
+    options.params = options.params.append('pageSize', 20);
+    if (employeeId) {
+      options.params = options.params.append('employeeId', employeeId.toString());
+    }
+    return this.httpClient.get<Page<CustomerListEntry>>(`${this.apiUrl}/customer/list`, options);
+  }
 
   /** Gets a deployment report */
   getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) =>

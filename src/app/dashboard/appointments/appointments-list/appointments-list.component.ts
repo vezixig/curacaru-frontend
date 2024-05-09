@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import {
@@ -77,6 +77,7 @@ export class AppointmentsListComponent implements OnDestroy {
   private readonly locationService = inject(LocationService);
   private readonly modalService = inject(NgbModal);
   private readonly offcanvasService = inject(NgbOffcanvas);
+  private readonly router = inject(Router);
   private readonly store = inject(Store<AppointmentListState>);
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
@@ -158,12 +159,14 @@ export class AppointmentsListComponent implements OnDestroy {
       .get('employeeId')!
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
+        this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
         this.store.dispatch(AppointmentListActions.changeEmployeeFilter({ employeeId: next }));
       });
     this.filterForm
       .get('customerId')!
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
+        this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
         this.store.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: next }));
       });
 
@@ -199,7 +202,6 @@ export class AppointmentsListComponent implements OnDestroy {
             this.filterForm.get('start')?.value ?? dateBounds.start,
             this.filterForm.get('end')?.value ?? dateBounds.end,
             next.route['p'] ?? 1,
-            20,
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )
@@ -264,6 +266,7 @@ export class AppointmentsListComponent implements OnDestroy {
     }
 
     if (this.fromDate && this.toDate && (this.toDate.equals(this.fromDate) || this.toDate.after(this.fromDate))) {
+      this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
       this.filterForm.patchValue({ start: this.fromDate, end: this.toDate });
       this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: this.fromDate, dateEnd: this.toDate }));
     }
