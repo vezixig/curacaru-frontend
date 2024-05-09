@@ -88,17 +88,19 @@ export class ApiService {
   getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`);
 
   /** Gets the list of appointments from the API filtered by the query */
-  getAppointmentList(from: NgbDate, to: NgbDate, customer?: number, employee?: number) {
+  getAppointmentList(from: NgbDate, to: NgbDate, page: number, pageSize: number, customer?: number, employee?: number) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('from', DateTimeService.toDateString(from));
     options.params = options.params.append('to', DateTimeService.toDateString(to));
+    options.params = options.params.append('page', page);
+    options.params = options.params.append('pageSize', pageSize);
     if (employee) {
       options.params = options.params.append('employeeId', employee.toString());
     }
     if (customer) {
       options.params = options.params.append('customerId', customer.toString());
     }
-    return this.httpClient.get<AppointmentListEntry[]>(`${this.apiUrl}/appointment/list`, options);
+    return this.httpClient.get<Page<AppointmentListEntry[]>>(`${this.apiUrl}/appointment/list`, options);
   }
 
   /** Gets the city name for the given zip code */

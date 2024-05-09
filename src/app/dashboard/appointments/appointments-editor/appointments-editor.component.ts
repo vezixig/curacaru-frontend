@@ -453,7 +453,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.isPlanning && !this.selectedClearanceType) {
+    if (!this.isPlanning && this.selectedClearanceType == undefined) {
       this.toastr.warning('Bitte wähle eine Abrechnungsart aus');
       return;
     }

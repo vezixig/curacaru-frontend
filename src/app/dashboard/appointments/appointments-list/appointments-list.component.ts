@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import {
@@ -33,7 +33,6 @@ import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.co
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
 import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { TimeFormatPipe } from '../../../pipes/time.pipe';
-import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
@@ -43,6 +42,8 @@ import { AppointmentListActions, AppointmentListState } from '@curacaru/state/ap
 import { Store } from '@ngrx/store';
 import { AppointmentRepository } from '@curacaru/services/repositories/appointment.repository';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
+import { Page } from '@curacaru/models/page.model';
 
 @Component({
   imports: [
@@ -53,6 +54,7 @@ import { SignatureComponent } from '@curacaru/shared/signature/signature.compone
     NgbDatePipe,
     NgbDatepickerModule,
     NgxSkeletonLoaderModule,
+    PagingComponent,
     ReactiveFormsModule,
     ReplacePipe,
     RouterModule,
@@ -67,6 +69,7 @@ import { SignatureComponent } from '@curacaru/shared/signature/signature.compone
 })
 export class AppointmentsListComponent implements OnDestroy {
   /** injections */
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
   private readonly appointmentRepository = inject(AppointmentRepository);
   private readonly calendar = inject(NgbCalendar);
@@ -116,6 +119,7 @@ export class AppointmentsListComponent implements OnDestroy {
     user: UserEmployee;
   }>;
   readonly dataModel$: Observable<{
+    page: Page<AppointmentListEntry[]>;
     appointments: AppointmentListEntry[];
   }>;
   readonly filterForm: FormGroup;
@@ -166,6 +170,7 @@ export class AppointmentsListComponent implements OnDestroy {
     // Data Model
     this.dataModel$ = combineLatest({
       filter: this.filterModel$,
+      route: this.activatedRoute.queryParams,
       state: this.store,
       refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
@@ -193,12 +198,15 @@ export class AppointmentsListComponent implements OnDestroy {
           .getAppointmentList(
             this.filterForm.get('start')?.value ?? dateBounds.start,
             this.filterForm.get('end')?.value ?? dateBounds.end,
+            next.route['p'] ?? 1,
+            20,
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )
           .pipe(
-            map((appointments) => ({
-              appointments: appointments.map(this.deserializeDates).map((appointment) => {
+            map((page) => ({
+              page: page,
+              appointments: page.items.map(this.deserializeDates).map((appointment) => {
                 appointment.canSign =
                   appointment.employeeReplacementId == next.filter.user.id ||
                   (!appointment.employeeReplacementId && appointment.employeeId == next.filter.user.id);
