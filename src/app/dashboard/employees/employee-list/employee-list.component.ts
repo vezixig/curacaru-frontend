@@ -2,16 +2,19 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal }
 import { Employee } from '@curacaru/models/employee.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
-import { RouterModule } from '@angular/router';
-import { Subject, mergeMap, startWith, takeUntil, tap } from 'rxjs';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Subject, combineLatest, mergeMap, startWith, takeUntil, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { EmployeeListMobileComponent } from '../employee-list-mobile/employee-list-mobile.component';
 import { EmployeeListTableComponent } from '../employee-list-table/employee-list-table.component';
 import { ApiService, ErrorHandlerService, LoaderService, ScreenService } from '@curacaru/services';
+import { Page } from '@curacaru/models/page.model';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterModule, EmployeeListMobileComponent, EmployeeListTableComponent],
+  imports: [RouterModule, EmployeeListMobileComponent, EmployeeListTableComponent, FontAwesomeModule, PagingComponent],
   selector: 'cura-employee-list',
   standalone: true,
   templateUrl: './employee-list.component.html',
@@ -23,10 +26,12 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
   private readonly modalService = inject(NgbModal);
   private readonly screenService = inject(ScreenService);
   private readonly toastrService = inject(ToastrService);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
   isMobile = this.screenService.isMobile;
   isLoading = signal(true);
   employees = signal<Employee[]>([]);
+  page = signal<Page<Employee> | null>(null);
 
   $refresh = new Subject<void>();
   $onDestroy = new Subject<void>();
@@ -48,19 +53,19 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
   }
 
   private subscribeEmployeeList() {
-    this.$refresh
+    combineLatest({ route: this.activatedRoute.queryParams, refresh: this.$refresh.pipe(startWith({})) })
       .pipe(
         takeUntil(this.$onDestroy),
-        startWith({}),
         tap(() => {
           this.employees.set([]);
           this.isLoading.set(true);
         }),
-        mergeMap(() => this.apiService.getEmployeeList())
+        mergeMap((o) => this.apiService.getEmployeeList(o.route['p'] ?? 1, 20))
       )
       .subscribe({
         next: (result) => {
-          this.employees.set(result);
+          this.employees.set(result.items);
+          this.page.set(result);
           this.isLoading.set(false);
         },
         error: (e) => {

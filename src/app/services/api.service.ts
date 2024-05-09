@@ -17,6 +17,7 @@ import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
+import { Page } from '@curacaru/models/page.model';
 
 @Injectable({
   providedIn: 'root',
@@ -142,7 +143,8 @@ export class ApiService {
   getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`);
 
   /** Gets the list of employees from the API. */
-  getEmployeeList = () => this.httpClient.get<Employee[]>(`${this.apiUrl}/employee/list`);
+  getEmployeeList = (page: number, pageSize: number) =>
+    this.httpClient.get<Page<Employee>>(`${this.apiUrl}/employee/list`, { params: { page, pageSize } });
 
   /**
    * Gets the list of employees wit only basic information from the API
