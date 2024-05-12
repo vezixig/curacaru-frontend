@@ -6,13 +6,15 @@ import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.c
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { DeploymentReportListEntry } from '@curacaru/models/deployment-report-list.entry.model';
 import { MinimalCustomerListEntry } from '@curacaru/models/minimal-customer-list-entry.model';
+import { Page } from '@curacaru/models/page.model';
 import { ClearanceTypeNamePipe } from '@curacaru/pipes/clarance-type-name.pipe';
 import { InsuranceStatusPipe } from '@curacaru/pipes/insurance-status.pipe';
 import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 import { DateTimeService, UserService } from '@curacaru/services';
 import { ApiService } from '@curacaru/services/api.service';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
-import { DeploymentReportChangeFilterAction } from '@curacaru/state/deployment-report-list.state';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
+import { DeploymentReportChangeFilterAction, DeploymentReportChangePageAction } from '@curacaru/state/deployment-report-list.state';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faCoins, faDownload, faGear, faPersonCane, faUserAlt } from '@fortawesome/free-solid-svg-icons';
@@ -24,15 +26,16 @@ import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin,
 
 @Component({
   imports: [
+    ClearanceTypeNamePipe,
     CommonModule,
     FontAwesomeModule,
-    ReactiveFormsModule,
-    ClearanceTypeNamePipe,
-    MonthNamePipe,
-    RouterModule,
-    NgxSkeletonLoaderModule,
     FormsModule,
     InsuranceStatusPipe,
+    MonthNamePipe,
+    NgxSkeletonLoaderModule,
+    PagingComponent,
+    ReactiveFormsModule,
+    RouterModule,
   ],
   providers: [ApiService, MonthNamePipe, ClearanceTypeNamePipe],
   selector: 'cura-deployment',
@@ -68,7 +71,7 @@ export class DeploymentReportsListComponent {
     user: UserEmployee;
   }>;
   readonly filterForm: FormGroup;
-  readonly listModel$: Observable<DeploymentReportListEntry[]>;
+  readonly listModel$: Observable<Page<DeploymentReportListEntry>>;
   readonly $onRefresh = new Subject();
   readonly isLoading = signal(false);
 
@@ -93,13 +96,14 @@ export class DeploymentReportsListComponent {
           month: state.deploymentReportList.month,
           employeeId: state.deploymentReportList.employeeId,
           customerId: state.deploymentReportList.customerId,
+          page: state.deploymentReportList.page,
         };
         this.filterForm.patchValue(queryFilter, { emitEvent: false });
         return queryFilter;
       }),
-      debounceTime(300),
+      debounceTime(250),
       switchMap((filter) =>
-        this.documentRepository.getDeploymentReportsList(filter.year, filter.month, filter.customerId, filter.employeeId).pipe(
+        this.documentRepository.getDeploymentReportsList(filter.year, filter.month, filter.page, filter.customerId, filter.employeeId).pipe(
           catchError(() => {
             this.toastrService.error('Die Liste mit Einsatznachweisen konnte nicht geladen werden');
             return [];
@@ -136,6 +140,10 @@ export class DeploymentReportsListComponent {
     modalRef.componentInstance.text = `Soll der Einsatznachweis ${this.clearanceTypeNamePipe.transform(report.clearanceType)} von ${
       report.customerName
     } für ${this.monthNamePipe.transform(report.month)} ${report.year} wirklich gelöscht werden?`;
+  }
+
+  onPageChanged($event: number) {
+    this.store.dispatch(DeploymentReportChangePageAction({ page: $event }));
   }
 
   private deleteReport(report: DeploymentReportListEntry) {

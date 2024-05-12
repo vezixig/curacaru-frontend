@@ -93,7 +93,6 @@ export class ApiService {
     options.params = options.params.append('from', DateTimeService.toDateString(from));
     options.params = options.params.append('to', DateTimeService.toDateString(to));
     options.params = options.params.append('page', page);
-    options.params = options.params.append('pageSize', 20);
     if (employee) {
       options.params = options.params.append('employeeId', employee.toString());
     }
@@ -119,7 +118,6 @@ export class ApiService {
   getCustomerList(page: number, employeeId?: UUID) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('page', page);
-    options.params = options.params.append('pageSize', 20);
     if (employeeId) {
       options.params = options.params.append('employeeId', employeeId.toString());
     }
@@ -153,8 +151,7 @@ export class ApiService {
   getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`);
 
   /** Gets the list of employees from the API. */
-  getEmployeeList = (page: number, pageSize: number) =>
-    this.httpClient.get<Page<Employee>>(`${this.apiUrl}/employee/list`, { params: { page, pageSize } });
+  getEmployeeList = (page: number) => this.httpClient.get<Page<Employee>>(`${this.apiUrl}/employee/list`, { params: { page } });
 
   /**
    * Gets the list of employees wit only basic information from the API

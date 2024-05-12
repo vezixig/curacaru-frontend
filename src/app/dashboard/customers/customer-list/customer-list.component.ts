@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService, ErrorHandlerService, LocationService, ScreenService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { ChangeEmployeeFilterAction } from '@curacaru/state/customer-list.state';
+import { ChangeEmployeeFilterAction, ChangePageAction } from '@curacaru/state/customer-list.state';
 import { UUID } from 'angular2-uuid';
 import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
 import { DeploymentReportChangeCustomerAction, DeploymentReportListState } from '@curacaru/state/deployment-report-list.state';
@@ -41,7 +41,6 @@ import { start } from '@popperjs/core';
 })
 export class CustomerListComponent implements OnDestroy, OnInit {
   private readonly apiService = inject(ApiService);
-  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly appointmentListStore = inject(Store<AppointmentListState>);
   private readonly deploymentReportListStore = inject(Store<DeploymentReportListState>);
   private readonly invoiceListStore = inject(Store<InvoicesListState>);
@@ -76,21 +75,15 @@ export class CustomerListComponent implements OnDestroy, OnInit {
 
     this.filterModel$ = combineLatest({
       employees: this.apiService.getEmployeeBaseList(),
-      state: this.store,
     }).pipe(
-      tap((o) => (o.state.customerList.employeeId != '' ? this.selectedEmployeeId.set(o.state.customerList.employeeId) : '')),
       map((o) => {
-        if (this.activatedRoute.snapshot.queryParams['p'] == 1) {
-          this.$onRefresh.next();
-        }
-        this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
         return { employees: o.employees };
       })
     );
 
     combineLatest({
-      route: this.activatedRoute.queryParams,
-      refrsh: this.$onRefresh.pipe(startWith({})),
+      refresh: this.$onRefresh.pipe(startWith({})),
+      state: this.store,
     })
       .pipe(
         takeUntil(this.$onDestroy),
@@ -98,7 +91,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
           this.customers.set([]);
           this.isLoading.set(true);
         }),
-        mergeMap((o) => this.apiService.getCustomerList(o.route['p'] ?? 1, this.selectedEmployeeId()))
+        mergeMap((o) => this.apiService.getCustomerList(o.state.customerList.page, o.state.customerList.employeeId))
       )
       .subscribe({
         next: (o) => {
@@ -141,6 +134,10 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   handleShowInvoices(customer: CustomerListEntry) {
     this.invoiceListStore.dispatch(InvoiceChangeCustomerAction({ customerId: customer.id }));
     this.router.navigate(['/dashboard/invoices']);
+  }
+
+  onPageChange($event: number) {
+    this.store.dispatch(ChangePageAction({ page: $event }));
   }
 
   private deleteEmployee(customer: CustomerListEntry) {

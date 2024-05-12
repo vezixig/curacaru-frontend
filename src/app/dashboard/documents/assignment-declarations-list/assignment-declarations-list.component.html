@@ -33,7 +33,7 @@
       }
     </div>
   </form>
-  @if(listModel$ | async; as documents) {
+  @if(listModel$ | async; as page) {
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
       <tr>
@@ -45,7 +45,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (document of documents; track document) {
+      @for (document of page.items; track document) {
       <tr>
         <td>{{ document.year }}</td>
         <td>{{ document.customerName }}</td>
@@ -88,7 +88,7 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (document of documents; track document) {
+    @for (document of page.items; track document) {
     <div class="card my-3">
       <div class="card-header d-flex">
         <img class="me-2" width="10" [class.bg-success]="document.isSigned" [class.bg-danger]="!document.isSigned" />
@@ -131,7 +131,9 @@
     }
   </div>
 
-  @if (documents.length == 0) {
+  <cura-paging [page]="page" (pageChange)="onPageChange($event)" />
+
+  @if (page.items.length === 0) {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Abtretungserklärungen gefunden.</div>
   } } }
 </div>

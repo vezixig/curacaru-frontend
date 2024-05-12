@@ -270,7 +270,7 @@
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Termine gefunden.</div>
   }
 
-  <cura-paging [page]="dataModel.page" [link]="'/dashboard/appointments'" />
+  <cura-paging [page]="dataModel.page" (pageChange)="onPageChange($event)" />
 
   }
   <!-- show table loader -->

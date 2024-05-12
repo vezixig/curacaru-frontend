@@ -11,6 +11,8 @@ import { ApiService, ErrorHandlerService, LoaderService, ScreenService } from '@
 import { Page } from '@curacaru/models/page.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
+import { ChangePageAction, EmployeeListState } from '@curacaru/state/employee-list.state';
+import { Store } from '@ngrx/store';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,7 +28,7 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
   private readonly modalService = inject(NgbModal);
   private readonly screenService = inject(ScreenService);
   private readonly toastrService = inject(ToastrService);
-  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly store = inject(Store<EmployeeListState>);
 
   isMobile = this.screenService.isMobile;
   isLoading = signal(true);
@@ -52,15 +54,19 @@ export class EmployeeListComponent implements OnDestroy, OnInit {
     modalRef.componentInstance.text = `Soll ${employee.firstName} ${employee.lastName} wirklich gelöscht werden?`;
   }
 
+  onPageChange($event: number) {
+    this.store.dispatch(ChangePageAction({ page: $event }));
+  }
+
   private subscribeEmployeeList() {
-    combineLatest({ route: this.activatedRoute.queryParams, refresh: this.$refresh.pipe(startWith({})) })
+    combineLatest({ state: this.store, refresh: this.$refresh.pipe(startWith({})) })
       .pipe(
         takeUntil(this.$onDestroy),
         tap(() => {
           this.employees.set([]);
           this.isLoading.set(true);
         }),
-        mergeMap((o) => this.apiService.getEmployeeList(o.route['p'] ?? 1, 20))
+        mergeMap((o) => this.apiService.getEmployeeList(o.state.employeeList.page))
       )
       .subscribe({
         next: (result) => {

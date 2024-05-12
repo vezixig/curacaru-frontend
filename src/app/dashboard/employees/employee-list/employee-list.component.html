@@ -7,4 +7,4 @@
 <cura-employee-list-table [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
 }
 
-<cura-paging [page]="page()" [link]="'/dashboard/employees'" />
+<cura-paging [page]="page()" (pageChange)="onPageChange($event)" />

@@ -69,7 +69,6 @@ import { Page } from '@curacaru/models/page.model';
 })
 export class AppointmentsListComponent implements OnDestroy {
   /** injections */
-  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
   private readonly appointmentRepository = inject(AppointmentRepository);
   private readonly calendar = inject(NgbCalendar);
@@ -77,7 +76,6 @@ export class AppointmentsListComponent implements OnDestroy {
   private readonly locationService = inject(LocationService);
   private readonly modalService = inject(NgbModal);
   private readonly offcanvasService = inject(NgbOffcanvas);
-  private readonly router = inject(Router);
   private readonly store = inject(Store<AppointmentListState>);
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
@@ -159,21 +157,18 @@ export class AppointmentsListComponent implements OnDestroy {
       .get('employeeId')!
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
-        this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
         this.store.dispatch(AppointmentListActions.changeEmployeeFilter({ employeeId: next }));
       });
     this.filterForm
       .get('customerId')!
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
-        this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
         this.store.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: next }));
       });
 
     // Data Model
     this.dataModel$ = combineLatest({
       filter: this.filterModel$,
-      route: this.activatedRoute.queryParams,
       state: this.store,
       refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
@@ -201,7 +196,7 @@ export class AppointmentsListComponent implements OnDestroy {
           .getAppointmentList(
             this.filterForm.get('start')?.value ?? dateBounds.start,
             this.filterForm.get('end')?.value ?? dateBounds.end,
-            next.route['p'] ?? 1,
+            next.state.appointmentList.page,
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )
@@ -235,22 +230,6 @@ export class AppointmentsListComponent implements OnDestroy {
     isEmployee: boolean;
   };
 
-  onTakeSignature(appointment: AppointmentListEntry, isEmployee: boolean) {
-    this.signatureTaking = { appointment, isEmployee };
-    this.signatureName.set(
-      isEmployee
-        ? (appointment.employeeReplacementName ?? '') != ''
-          ? appointment.employeeReplacementName!
-          : appointment.employeeName
-        : appointment.customerName
-    );
-    this.signatureTitle.set(isEmployee ? 'Unterschrift Mitarbeiter' : 'Unterschrift Kunde');
-    this.offcanvasService.open(this.signatureTemplate, { position: 'bottom', panelClass: 'signature-panel', backdrop: 'static' });
-  }
-
-  onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
-    this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
-
   isHovered = (date: NgbDate) => this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
   isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate) && date.before(this.toDate);
   isRange = (date: NgbDate) => date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
@@ -266,7 +245,6 @@ export class AppointmentsListComponent implements OnDestroy {
     }
 
     if (this.fromDate && this.toDate && (this.toDate.equals(this.fromDate) || this.toDate.after(this.fromDate))) {
-      this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { p: 1 }, queryParamsHandling: 'merge' });
       this.filterForm.patchValue({ start: this.fromDate, end: this.toDate });
       this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: this.fromDate, dateEnd: this.toDate }));
     }
@@ -283,6 +261,26 @@ export class AppointmentsListComponent implements OnDestroy {
     const start = DateTimeService.toTimeString(appointment.timeStart, false);
     const end = DateTimeService.toTimeString(appointment.timeEnd, false);
     modalRef.componentInstance.text = `Soll der Termin am ${date} von ${start}-${end} wirklich gelöscht werden?`;
+  }
+
+  onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
+    this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
+
+  onPageChange($event: number) {
+    this.store.dispatch(AppointmentListActions.changePage({ page: $event }));
+  }
+
+  onTakeSignature(appointment: AppointmentListEntry, isEmployee: boolean) {
+    this.signatureTaking = { appointment, isEmployee };
+    this.signatureName.set(
+      isEmployee
+        ? (appointment.employeeReplacementName ?? '') != ''
+          ? appointment.employeeReplacementName!
+          : appointment.employeeName
+        : appointment.customerName
+    );
+    this.signatureTitle.set(isEmployee ? 'Unterschrift Mitarbeiter' : 'Unterschrift Kunde');
+    this.offcanvasService.open(this.signatureTemplate, { position: 'bottom', panelClass: 'signature-panel', backdrop: 'static' });
   }
 
   validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
@@ -322,10 +320,6 @@ export class AppointmentsListComponent implements OnDestroy {
       });
   }
 
-  takeSignature(template: TemplateRef<any>, name: string, isEmployee: boolean) {
-    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
-  }
-
   onSignatureTaken($event: string) {
     if (this.signatureTaking == null || $event == '') return;
 
@@ -345,6 +339,10 @@ export class AppointmentsListComponent implements OnDestroy {
         this.toastr.error(`Unterschrift konnte nicht gespeichert werden: [${error.status}] ${error.error}`);
       },
     });
+  }
+
+  takeSignature(template: TemplateRef<any>, name: string, isEmployee: boolean) {
+    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
   }
 
   private deserializeDates(obj: any): AppointmentListEntry {

@@ -2,13 +2,17 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
-import { EmployeeBasic, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
+import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { AssignmentDeclarationListEntry } from '@curacaru/models/assignment-declaration-list-entry.model';
+import { Page } from '@curacaru/models/page.model';
 import { ApiService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
-import { AssignmentDeclarationListChangeFilterAction } from '@curacaru/state/assignment-declaration-list.state';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
+import {
+  AssignmentDeclarationListChangeFilterAction,
+  AssignmentDeclarationListChangePageAction,
+} from '@curacaru/state/assignment-declaration-list.state';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import { faCircleInfo, faDownload, faGear } from '@fortawesome/free-solid-svg-icons';
@@ -19,7 +23,7 @@ import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin,
 
 @Component({
   templateUrl: './assignment-declarations-list.component.html',
-  imports: [RouterModule, AsyncPipe, FormsModule, ReactiveFormsModule, CommonModule, FontAwesomeModule],
+  imports: [RouterModule, AsyncPipe, FormsModule, ReactiveFormsModule, PagingComponent, CommonModule, FontAwesomeModule],
   selector: 'cura-assignment-declarations',
   standalone: true,
 })
@@ -35,7 +39,7 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
     employees: EmployeeBasic[];
     user: UserEmployee;
   }>;
-  readonly listModel$: Observable<AssignmentDeclarationListEntry[]>;
+  readonly listModel$: Observable<Page<AssignmentDeclarationListEntry>>;
   readonly filterForm: FormGroup;
   readonly isLoading = signal(false);
 
@@ -72,13 +76,14 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
         const queryFilter = {
           year: state.assignmentDeclarationList.year,
           employeeId: state.assignmentDeclarationList.employeeId,
+          page: state.assignmentDeclarationList.page,
         };
         this.filterForm.patchValue(queryFilter, { emitEvent: false });
         return queryFilter;
       }),
       debounceTime(300),
       switchMap((filter) =>
-        this.documentRepository.getAssignmentDeclarationList(filter.year, filter.employeeId).pipe(
+        this.documentRepository.getAssignmentDeclarationList(filter.year, filter.page, filter.employeeId).pipe(
           catchError(() => {
             this.toastrService.error('Die Liste mit Abtretungserklärungen konnte nicht geladen werden');
             return [];
@@ -116,6 +121,10 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
           this.isLoading.set(false);
       },
     });
+  }
+
+  onPageChange($event: number) {
+    this.store.dispatch(AssignmentDeclarationListChangePageAction({ page: $event }));
   }
 
   onSelectedYearChange(selectedYear: string) {

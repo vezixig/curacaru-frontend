@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, Output, input, model, output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Page } from '@curacaru/models/page.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -11,5 +11,5 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 })
 export class PagingComponent<T> {
   page = input<Page<T> | null>();
-  link = input<string>();
+  pageChange = output<number>();
 }

@@ -10,6 +10,7 @@ import { UUID } from 'angular2-uuid';
 import { DateTimeService } from '../date-time.service';
 import { map } from 'rxjs';
 import { DeploymentReportSaveModel } from '@curacaru/models/deployment-report-save.model';
+import { Page } from '@curacaru/models/page.model';
 
 /**
  * Repository for document related requests
@@ -29,7 +30,7 @@ export class DocumentRepository extends BaseRepository {
     return this.client.post(`${this.apiUrl}/documents/deployment-reports`, report);
   }
 
-  getDeploymentReportsList(year: number, month: number, customerId?: UUID, employeeId?: UUID) {
+  getDeploymentReportsList(year: number, month: number, page: number, customerId?: UUID, employeeId?: UUID) {
     const options = { params: new HttpParams().set('year', year) };
     if (customerId) {
       options.params = options.params.set('customerId', customerId.toString());
@@ -37,8 +38,9 @@ export class DocumentRepository extends BaseRepository {
     if (employeeId) {
       options.params = options.params.set('employeeId', employeeId.toString());
     }
+    options.params = options.params.set('page', page.toString());
 
-    return this.client.get<DeploymentReportListEntry[]>(`${this.apiUrl}/documents/deployment-reports/${year}/${month}`, options);
+    return this.client.get<Page<DeploymentReportListEntry>>(`${this.apiUrl}/documents/deployment-reports/${year}/${month}`, options);
   }
 
   getDeploymentReport(year: number, month: number, customerId: UUID, clearanceType: ClearanceType) {
@@ -87,12 +89,13 @@ export class DocumentRepository extends BaseRepository {
    * @param employeeId an optional employee id to filter by
    * @returns a list of assignment declarations
    */
-  getAssignmentDeclarationList(year: number, employeeId?: UUID) {
+  getAssignmentDeclarationList(year: number, page: number, employeeId?: UUID) {
     const options = { params: new HttpParams().set('year', year) };
     if (employeeId) {
       options.params = options.params.set('employeeId', employeeId.toString());
     }
-    return this.client.get<AssignmentDeclarationListEntry[]>(`${this.apiUrl}/documents/assignment-declarations/${year}`, options);
+    options.params = options.params.set('page', page);
+    return this.client.get<Page<AssignmentDeclarationListEntry>>(`${this.apiUrl}/documents/assignment-declarations/${year}`, options);
   }
 
   /** Gets an assignment declaration document

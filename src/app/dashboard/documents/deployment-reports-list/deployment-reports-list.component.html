@@ -63,7 +63,7 @@
     </div>
   </form>
 
-  @if(listModel$ | async; as documents) { @if(documents.length > 0) {
+  @if(listModel$ | async; as documents) { @if(documents.items.length > 0) {
 
   <table class="d-none d-md-table table mt-3 table-striped">
     <thead>
@@ -79,7 +79,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (document of documents; track document) {
+      @for (document of documents.items; track document) {
       <tr>
         <td>{{ document.year }}</td>
         <td>{{ document.month | monthName }}</td>
@@ -125,7 +125,7 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (document of documents; track document) {
+    @for (document of documents.items; track document) {
     <div class="card my-3">
       <div class="card-header d-flex px-2">
         <img class="me-2" width="10" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" />
@@ -171,6 +171,9 @@
     </div>
     }
   </div>
+
+  <!-- paging -->
+  <cura-paging [page]="documents" (pageChange)="onPageChanged($event)" />
 
   } @else {
   <div class="row">

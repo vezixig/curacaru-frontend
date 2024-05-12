@@ -3,7 +3,7 @@
   <ul class="pagination justify-content-center">
     <!-- previous page arrows -->
     <li class="page-item" [class.disabled]="page()!.page == 1">
-      <a class="page-link" onClick="blur()" [routerLink]="[link()]" [queryParams]="{ p: page()!.page - 1 }">
+      <a class="page-link" (click)="pageChange.emit(page()!.page - 1)" onClick="blur()">
         <fa-icon [icon]="['far', 'circle-left']" [fixedWidth]="true" />
       </a>
     </li>
@@ -11,7 +11,7 @@
     <!-- first page -->
     @if(page()!.page > 2) {
     <li class="page-item">
-      <a class="page-link text-secondary" onClick="blur()" [routerLink]="[link()]" [queryParams]="{ p: 1 }">1</a>
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(1)">1</a>
     </li>
     @if(page()!.page > 3) {
     <li class="page-item">
@@ -22,7 +22,7 @@
     <!-- previous page -->
     @if(page()!.page > 1) {
     <li class="page-item">
-      <a class="page-link text-secondary" onClick="blur()" [routerLink]="[link()]" [queryParams]="{ p: page()!.page - 1 }">{{ page()!.page - 1 }}</a>
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(page()!.page - 1)">{{ page()!.page - 1 }}</a>
     </li>
     }
 
@@ -34,7 +34,7 @@
     <!-- next page -->
     @if(page()!.page < page()!.pageCount) {
     <li class="page-item">
-      <a class="page-link text-secondary" onClick="blur()" [routerLink]="[link()]" [queryParams]="{ p: page()!.page + 1 }">{{ page()!.page + 1 }}</a>
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(page()!.page + 1)">{{ page()!.page + 1 }}</a>
     </li>
     }
 
@@ -45,21 +45,13 @@
     </li>
     }
     <li class="page-item">
-      <a class="page-link text-secondary" onClick="blur()" [routerLink]="[link()]" [queryParams]="{ p: page()!.pageCount }">{{
-        page()!.pageCount
-      }}</a>
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(page()!.pageCount)">{{ page()!.pageCount }}</a>
     </li>
     }
 
     <!-- next page arrows -->
     <li class="page-item">
-      <a
-        class="page-link"
-        onClick="blur()"
-        [class.disabled]="page()!.page == page()!.pageCount"
-        [routerLink]="[link()]"
-        [queryParams]="{ p: page()!.page + 1 }"
-      >
+      <a class="page-link" onClick="blur()" (click)="pageChange.emit(page()!.page + 1)" [class.disabled]="page()!.page == page()!.pageCount">
         <fa-icon [icon]="['far', 'circle-right']" [fixedWidth]="true" />
       </a>
     </li>

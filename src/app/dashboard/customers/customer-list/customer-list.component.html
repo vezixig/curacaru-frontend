@@ -43,7 +43,7 @@
 }
 
 <!-- paging -->
-<cura-paging [page]="page()" [link]="'/dashboard/customers'" />
+<cura-paging [page]="page()" (pageChange)="onPageChange($event)" />
 
 <!-- filter loader -->
 } @else {<cura-loader-filter />}
