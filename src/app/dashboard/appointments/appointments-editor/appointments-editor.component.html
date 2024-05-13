@@ -97,7 +97,7 @@
       @if (isLoading) {
       <ngx-skeleton-loader count="4" />
       } @if (!isLoading) {
-      <textarea class="form-control" formControlName="notes" rows="4" id="inputNotes" placeholder="Notizen"></textarea>
+      <textarea class="form-control" formControlName="notes" rows="4" maxlength="500" id="inputNotes" placeholder="Notizen"></textarea>
       }
     </div>
 

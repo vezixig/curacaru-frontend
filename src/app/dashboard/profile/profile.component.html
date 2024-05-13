@@ -4,9 +4,9 @@
   <form (ngSubmit)="onSave()" [formGroup]="employeeForm">
     <Label class="fw-light">E-Mail Adresse</Label>
     <p class="ms-3 mt-1 m-0 fs-6">{{ employeeForm.get("email")?.value }}</p>
-    <cura-input key="firstName" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
-    <cura-input key="lastName" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
-    <cura-input key="phoneNumber" label="Telefonnummer" [form]="employeeForm" placeholder="Telefonnummer eingeben" />
+    <cura-input [maxLength]="50" key="firstName" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
+    <cura-input [maxLength]="50" key="lastName" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
+    <cura-input [maxLength]="50" key="phoneNumber" label="Telefonnummer" [form]="employeeForm" placeholder="Telefonnummer eingeben" />
 
     <div class="form-group">
       <label class="fw-light" for="exampleFormControlSelect1">Mitarbeiterrolle</label>

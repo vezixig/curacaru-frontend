@@ -8,6 +8,7 @@
       info="Das Password wird automatisch an diese Adresse geschickt."
       [isLoading]="isLoading"
       label="E-Mail Adresse"
+      [maxLength]="150"
       [form]="employeeForm"
       placeholder="E-Mail Adresse eingeben"
       type="email"
@@ -16,9 +17,16 @@
     <Label class="fw-light">E-Mail Adresse</Label>
     <p class="ms-3 mt-1 m-0 fs-6">{{ employeeForm.get("email")?.value }}</p>
     }
-    <cura-input key="firstName" [isLoading]="isLoading" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
-    <cura-input key="lastName" [isLoading]="isLoading" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
-    <cura-input key="phone" [isLoading]="isLoading" label="Telefonnummer" [form]="employeeForm" placeholder="Telefonnummer eingeben" />
+    <cura-input [maxLength]="50" key="firstName" [isLoading]="isLoading" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
+    <cura-input [maxLength]="50" key="lastName" [isLoading]="isLoading" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
+    <cura-input
+      [maxLength]="50"
+      key="phone"
+      [isLoading]="isLoading"
+      label="Telefonnummer"
+      [form]="employeeForm"
+      placeholder="Telefonnummer eingeben"
+    />
 
     <div class="form-group">
       <label class="fw-light" for="exampleFormControlSelect1">Mitarbeiterrolle</label>

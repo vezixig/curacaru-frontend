@@ -194,7 +194,7 @@ export class TimeTrackerEditorComponent implements OnDestroy {
     return this.formBuilder.group({
       employeeId: ['', { Validators: Validators.required }],
       employeeName: ['', { Validators: Validators.required }],
-      signatureCity: ['', [Validators.required, Validators.maxLength(25)]],
+      signatureCity: ['', [Validators.required, Validators.maxLength(30)]],
       signature: [''],
       year: [],
       month: [],

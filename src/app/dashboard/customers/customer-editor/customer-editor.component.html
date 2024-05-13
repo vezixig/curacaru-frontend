@@ -48,6 +48,7 @@
           class="form-control"
           formControlName="firstName"
           id="inputFirstName"
+          maxlength="50"
           [ngClass]="{
             'is-valid': customerForm.controls['firstName'].valid,
             'is-invalid': customerForm.controls['firstName'].invalid && customerForm.controls['firstName'].touched
@@ -61,6 +62,7 @@
             'is-invalid': customerForm.controls['lastName'].invalid && customerForm.controls['lastName'].touched
           }"
           class="form-control"
+          maxlength="50"
           formControlName="lastName"
           id="inputLastName"
           placeholder="Nachnamen eingeben"
@@ -78,12 +80,29 @@
     </div>
 
     <!-- name [mobile]-->
-    <cura-input class="d-md-none" key="firstName" [isLoading]="isLoading" label="Vorname" [form]="customerForm" placeholder="Vornamen eingeben" />
-    <cura-input class="d-md-none" key="lastName" [isLoading]="isLoading" label="Nachname" [form]="customerForm" placeholder="Nachnamen eingeben" />
+    <cura-input
+      class="d-md-none"
+      [maxLength]="50"
+      key="firstName"
+      [isLoading]="isLoading"
+      label="Vorname"
+      [form]="customerForm"
+      placeholder="Vornamen eingeben"
+    />
+    <cura-input
+      class="d-md-none"
+      [maxLength]="50"
+      key="lastName"
+      [isLoading]="isLoading"
+      label="Nachname"
+      [form]="customerForm"
+      placeholder="Nachnamen eingeben"
+    />
 
     <!-- street -->
     <cura-input
       key="street"
+      [maxLength]="150"
       [isLoading]="isLoading"
       label="Straße und Hausnummer"
       [form]="customerForm"
@@ -117,7 +136,14 @@
     </div>
 
     <cura-input key="birthDate" [isLoading]="isLoading" label="Geburtsdatum" [form]="customerForm" placeholder="Datum wählen" type="date" />
-    <cura-input key="phone" [isLoading]="isLoading" label="Telefonnummer" [form]="customerForm" placeholder="Telefonnummer eingeben" />
+    <cura-input
+      [maxLength]="50"
+      key="phone"
+      [isLoading]="isLoading"
+      label="Telefonnummer"
+      [form]="customerForm"
+      placeholder="Telefonnummer eingeben"
+    />
 
     <!-- Notfallkontakt -->
     <div class="form-group mb-2">
@@ -126,10 +152,18 @@
       <ngx-skeleton-loader />
       } @if (!isLoading) {
       <div class="input-group">
-        <input type="text" class="form-control" formControlName="emergencyContactName" id="inputEmergencyContactName" placeholder="Namen eingeben" />
         <input
           type="text"
           class="form-control"
+          maxlength="150"
+          formControlName="emergencyContactName"
+          id="inputEmergencyContactName"
+          placeholder="Namen eingeben"
+        />
+        <input
+          type="text"
+          class="form-control"
+          maxlength="50"
           formControlName="emergencyContactPhone"
           id="inputEmergencyContactPhone"
           placeholder="Telefonnummer eingeben"
@@ -144,10 +178,18 @@
       @if (isLoading) {
       <ngx-skeleton-loader />
       } @if (!isLoading) {
+
+      <ng-template #rt let-r="result" let-t="term">
+        <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+        <br />
+        <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
+      </ng-template>
+
       <div class="input-group">
         <input
           [disabled]="!isManager"
           id="inputInsurance"
+          [resultTemplate]="rt"
           type="text"
           class="form-control"
           [(ngModel)]="selectedInsurance"
@@ -162,7 +204,7 @@
             'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
           }"
           [ngbTypeahead]="search"
-          placeholder="Krankenkasse"
+          placeholder="Krankenkasse oder IK-Nummer"
           [editable]="false"
           [ngModelOptions]="{ standalone: true }"
         />
@@ -195,7 +237,7 @@
           <option [ngValue]="2">Selbstzahler</option>
         </select>
       </div>
-      }
+      } @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
     </div>
 
     <div class="d-md-none form-group mb-2">
@@ -220,6 +262,7 @@
         [editable]="false"
         [ngModelOptions]="{ standalone: true }"
       />
+      @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
     </div>
     <cura-input
       class="d-md-none"

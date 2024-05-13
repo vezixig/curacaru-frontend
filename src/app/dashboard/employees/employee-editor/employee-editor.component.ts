@@ -31,10 +31,10 @@ export class EmployeeEditorComponent implements OnInit, OnDestroy {
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder, private router: Router, private toastr: ToastrService) {
     this.employeeForm = this.formBuilder.group({
-      firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-      lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: [''],
+      firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
+      phone: ['', [Validators.maxLength(50)]],
       role: ['employee', [Validators.required]],
       id: [''],
     });

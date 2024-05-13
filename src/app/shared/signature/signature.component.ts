@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild, inject, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEraser } from '@fortawesome/free-solid-svg-icons';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
@@ -13,7 +13,7 @@ import SignaturePad from 'signature_pad';
   styleUrls: ['./signature.component.scss'],
   imports: [FontAwesomeModule],
 })
-export class SignatureComponent implements AfterViewInit {
+export class SignatureComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') canvasElement!: ElementRef;
   @ViewChild('submitButtonHorizontal') submitButtonHorizontalElement!: ElementRef;
   @ViewChild('submitButtonVertical') submitButtonVerticalElement!: ElementRef;
@@ -37,6 +37,11 @@ export class SignatureComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.signaturePad = new SignaturePad(this.canvasElement.nativeElement);
 
+    // prevent loupe (magnifier) on ios to open while signing
+    this.canvasElement.nativeElement.addEventListener('touchstart', (e: any) => {
+      e.preventDefault(), { passive: false };
+    });
+
     fromEvent(window, 'resize')
       .pipe(startWith([]), takeUntil(this.$onDestroy), delay(100))
       .subscribe(() => {
@@ -52,6 +57,12 @@ export class SignatureComponent implements AfterViewInit {
         this.canvasHeight.set(height);
         this.canvasWidth.set(width);
       });
+  }
+
+  ngOnDestroy(): void {
+    this.canvasElement.nativeElement.removeEventListener('touchstart', (e: any) => {
+      e.preventDefault(), { passive: false };
+    });
   }
 
   onDismiss() {
