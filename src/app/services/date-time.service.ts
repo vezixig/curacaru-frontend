@@ -7,6 +7,13 @@ import { NgbTime } from '../models/ngbtime';
   providedIn: 'root',
 })
 export class DateTimeService {
+  static daysBetween(value: NgbDate, value1: NgbDate) {
+    const date1 = new Date(value.year, value.month - 1, value.day);
+    const date2 = new Date(value1.year, value1.month - 1, value1.day);
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
   private static dateFormat = new Intl.DateTimeFormat('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' });
   static today: Date = new Date();
 

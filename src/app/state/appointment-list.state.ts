@@ -13,8 +13,8 @@ export interface AppointmentListState {
 const initialState: AppointmentListState = {
   employeeId: undefined,
   customerId: undefined,
-  dateStart: DateTimeService.getStartAndEndOfWeek().start,
-  dateEnd: DateTimeService.getStartAndEndOfWeek().end,
+  dateStart: DateTimeService.toNgbDate(new Date()),
+  dateEnd: DateTimeService.toNgbDate(new Date()),
 };
 
 export const AppointmentListActions = createActionGroup({

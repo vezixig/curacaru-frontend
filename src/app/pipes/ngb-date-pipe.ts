@@ -7,7 +7,10 @@ import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
   standalone: true,
 })
 export class NgbDatePipe implements PipeTransform {
-  transform(value: NgbDate): string {
+  transform(value: NgbDate, showWeekday: boolean = false): string {
+    if (showWeekday) {
+      return DateTimeService.toDate(value).toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' });
+    }
     return DateTimeService.toDate(value).toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' });
   }
 }

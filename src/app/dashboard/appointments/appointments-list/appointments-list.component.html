@@ -10,7 +10,6 @@
     type="button"
     [routerLink]="['/dashboard/appointments/new']"
     [queryParams]="{
-      date: DateTimeService.toDateString(fromDate!),
       customerId: filterForm.get('customerId')?.value,
       employeeId: filterForm.get('employeeId')?.value
     }"
@@ -23,48 +22,35 @@
     <div class="form-group p-0">
       <label class="fw-light" for="dpFromDate">Datum</label>
       <div class="input-group">
-        <div class="dp-hidden position-absolute">
+        <button class="btn btn-sm btn-outline-secondary" (click)="onOffsetDate(-1)" type="button">
+          <fa-icon [icon]="faCaretLeft" [fixedWidth]="true" />
+        </button>
+
+        <div class="dp-hidden">
           <input
             name="datepicker"
             class="form-control"
             ngbDatepicker
             #datepicker="ngbDatepicker"
-            [autoClose]="'outside'"
             (dateSelect)="onDateSelection($event)"
             [displayMonths]="1"
-            [dayTemplate]="t"
-            outsideDays="hidden"
-            [startDate]="fromDate!"
+            formControlName="start"
+            outsideDays="collapsed"
+            [footerTemplate]="footerTemplate"
             tabindex="-1"
+            ngbDatepicker
+            #d="ngbDatepicker"
           />
-          <ng-template #t let-date let-focused="focused">
-            <span
-              class="custom-day"
-              [class.focused]="focused"
-              [class.range]="isRange(date)"
-              [class.faded]="isHovered(date) || isInside(date)"
-              (mouseenter)="hoveredDate = date"
-              (mouseleave)="hoveredDate = null"
-            >
-              {{ date.day }}
-            </span>
+          <ng-template #footerTemplate>
+            <button class="btn w-100 btn-sm btn-outline-primary btn-sm" (click)="onSetToday(); d.close()">Heute</button>
           </ng-template>
         </div>
-        <input
-          (click)="datepicker.toggle()"
-          readonly
-          [value]="filterForm.get('start')?.value | ngbDate"
-          class="form-control"
-          placeholder="tt.mm.jjjj"
-        />
-        <input
-          (click)="datepicker.toggle()"
-          readonly
-          class="form-control"
-          [value]="filterForm.get('end')?.value | ngbDate"
-          placeholder="tt.mm.jjjj"
-        />
-        <button id="dpFromDate" class="btn btn-outline-secondary" (click)="datepicker.toggle()" type="button">
+
+        <input (click)="datepicker.toggle()" readonly [value]="filterForm.get('start')?.value | ngbDate : true" class="form-control" />
+        <button class="btn btn-sm btn-outline-secondary" (click)="onOffsetDate(1)" type="button">
+          <fa-icon [icon]="faCaretRight" [fixedWidth]="true" />
+        </button>
+        <button id="dpFromDate" class="btn btn-sm btn-outline-secondary" (click)="datepicker.toggle()" type="button">
           <fa-icon [icon]="faCalendar" [fixedWidth]="true" />
         </button>
       </div>

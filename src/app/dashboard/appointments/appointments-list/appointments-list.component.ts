@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
+import { Component, OnDestroy, TemplateRef, ViewChild, inject, model, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import {
   faCakeCandles,
+  faCaretLeft,
+  faCaretRight,
   faCheck,
   faCircleInfo,
   faFileSignature,
@@ -27,7 +29,21 @@ import {
   NgbOffcanvas,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { EMPTY, Observable, Subject, catchError, combineLatest, finalize, forkJoin, map, startWith, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  Subject,
+  catchError,
+  combineLatest,
+  debounceTime,
+  finalize,
+  forkJoin,
+  map,
+  startWith,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
@@ -96,6 +112,8 @@ export class AppointmentsListComponent implements OnDestroy {
   faUnlock = faUnlock;
   faUser = faUser;
   faUserSolid = faUserAlt;
+  faCaretRight = faCaretRight;
+  faCaretLeft = faCaretLeft;
 
   /** properties  */
   @ViewChild('signature') signatureTemplate!: TemplateRef<any>;
@@ -103,12 +121,10 @@ export class AppointmentsListComponent implements OnDestroy {
   isLoading = true;
   isCollapsed = true;
   today = new Date();
-  fromDate?: NgbDate;
-  toDate?: NgbDate;
+
   ngbDatePipe = new NgbDatePipe();
   readonly signatureName = signal('');
   readonly signatureTitle = signal('');
-
   readonly showPriceInfo$: Observable<boolean>;
   readonly filterModel$: Observable<{
     employees: EmployeeBasic[];
@@ -138,16 +154,11 @@ export class AppointmentsListComponent implements OnDestroy {
       })
     );
 
-    // Filter Form
-    var dateBounds = DateTimeService.getStartAndEndOfWeek(new Date());
-    this.fromDate = dateBounds.start;
-    this.toDate = dateBounds.end;
-
     this.filterForm = this.formBuilder.group({
       employeeId: [undefined],
       customerId: [undefined],
-      start: [dateBounds.start],
-      end: [dateBounds.end],
+      start: [DateTimeService.toNgbDate(new Date())],
+      end: [DateTimeService.toNgbDate(new Date())],
     });
 
     this.filterForm
@@ -169,16 +180,15 @@ export class AppointmentsListComponent implements OnDestroy {
       state: this.store,
       refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
+      debounceTime(250),
       tap(() => (this.isLoading = true)),
       switchMap((next) => {
         if (next.state.appointmentList.dateStart != this.filterForm.get('start')?.value) {
           this.filterForm.patchValue({ start: next.state.appointmentList.dateStart }, { emitEvent: false });
-          this.fromDate = next.state.appointmentList.dateStart;
         }
 
         if (next.state.appointmentList.dateEnd != this.filterForm.get('end')?.value) {
           this.filterForm.patchValue({ end: next.state.appointmentList.dateEnd }, { emitEvent: false });
-          this.toDate = next.state.appointmentList.dateEnd;
         }
 
         if (next.filter.user.isManager && next.state.appointmentList.employeeId != this.filterForm.get('employeeId')?.value) {
@@ -191,8 +201,8 @@ export class AppointmentsListComponent implements OnDestroy {
 
         return this.apiService
           .getAppointmentList(
-            this.filterForm.get('start')?.value ?? dateBounds.start,
-            this.filterForm.get('end')?.value ?? dateBounds.end,
+            this.filterForm.get('start')?.value,
+            this.filterForm.get('end')?.value,
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )
@@ -225,6 +235,22 @@ export class AppointmentsListComponent implements OnDestroy {
     isEmployee: boolean;
   };
 
+  onSetToday() {
+    this.store.dispatch(
+      AppointmentListActions.changeDateFilter({ dateStart: DateTimeService.toNgbDate(new Date()), dateEnd: DateTimeService.toNgbDate(new Date()) })
+    );
+  }
+
+  onOffsetDate(offset: number) {
+    var start = this.filterForm.get('start')!.value as NgbDate;
+    var startDate = new Date(start.year, start.month - 1, start.day);
+    startDate.setDate(startDate.getDate() + offset);
+    const ngbStartDate = DateTimeService.toNgbDate(startDate);
+
+    this.filterForm.patchValue({ start: ngbStartDate, end: ngbStartDate });
+    this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: ngbStartDate, dateEnd: ngbStartDate }));
+  }
+
   onTakeSignature(appointment: AppointmentListEntry, isEmployee: boolean) {
     this.signatureTaking = { appointment, isEmployee };
     this.signatureName.set(
@@ -241,24 +267,15 @@ export class AppointmentsListComponent implements OnDestroy {
   onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
     this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
 
-  isHovered = (date: NgbDate) => this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-  isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-  isRange = (date: NgbDate) => date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
+  // isHovered = (date: NgbDate) => this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
+  // isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate()) && date.before(this.toDate);
+  // isRange = (date: NgbDate) => date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
 
   onDateSelection(date: NgbDate) {
-    if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (this.fromDate && !this.toDate && date && (date.equals(this.fromDate) || date.after(this.fromDate))) {
-      this.toDate = date;
-    } else {
-      this.toDate = undefined;
-      this.fromDate = date;
-    }
-
-    if (this.fromDate && this.toDate && (this.toDate.equals(this.fromDate) || this.toDate.after(this.fromDate))) {
-      this.filterForm.patchValue({ start: this.fromDate, end: this.toDate });
-      this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: this.fromDate, dateEnd: this.toDate }));
-    }
+    // this.fromDate.set(date);
+    // this.toDate = date;
+    this.filterForm.patchValue({ start: date, end: date });
+    this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: date, dateEnd: date }));
   }
 
   onDelete(appointment: AppointmentListEntry) {
