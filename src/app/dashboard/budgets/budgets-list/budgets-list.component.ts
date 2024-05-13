@@ -8,16 +8,25 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { faGear, faInfoCircle, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { Subject, forkJoin, takeUntil } from 'rxjs';
+import { Subject, forkJoin, mergeMap, takeUntil } from 'rxjs';
+import { PagingComponent } from '../../../shared/paging/paging.component';
+import { Page } from '@curacaru/models/page.model';
+import { Store } from '@ngrx/store';
+import { BudgetsListState } from '@curacaru/state/budgets-list.state';
 
 @Component({
-  imports: [NgxSkeletonLoaderModule, CurrencyPipe, DecimalPipe, FontAwesomeModule, RouterModule],
   providers: [BudgetService],
   selector: 'cura-budgets-list',
   standalone: true,
   templateUrl: './budgets-list.component.html',
+  imports: [NgxSkeletonLoaderModule, CurrencyPipe, DecimalPipe, FontAwesomeModule, RouterModule, PagingComponent],
 })
 export class BudgetListComponent implements OnInit, OnDestroy {
+  private readonly store = inject(Store<BudgetsListState>);
+  private readonly budgetService = inject(BudgetService);
+  private readonly apiService = inject(ApiService);
+  private readonly $onDestroy = new Subject<void>();
+
   faGear = faGear;
   faInfoCircle = faInfoCircle;
   faMoney = faMoneyBill;
@@ -25,14 +34,16 @@ export class BudgetListComponent implements OnInit, OnDestroy {
 
   isLoading = true;
   showPriceInfo = false;
-  budgetList: BudgetListEntry[] = [];
-  private budgetService = inject(BudgetService);
-  private apiService = inject(ApiService);
-  private $onDestroy = new Subject();
+  budgetList: Page<BudgetListEntry> = { items: [], page: 1, pageCount: 1 };
 
   ngOnInit(): void {
-    forkJoin({ budgets: this.budgetService.getBudgetList(), prices: this.apiService.getCompanyPrices() })
-      .pipe(takeUntil(this.$onDestroy))
+    this.store
+      .pipe(
+        mergeMap((next) =>
+          forkJoin({ budgets: this.budgetService.getBudgetList(next.budgetsList.page), prices: this.apiService.getCompanyPrices() })
+        ),
+        takeUntil(this.$onDestroy)
+      )
       .subscribe((result) => {
         this.isLoading = false;
         this.showPriceInfo = result.prices.pricePerHour == 0;
@@ -41,7 +52,11 @@ export class BudgetListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.$onDestroy.next(true);
+    this.$onDestroy.next();
     this.$onDestroy.complete();
+  }
+
+  onPageChange($event: number) {
+    this.store.dispatch({ type: '[BudgetsListState] Change page', page: $event });
   }
 }

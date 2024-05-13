@@ -25,7 +25,7 @@
         <td><ngx-skeleton-loader /></td>
         <td></td>
       </tr>
-      } } @for (budget of budgetList; track budget) {
+      } } @for (budget of budgetList.items; track budget) {
       <tr>
         <td>{{ budget.customerName }}</td>
         <td class="text-end">{{ budget.totalAmount | currency }}</td>
@@ -46,7 +46,7 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (budget of budgetList; track budget) {
+    @for (budget of budgetList.items; track budget) {
     <div class="card my-3">
       <div class="card-header d-flex">
         <span class="lead text-truncate">{{ budget.customerName }}</span>
@@ -71,7 +71,9 @@
     }
   </div>
 
-  @if (budgetList.length == 0) {
+  <cura-paging [page]="budgetList" (pageChange)="onPageChange($event)" />
+
+  @if (budgetList.items.length == 0) {
   <div class="alert alert-secondary mt-3" role="alert">
     <fa-icon [icon]="faInfoCircle" /> Bitte lege erst mindestens einen Kunden an. Dann kannst du auf den Bereich Budgets zugreifen.
   </div>
