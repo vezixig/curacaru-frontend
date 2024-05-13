@@ -22,7 +22,6 @@
       <ngx-skeleton-loader />
       } @if (!isLoading) {
       <select class="form-select" aria-label="Default select example" id="selectCustomerStatus" formControlName="status">
-        <option [ngValue]="null"></option>
         <option [ngValue]="customerStatus.Interested">Interessent</option>
         <option [ngValue]="customerStatus.Customer">Kunde</option>
         <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>

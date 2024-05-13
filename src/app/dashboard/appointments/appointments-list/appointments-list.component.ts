@@ -206,6 +206,7 @@ export class AppointmentsListComponent implements OnDestroy {
           .getAppointmentList(
             this.filterForm.get('start')?.value,
             this.filterForm.get('end')?.value,
+            next.state.appointmentList.page,
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )

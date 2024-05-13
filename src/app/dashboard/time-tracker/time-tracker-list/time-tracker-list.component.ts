@@ -18,13 +18,15 @@ import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, combineLatest, finalize, map, mergeMap, startWith } from 'rxjs';
+import { PagingComponent } from '../../../shared/paging/paging.component';
+import { Page } from '@curacaru/models/page.model';
 
 @Component({
-  imports: [AsyncPipe, RouterModule, FormsModule, MonthNamePipe, NgxSkeletonLoaderModule, FontAwesomeModule],
   providers: [MonthNamePipe],
   selector: 'cura-time-tracker-list',
   standalone: true,
   templateUrl: './time-tracker-list.component.html',
+  imports: [AsyncPipe, RouterModule, FormsModule, MonthNamePipe, NgxSkeletonLoaderModule, FontAwesomeModule, PagingComponent],
 })
 export class TimeTrackerListComponent {
   private readonly toastr = inject(ToastrService);
@@ -48,7 +50,7 @@ export class TimeTrackerListComponent {
   readonly selectedMonth = signal(new Date().getMonth() + 1);
   readonly selectedYear = signal(new Date().getFullYear());
   readonly userId: WritableSignal<UUID> = signal('');
-  readonly workingTimeList$: Observable<WorkingHoursReportListEntry[]>;
+  readonly workingTimeList$: Observable<Page<WorkingHoursReportListEntry>>;
   readonly $onRefresh = new Subject();
 
   constructor() {
@@ -63,12 +65,12 @@ export class TimeTrackerListComponent {
         this.isLoading.set(true);
         this.isManager.set(result.user.isManager);
         this.userId.set(result.user.id);
+        return result;
       }),
-      mergeMap(() =>
-        this.workingTimeService.getWorkTimeList(this.selectedYear(), this.selectedMonth()).pipe(
-          startWith([]),
-          finalize(() => this.isLoading.set(false))
-        )
+      mergeMap((result) =>
+        this.workingTimeService
+          .getWorkTimeList(this.selectedYear(), this.selectedMonth(), result.state.timeTracker.page)
+          .pipe(finalize(() => this.isLoading.set(false)))
       )
     );
   }
@@ -96,6 +98,10 @@ export class TimeTrackerListComponent {
         this.toastr.error(`Arbeitszeiterfassung  konnte nicht heruntergeladen werden: [${error.status}] ${error.error}`);
       },
     });
+  }
+
+  onPageChange($event: number) {
+    this.store.dispatch(TimeTrackerActions.changePage({ page: $event }));
   }
 
   onSelectedMonthChange(selectedDate: string) {

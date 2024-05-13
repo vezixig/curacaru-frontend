@@ -29,7 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (report of workingTimeList; track $index) {
+      @for (report of workingTimeList.items; track $index) {
       <tr>
         <td class="text-center">{{ report.year }}</td>
         <td class="text-center">{{ report.month | monthName }}</td>
@@ -79,7 +79,7 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (report of workingTimeList; track report) {
+    @for (report of workingTimeList.items; track report) {
     <div class="card my-2">
       <div class="card-header d-flex">
         <img
@@ -121,10 +121,13 @@
         </div>
       </div>
     </div>
+
     }
   </div>
 
-  @if(workingTimeList.length == 0) {
+  <cura-paging [page]="workingTimeList" (pageChange)="onPageChange($event)" />
+
+  @if(workingTimeList.items.length == 0) {
   <div class="row">
     <div class="alert alert-secondary mt-3" role="alert">
       <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat wurde bisher keine Arbeitszeit erfasst.

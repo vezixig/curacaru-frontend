@@ -109,13 +109,24 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
         const employeeId = this.appointmentForm.get('employeeId')?.value;
         const timeStartValue = this.appointmentForm.get('timeStart')?.value;
         const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
-        return employeeId != null && employeeId != '' && timeStartValue != null && timeStartValue != '' && timeEndValue != null && timeEndValue != '';
+        const dateValue = this.appointmentForm.get('date')?.value;
+        return (
+          employeeId != null &&
+          employeeId != '' &&
+          timeStartValue != null &&
+          timeStartValue != '' &&
+          timeEndValue != null &&
+          timeEndValue != '' &&
+          dateValue != null &&
+          dateValue != ''
+        );
       }),
       switchMap(() => {
         const employeeId =
           this.appointmentForm.get('employeeReplacementId')?.value != '' && this.appointmentForm.get('employeeReplacementId')?.value != null
             ? this.appointmentForm.get('employeeReplacementId')?.value
             : this.appointmentForm.get('employeeId')?.value;
+
         return this.appointmentRepository.getIsBlockingAppointment(
           employeeId,
           DateTimeService.toDate(this.appointmentForm.get('date')?.value),
