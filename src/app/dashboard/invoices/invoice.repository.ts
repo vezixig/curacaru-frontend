@@ -4,6 +4,7 @@ import { UUID } from 'angular2-uuid';
 import { InvoiceListEntry } from '@curacaru/dashboard/invoices/models/invoice-list-entry.model';
 import { InvoiceNumber } from '@curacaru/models/invioce-number.model';
 import { InvoiceAddModel } from '@curacaru/dashboard/invoices/models/invoice-add.model';
+import { Page } from '@curacaru/models/page.model';
 
 /**
  * Repository for appointment related requests
@@ -19,11 +20,12 @@ export class InvoiceRepository extends BaseRepository {
    * @param customerId an optional customer id to filter the list
    * @returns an invoice list
    */
-  getInvoiceList(year: number, month: number, customerId?: UUID) {
+  getInvoiceList(year: number, month: number, page: number, customerId?: UUID) {
+    const params = { page: page };
     if (customerId) {
-      return this.client.get<InvoiceListEntry[]>(`${this.apiUrl}/invoices/${year}/${month}/${customerId}`);
+      return this.client.get<Page<InvoiceListEntry>>(`${this.apiUrl}/invoices/${year}/${month}/${customerId}`, { params });
     }
-    return this.client.get<InvoiceListEntry[]>(`${this.apiUrl}/invoices/${year}/${month}`);
+    return this.client.get<Page<InvoiceListEntry>>(`${this.apiUrl}/invoices/${year}/${month}`, { params });
   }
 
   /**

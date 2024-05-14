@@ -8,7 +8,12 @@ import { Store } from '@ngrx/store';
 import { Observable, Subject, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
 import { InvoiceRepository } from '../invoice.repository';
 import { InvoiceListEntry } from '../models/invoice-list-entry.model';
-import { InvoicesChangeFilterAction } from '@curacaru/state/invoices-list.state';
+import {
+  InvoiceChangeCustomerAction,
+  InvoiceChangePageAction,
+  InvoicesChangeFilterAction,
+  InvoicesListState,
+} from '@curacaru/state/invoices-list.state';
 import { faCircleInfo, faDownload, faGear, faHashtag, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
@@ -18,16 +23,18 @@ import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.c
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { faCalendar, faUser } from '@fortawesome/free-regular-svg-icons';
+import { Page } from '@curacaru/models/page.model';
+import { PagingComponent } from '../../../shared/paging/paging.component';
 
 @Component({
-  imports: [AsyncPipe, ClearanceTypeNamePipe, CommonModule, FontAwesomeModule, MonthNamePipe, ReactiveFormsModule, RouterModule],
   selector: 'curacaru-invoices-list',
   templateUrl: './invoices-list.component.html',
   standalone: true,
+  imports: [AsyncPipe, ClearanceTypeNamePipe, CommonModule, FontAwesomeModule, MonthNamePipe, ReactiveFormsModule, RouterModule, PagingComponent],
 })
 export class InvoicesListComponent {
   /** injections */
-  private readonly store = inject(Store);
+  private readonly store = inject(Store<InvoicesListState>);
   private readonly apiService = inject(ApiService);
   private readonly userService = inject(UserService);
   private readonly formBuilder = inject(FormBuilder);
@@ -46,7 +53,7 @@ export class InvoicesListComponent {
   months = DateTimeService.months;
 
   /** Properties */
-  readonly model$: Observable<{ user: UserEmployee; customers: MinimalCustomerListEntry[]; invoices: InvoiceListEntry[] }>;
+  readonly model$: Observable<{ user: UserEmployee; customers: MinimalCustomerListEntry[]; invoices: Page<InvoiceListEntry> }>;
   readonly filterForm: FormGroup;
   readonly isLoading = signal(false);
 
@@ -73,7 +80,12 @@ export class InvoicesListComponent {
       tap((result) => this.filterForm.patchValue(result.state.invoicesList, { emitEvent: false })),
       switchMap((result) =>
         this.invoiceRepository
-          .getInvoiceList(result.state.invoicesList.year, result.state.invoicesList.month, result.state.invoicesList.customerId)
+          .getInvoiceList(
+            result.state.invoicesList.year,
+            result.state.invoicesList.month,
+            result.state.invoicesList.page,
+            result.state.invoicesList.customerId
+          )
           .pipe(map((invoices) => ({ user: result.user, customers: result.customers, invoices })))
       )
     );
@@ -107,6 +119,10 @@ export class InvoicesListComponent {
     modalRef.result.then(() => this.deleteInvoice(invoice.invoiceId!));
     modalRef.componentInstance.title = 'Rechnung löschen';
     modalRef.componentInstance.text = `Soll die Rechnung ${invoice.invoiceNumber} wirklich gelöscht werden?`;
+  }
+
+  onPageChange($event: number) {
+    this.store.dispatch(InvoiceChangePageAction({ page: $event }));
   }
 
   private deleteInvoice(invoiceId: UUID) {

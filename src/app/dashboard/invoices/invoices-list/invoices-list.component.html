@@ -64,7 +64,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (invoice of model.invoices; track invoice) {
+      @for (invoice of model.invoices.items; track invoice) {
       <tr>
         <td>{{ invoice.year }}</td>
         <td>{{ invoice.month | monthName }}</td>
@@ -122,7 +122,7 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (invoice of model.invoices; track invoice) {
+    @for (invoice of model.invoices.items; track invoice) {
     <div class="card my-3">
       <div class="card-header d-flex">
         <img class="me-2" width="10" [class.bg-success]="invoice.invoiceNumber" [class.bg-danger]="!invoice.invoiceNumber" />
@@ -176,8 +176,10 @@
     }
   </div>
 
+  <cura-paging [page]="model.invoices" (pageChange)="onPageChange($event)" />
+
   <!-- show info if no invoices were found -->
-  @if(model.invoices.length == 0) {
+  @if(model.invoices.items.length == 0) {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Rechnungen gefunden.</div>
   } }
 </div>
