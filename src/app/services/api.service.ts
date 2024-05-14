@@ -166,7 +166,7 @@ export class ApiService {
   getInsuranceByName = (term: string) => this.httpClient.get<Insurance[]>(`${this.apiUrl}/insurance?search=${term}`);
 
   /** Gets all insurances */
-  getInsuranceList = () => this.httpClient.get<Insurance[]>(`${this.apiUrl}/insurance/list`);
+  getInsuranceList = (page: number) => this.httpClient.get<Page<Insurance>>(`${this.apiUrl}/insurance/list`, { params: { page } });
 
   /** Gets the employee of the current user */
   getUser = () => this.httpClient.get<UserEmployee>(`${this.apiUrl}/employee`);

@@ -2,6 +2,7 @@
   <h4>Versicherungsliste</h4>
   <Button type="button" [routerLink]="['/dashboard/insurances/new']" class="btn btn-primary text-white btn-block">Versicherung hinzufügen</Button>
 
+  @if(insurances$ | async; as insurances) {
   <table class="d-none d-md-table col-12 table mt-3 p-0 table-striped">
     <thead>
       <tr>
@@ -14,15 +15,7 @@
       </tr>
     </thead>
     <tbody>
-      @if (isLoading$ | async) { @for (_ of [].constructor(3); track _) {
-      <tr>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td><ngx-skeleton-loader /></td>
-        <td></td>
-      </tr>
-      } } @for (insurance of insurances$ | async; track insurance) {
+      @for (insurance of insurances.items; track insurance) {
       <tr>
         <td>{{ insurance.name }}</td>
         <td>{{ insurance.institutionCode }}</td>
@@ -32,7 +25,12 @@
         <td class="text-center">
           @if (insurance.companyId !== null) {
           <div class="btn-group" role="group">
-            <button type="button" [routerLink]="['/dashboard/insurances', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Versicherung bearbeiten">
+            <button
+              type="button"
+              [routerLink]="['/dashboard/insurances', insurance.id]"
+              class="btn btn-outline-secondary btn-sm"
+              title="Versicherung bearbeiten"
+            >
               <fa-icon [icon]="faGear" [fixedWidth]="true" />
             </button>
             <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Versicherung löschen">
@@ -47,13 +45,18 @@
   </table>
 
   <div class="d-md-none p-0">
-    @for (insurance of insurances$ | async; track insurance) {
+    @for (insurance of insurances.items; track insurance) {
     <div class="card my-2">
       <div class="card-header d-flex align-items-center">
         <span class="lead text-truncate">{{ insurance.name }}</span>
         @if (insurance.companyId !== null) {
         <div class="btn-group ms-auto" role="group">
-          <button type="button" [routerLink]="['/dashboard/insurances', insurance.id]" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter bearbeiten">
+          <button
+            type="button"
+            [routerLink]="['/dashboard/insurances', insurance.id]"
+            class="btn btn-outline-secondary btn-sm"
+            title="Mitarbeiter bearbeiten"
+          >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
           <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
@@ -73,4 +76,8 @@
     </div>
     }
   </div>
+
+  <cura-paging [page]="insurances" (pageChange)="onPageChange($event)" />
+
+  }
 </div>

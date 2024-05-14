@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faGear, faHouse, faKey } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
@@ -7,20 +7,38 @@ import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { ToastrService } from 'ngx-toastr';
-import { BehaviorSubject, EMPTY, Subscription, catchError, debounceTime, finalize } from 'rxjs';
+import {
+  BehaviorSubject,
+  EMPTY,
+  Observable,
+  Subject,
+  Subscription,
+  catchError,
+  combineLatest,
+  debounceTime,
+  finalize,
+  mergeMap,
+  startWith,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { ApiService } from '../../../services/api.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { Insurance } from '../../../models/insurance.model';
+import { Store } from '@ngrx/store';
+import { ChangePageAction, InsurancesListState } from '@curacaru/state/insurances-list.state';
+import { Page } from '@curacaru/models/page.model';
+import { PagingComponent } from '../../../shared/paging/paging.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule],
   providers: [ApiService],
   selector: 'cura-insurances-list',
   standalone: true,
   templateUrl: './insurances-list.component.html',
+  imports: [CommonModule, FontAwesomeModule, RouterModule, NgxSkeletonLoaderModule, PagingComponent],
 })
-export class InsurancesListComponent implements OnDestroy, OnInit {
+export class InsurancesListComponent implements OnDestroy {
   faGear = faGear;
   faKey = faKey;
   faHouse = faHouse;
@@ -29,31 +47,31 @@ export class InsurancesListComponent implements OnDestroy, OnInit {
   private isLoading = new BehaviorSubject<boolean>(true);
   isLoading$ = this.isLoading.asObservable();
 
-  private insurances = new BehaviorSubject<Insurance[]>([]);
-  insurances$ = this.insurances.asObservable();
+  insurances$: Observable<Page<Insurance>>;
 
   private deleteInsuranceSubscription?: Subscription;
-  private getInsurancesSubscription?: Subscription;
+  private refresh$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
 
-  constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService) {}
+  private readonly store = inject(Store<InsurancesListState>);
 
-  ngOnInit(): void {
-    this.getInsurancesSubscription = this.apiService
-      .getInsuranceList()
-      .pipe(
-        debounceTime(300),
-        catchError((error) => {
-          this.toastr.error(`Versicherungsliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
-          return EMPTY;
-        }),
-        finalize(() => this.isLoading.next(false))
-      )
-      .subscribe((insurances) => this.insurances.next(insurances));
+  constructor(private apiService: ApiService, private modalService: NgbModal, private toastr: ToastrService) {
+    this.insurances$ = combineLatest({ state: this.store, refresh: this.refresh$.pipe(startWith({})) }).pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$),
+      tap(() => this.isLoading.next(true)),
+      mergeMap((o) => this.apiService.getInsuranceList(o.state.insurancesList.page)),
+      tap(() => this.isLoading.next(false)),
+      catchError((error) => {
+        this.toastr.error(`Versicherungsliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`);
+        return EMPTY;
+      })
+    );
   }
 
   ngOnDestroy(): void {
-    this.getInsurancesSubscription?.unsubscribe();
-    this.deleteInsuranceSubscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   handleDelete(insurance: Insurance) {
@@ -63,12 +81,16 @@ export class InsurancesListComponent implements OnDestroy, OnInit {
     modalRef.componentInstance.text = `Soll die ${insurance.name} wirklich gelöscht werden?`;
   }
 
+  onPageChange($event: number) {
+    this.store.dispatch(ChangePageAction({ page: $event }));
+  }
+
   private deleteInsurance(insurance: Insurance) {
     this.deleteInsuranceSubscription?.unsubscribe();
     this.deleteInsuranceSubscription = this.apiService.deleteInsurance(insurance.id!).subscribe({
       complete: () => {
         this.toastr.success(`${insurance.name} wurde gelöscht.`);
-        this.insurances.next(this.insurances.value.filter((e) => e.id !== insurance.id));
+        this.refresh$.next();
       },
       error: (error) => this.toastr.error(`Versicherung konnte nicht gelöscht werden: [${error.status}] ${error.error}`),
     });
