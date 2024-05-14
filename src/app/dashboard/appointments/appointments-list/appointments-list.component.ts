@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, TemplateRef, ViewChild, inject, model, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCalendar, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 import {
@@ -29,21 +29,7 @@ import {
   NgbOffcanvas,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import {
-  EMPTY,
-  Observable,
-  Subject,
-  catchError,
-  combineLatest,
-  debounceTime,
-  finalize,
-  forkJoin,
-  map,
-  startWith,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { EMPTY, Observable, Subject, catchError, combineLatest, debounceTime, forkJoin, map, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
@@ -162,6 +148,7 @@ export class AppointmentsListComponent implements OnDestroy {
       customerId: [undefined],
       start: [DateTimeService.toNgbDate(new Date())],
       end: [DateTimeService.toNgbDate(new Date())],
+      onlyOpen: [false],
     });
 
     this.filterForm
@@ -175,6 +162,12 @@ export class AppointmentsListComponent implements OnDestroy {
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
         this.store.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: next }));
+      });
+    this.filterForm
+      .get('onlyOpen')!
+      .valueChanges.pipe(takeUntil(this.$onDestroy))
+      .subscribe((next) => {
+        this.store.dispatch(AppointmentListActions.changeOnlyOpen({ onlyOpen: next }));
       });
 
     // Data Model
@@ -207,6 +200,7 @@ export class AppointmentsListComponent implements OnDestroy {
             this.filterForm.get('start')?.value,
             this.filterForm.get('end')?.value,
             next.state.appointmentList.page,
+            next.state.appointmentList.onlyOpen,
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )

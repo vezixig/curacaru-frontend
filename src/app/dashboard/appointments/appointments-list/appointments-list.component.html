@@ -76,8 +76,12 @@
         }
       </select>
     </div>
-
     }
+
+    <div class="form-check form-switch m-2">
+      <input class="form-check-input" type="checkbox" role="switch" formControlName="onlyOpen" id="checkOnlyOpen" />
+      <label class="form-check-label fw-light" for="checkOnlyOpen"> Nur offene Termine anzeigen</label>
+    </div>
   </form>
 
   @if(dataModel$ | async; as dataModel) {

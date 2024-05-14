@@ -2,12 +2,29 @@
   {
     "version": "0.8.0",
     "releaseDate": "2024-06-01",
+    "bugfixes": ["Bei kleinen Bildschirmen kann die Navigationsleiste jetzt gescrollt angezeigt"],
     "features": [
       "Seite zur Anzeige der Versionsinformationen hinzugefügt",
-      "Automatische Abrechnung erfolgt jetzt über alle Optionen hinweg",
-      "Möglichkeit Kunden einen Staus zuzuweisen hinzugefügt"
+      "Automatische Abrechnung erfolgt jetzt über alle Budget-Optionen hinweg",
+      "Möglichkeit Kunden einen Staus zuzuweisen hinzugefügt",
+      "Alle Listen werden jetzt seitenweise angezeigt und haben eine Navigation am unteren Rand",
+      "Ein Filter in der Terminliste um nur offene Termine anzuzeigen wurde hinzugefügt"
     ],
-    "changes": ["Bei Eingabe des Namens einer Versicherung werden jetzt alle passenden Versicherungen angezeigt"]
+    "changes": [
+      "Bei Eingabe des Namens einer Versicherung werden jetzt alle passenden Versicherungen angezeigt",
+      "Gelöschte Kunden werden jetzt in den Status 'Ehemaliger Kunde' versetzt und nicht mehr zur Auswahl angezeigt"
+    ]
+  },
+  {
+    "version": "0.7.5",
+    "releaseDate": "2024-05-12",
+    "features": ["Sprungtasten für die Datumswahl hinzugefügt und Bereich auf einen Tag geändert"]
+  },
+  {
+    "version": "0.7.4",
+    "releaseDate": "2024-05-05",
+    "features": ["Möglichkeit die Versicherung eines Kunden anhand der IK-Nummer zu suchen"],
+    "bugfixes": ["Die Nummer für eine neue Rechnung wurde nicht vorgeschlagen"]
   },
   {
     "version": "0.7.3",

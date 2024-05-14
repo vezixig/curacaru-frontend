@@ -88,7 +88,7 @@ export class ApiService {
   getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`);
 
   /** Gets the list of appointments from the API filtered by the query */
-  getAppointmentList(from: NgbDate, to: NgbDate, page: number, customer?: number, employee?: number) {
+  getAppointmentList(from: NgbDate, to: NgbDate, page: number, onlyOpen: boolean, customer?: number, employee?: number) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('from', DateTimeService.toDateString(from));
     options.params = options.params.append('to', DateTimeService.toDateString(to));
@@ -98,6 +98,9 @@ export class ApiService {
     }
     if (customer) {
       options.params = options.params.append('customerId', customer.toString());
+    }
+    if (onlyOpen) {
+      options.params = options.params.append('onlyOpen', 'true');
     }
     return this.httpClient.get<Page<AppointmentListEntry[]>>(`${this.apiUrl}/appointment/list`, options);
   }
