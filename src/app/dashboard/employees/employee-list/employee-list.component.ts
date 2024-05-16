@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal }
 import { Employee } from '@curacaru/models/employee.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { Subject, combineLatest, mergeMap, startWith, takeUntil, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { EmployeeListMobileComponent } from '../employee-list-mobile/employee-list-mobile.component';

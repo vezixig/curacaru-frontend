@@ -242,7 +242,7 @@
           <fa-icon [icon]="faCheck" class="text-success ms-2" />
           }
         </button>
-        } @if (appointment.isSignedByCustomer && appointment.isSignedByEmployee && !appointment.isDone) {
+        } @if (appointment.canSign && appointment.isSignedByCustomer && appointment.isSignedByEmployee && !appointment.isDone) {
         <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin abschließen">
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen
         </button>

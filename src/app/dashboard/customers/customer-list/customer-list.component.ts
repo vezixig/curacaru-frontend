@@ -4,7 +4,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, combineLatest, firstValueFrom, map, mergeMap, startWith, takeUntil, tap } from 'rxjs';
-import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +20,7 @@ import { CustomerListeTableComponent } from '../customer-list-table/customer-lis
 import { CustomerListMobileComponent } from '../customer-list-mobile/customer-list-mobile.component';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import { Page } from '@curacaru/models/page.model';
-import { start } from '@popperjs/core';
+import { DeleteCustomerModal } from '../delete-customer-modal/delete-customer-modal.component';
 
 @Component({
   providers: [ApiService],
@@ -61,6 +60,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   filterModel$ = new Observable<{ employees: EmployeeBasic[] }>();
   isLoading = signal(true);
   selectedEmployeeId = signal<UUID | undefined>(undefined);
+  showInactiveCustomers = signal<boolean>(false);
 
   private $onRefresh = new Subject<void>();
   private $onDestroy = new Subject<void>();
@@ -91,7 +91,9 @@ export class CustomerListComponent implements OnDestroy, OnInit {
           this.customers.set([]);
           this.isLoading.set(true);
         }),
-        mergeMap((o) => this.apiService.getCustomerList(o.state.customerList.page, o.state.customerList.employeeId))
+        mergeMap((o) =>
+          this.apiService.getCustomerList(o.state.customerList.page, !o.state.customerList.showInactiveCustomers, o.state.customerList.employeeId)
+        )
       )
       .subscribe({
         next: (o) => {
@@ -110,15 +112,19 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     this.locationService.openLocationLink(`${customer.street} ${customer.zipCode} ${customer.city}`);
   }
 
-  onEmployeeChanged() {
-    this.store.dispatch(ChangeEmployeeFilterAction({ employeeId: this.selectedEmployeeId() == '' ? undefined : this.selectedEmployeeId() }));
+  onFilterChanged() {
+    this.store.dispatch(
+      ChangeEmployeeFilterAction({
+        employeeId: this.selectedEmployeeId() == '' ? undefined : this.selectedEmployeeId(),
+        showInactiveCustomers: this.showInactiveCustomers(),
+      })
+    );
   }
 
   handleDelete(customer: CustomerListEntry) {
-    const modalRef = this.modalService.open(NgbdModalConfirm);
-    modalRef.result.then(() => this.deleteEmployee(customer));
-    modalRef.componentInstance.title = 'Kunden löschen';
-    modalRef.componentInstance.text = `Soll ${customer.firstName} ${customer.lastName} wirklich gelöscht werden?`;
+    const modalRef = this.modalService.open(DeleteCustomerModal);
+    modalRef.result.then((result: boolean) => this.deleteCustomer(result, customer));
+    modalRef.componentInstance.customerName = `${customer.firstName} ${customer.lastName}`;
   }
 
   handleShowAppointments(customer: CustomerListEntry) {
@@ -140,9 +146,9 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     this.store.dispatch(ChangePageAction({ page: $event }));
   }
 
-  private deleteEmployee(customer: CustomerListEntry) {
+  private deleteCustomer(deleteOpenAppointments: boolean, customer: CustomerListEntry) {
     this.apiService
-      .deleteCustomer(customer.id)
+      .deleteCustomer(customer.id, deleteOpenAppointments)
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
         next: () => {

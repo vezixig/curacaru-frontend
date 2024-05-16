@@ -8,7 +8,8 @@
       "Automatische Abrechnung erfolgt jetzt über alle Budget-Optionen hinweg",
       "Möglichkeit Kunden einen Staus zuzuweisen hinzugefügt",
       "Alle Listen werden jetzt seitenweise angezeigt und haben eine Navigation am unteren Rand",
-      "Ein Filter in der Terminliste um nur offene Termine anzuzeigen wurde hinzugefügt"
+      "Ein Filter in der Terminliste um nur offene Termine anzuzeigen wurde hinzugefügt",
+      "Beim Löschen eines Kunden können optional alle offenen Termine gelöscht werden"
     ],
     "changes": [
       "Bei Eingabe des Namens einer Versicherung werden jetzt alle passenden Versicherungen angezeigt",

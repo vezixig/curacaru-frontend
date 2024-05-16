@@ -1,3 +1,4 @@
+import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 import { UUID } from 'angular2-uuid';
 
 export interface CustomerListEntry {
@@ -10,6 +11,7 @@ export interface CustomerListEntry {
   latitude: number;
   longitude: number;
   phone: string;
+  status: CustomerStatus;
   street: string;
   zipCode: string;
 }

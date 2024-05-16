@@ -24,9 +24,12 @@
           <fa-icon [icon]="['fas', 'gear']" [fixedWidth]="true" />
         </button>
         @if (isManager()) {
-        <button type="button" (click)="onDelete.emit(customer)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+        <!-- delete customer -->
+        @if(customer.status != customerStatus.Former) {
+        <button type="button" (click)="onDelete.emit(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
           <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
         </button>
+        }
         <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
           <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
             <fa-icon [icon]="['fas', 'ellipsis']" [fixedWidth]="true" />
@@ -50,6 +53,7 @@
         @if (customer.associatedEmployeeName) {
         <li><fa-icon [icon]="['far', 'user']" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
         }
+        <li><fa-icon [icon]="['far', 'id-card']" [fixedWidth]="true" /> {{ customer.status | customerStatus }}</li>
       </ul>
     </div>
   </div>

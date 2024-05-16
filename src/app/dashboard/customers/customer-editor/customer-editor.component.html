@@ -3,6 +3,19 @@
 
   <form (ngSubmit)="handleSave()" [formGroup]="customerForm">
     <div class="form-group mb-2">
+      <label class="fw-light" for="selectCustomerStatus">Kundenstatus:</label>
+      @if (isLoading) {
+      <ngx-skeleton-loader />
+      } @if (!isLoading) {
+      <select class="form-select" aria-label="Default select example" id="selectCustomerStatus" formControlName="status">
+        <option [ngValue]="customerStatus.Interested">Interessent</option>
+        <option [ngValue]="customerStatus.Customer">Kunde</option>
+        <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>
+      </select>
+      }
+    </div>
+
+    <div class="form-group mb-2">
       <label class="fw-light" for="selectAssociatedEmployeeId">Bearbeitet von:</label>
       @if (isLoading) {
       <ngx-skeleton-loader />
@@ -12,19 +25,6 @@
         @for (employee of employees; track employee) {
         <option [value]="employee.id">{{ employee.name }}</option>
         }
-      </select>
-      }
-    </div>
-
-    <div class="form-group mb-2">
-      <label class="fw-light" for="selectCustomerStatus">Kundenstatus:</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <select class="form-select" aria-label="Default select example" id="selectCustomerStatus" formControlName="status">
-        <option [ngValue]="customerStatus.Interested">Interessent</option>
-        <option [ngValue]="customerStatus.Customer">Kunde</option>
-        <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>
       </select>
       }
     </div>

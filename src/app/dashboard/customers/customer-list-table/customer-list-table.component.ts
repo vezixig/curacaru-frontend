@@ -4,15 +4,18 @@ import { CustomerListEntry } from '@curacaru/models';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LoaderTrComponent } from '@curacaru/shared/loader-tr/loader-tr.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { CustomerStatusPipe } from '../../../pipes/customer-status-name.pipe';
+import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 
 @Component({
   selector: 'cura-customer-list-table',
   standalone: true,
   templateUrl: './customer-list-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FontAwesomeModule, RouterModule, LoaderTrComponent, NgbDropdownModule],
+  imports: [FontAwesomeModule, RouterModule, LoaderTrComponent, NgbDropdownModule, CustomerStatusPipe],
 })
 export class CustomerListeTableComponent {
+  customerStatus = CustomerStatus;
   customers = input<CustomerListEntry[]>([]);
   isLoading = input(true);
   isManager = input(false);

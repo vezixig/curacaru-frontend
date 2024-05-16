@@ -66,7 +66,9 @@ export class ApiService {
   deleteAppointment = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/appointment/${id}`);
 
   /** Delete the customer with the given id */
-  deleteCustomer = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/customer/${id}`);
+  deleteCustomer(id: UUID, deleteOpenAppointments: boolean) {
+    return this.httpClient.delete(`${this.apiUrl}/customer/${id}`, { params: { deleteOpenAppointments: deleteOpenAppointments } });
+  }
 
   /** Deletes the insurance with the given id */
   deleteInsurance = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/insurance/${id}`);
@@ -118,9 +120,10 @@ export class ApiService {
   getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`);
 
   /** Gets the list of customers from the API */
-  getCustomerList(page: number, employeeId?: UUID) {
+  getCustomerList(page: number, onlyActive: boolean, employeeId?: UUID) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('page', page);
+    options.params = options.params.append('onlyActive', onlyActive);
     if (employeeId) {
       options.params = options.params.append('employeeId', employeeId.toString());
     }

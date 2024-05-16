@@ -14,6 +14,7 @@ export class ErrorHandlerService {
       const httpError = <HttpErrorResponse>error;
       this.toastrService.error(`${this.getErrorTitle(httpError.status)}: ${error.error}`, 'Das hat leider nicht geklappt');
     } else {
+      console.log(error);
       this.toastrService.error(`Das hat leider nicht geklappt`);
     }
     return EMPTY;
