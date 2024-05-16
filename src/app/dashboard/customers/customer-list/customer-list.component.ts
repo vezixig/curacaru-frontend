@@ -91,9 +91,14 @@ export class CustomerListComponent implements OnDestroy, OnInit {
           this.customers.set([]);
           this.isLoading.set(true);
         }),
-        mergeMap((o) =>
-          this.apiService.getCustomerList(o.state.customerList.page, !o.state.customerList.showInactiveCustomers, o.state.customerList.employeeId)
-        )
+        mergeMap((o) => {
+          this.showInactiveCustomers.set(o.state.customerList.showInactiveCustomers);
+          return this.apiService.getCustomerList(
+            o.state.customerList.page,
+            !o.state.customerList.showInactiveCustomers,
+            o.state.customerList.employeeId
+          );
+        })
       )
       .subscribe({
         next: (o) => {

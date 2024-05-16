@@ -195,6 +195,10 @@ export class AppointmentsListComponent implements OnDestroy {
           this.filterForm.patchValue({ customerId: next.state.appointmentList.customerId }, { emitEvent: false });
         }
 
+        if (next.state.appointmentList.onlyOpen != this.filterForm.get('onlyOpen')?.value) {
+          this.filterForm.patchValue({ onlyOpen: next.state.appointmentList.onlyOpen }, { emitEvent: false });
+        }
+
         return this.apiService
           .getAppointmentList(
             this.filterForm.get('start')?.value,
