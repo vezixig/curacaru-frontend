@@ -66,8 +66,8 @@ export class ApiService {
   deleteAppointment = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/appointment/${id}`);
 
   /** Delete the customer with the given id */
-  deleteCustomer(id: UUID, deleteOpenAppointments: boolean) {
-    return this.httpClient.delete(`${this.apiUrl}/customer/${id}`, { params: { deleteOpenAppointments: deleteOpenAppointments } });
+  deleteCustomer(id: UUID, deleteOpenAppointments: boolean, deleteBudgets: boolean) {
+    return this.httpClient.delete(`${this.apiUrl}/customer/${id}`, { params: { deleteOpenAppointments, deleteBudgets } });
   }
 
   /** Deletes the insurance with the given id */

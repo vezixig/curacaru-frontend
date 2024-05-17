@@ -11,6 +11,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 export class DeleteCustomerModal {
   @Input() customerName = '';
   deleteOpenAppointments = signal<boolean>(true);
+  deleteBudgets = signal<boolean>(true);
 
   modal = inject(NgbActiveModal);
 }

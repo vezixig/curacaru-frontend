@@ -21,6 +21,7 @@ import { CustomerListMobileComponent } from '../customer-list-mobile/customer-li
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import { Page } from '@curacaru/models/page.model';
 import { DeleteCustomerModal } from '../delete-customer-modal/delete-customer-modal.component';
+import { DeleteCustomerModalModel } from '../delete-customer-modal/delete-customer-model.model';
 
 @Component({
   providers: [ApiService],
@@ -128,7 +129,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
 
   handleDelete(customer: CustomerListEntry) {
     const modalRef = this.modalService.open(DeleteCustomerModal);
-    modalRef.result.then((result: boolean) => this.deleteCustomer(result, customer));
+    modalRef.result.then((result: DeleteCustomerModalModel) => this.deleteCustomer(result, customer));
     modalRef.componentInstance.customerName = `${customer.firstName} ${customer.lastName}`;
   }
 
@@ -151,9 +152,9 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     this.store.dispatch(ChangePageAction({ page: $event }));
   }
 
-  private deleteCustomer(deleteOpenAppointments: boolean, customer: CustomerListEntry) {
+  private deleteCustomer(model: DeleteCustomerModalModel, customer: CustomerListEntry) {
     this.apiService
-      .deleteCustomer(customer.id, deleteOpenAppointments)
+      .deleteCustomer(customer.id, model.deleteOpenAppointments, model.deleteBudgets)
       .pipe(takeUntil(this.$onDestroy))
       .subscribe({
         next: () => {
