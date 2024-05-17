@@ -179,9 +179,11 @@
       } @if (!isLoading) {
 
       <ng-template #rt let-r="result" let-t="term">
-        <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
-        <br />
-        <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
+        <p class="text-truncate">
+          <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+          <br />
+          <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
+        </p>
       </ng-template>
 
       <div class="input-group">
@@ -194,7 +196,7 @@
           [(ngModel)]="selectedInsurance"
           [inputFormatter]="insuranceFormatter"
           [resultFormatter]="insuranceFormatter"
-          [popupClass]="'overflow-auto height-150'"
+          [popupClass]="'overflow-auto height-250 mw-90 popup'"
           [ngClass]="{
             'is-valid':
               customerForm.controls['insuranceId'].valid &&
@@ -207,6 +209,7 @@
           [editable]="false"
           [ngModelOptions]="{ standalone: true }"
         />
+
         <input
           type="text"
           maxlength="10"
@@ -239,16 +242,26 @@
       } @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
     </div>
 
-    <div class="d-md-none form-group mb-2">
+    <div class="d-md-none form-group mb-2 w-100">
+      <ng-template #rt let-r="result" let-t="term">
+        <p class="text-truncate">
+          <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+          <br />
+          <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
+        </p>
+      </ng-template>
+
       <label class="fw-light" for="inputInsurance">Versicherung</label>
       <input
         [disabled]="!isManager"
         id="inputInsurance"
         type="text"
         class="form-control"
+        [resultTemplate]="rt"
         [(ngModel)]="selectedInsurance"
         [inputFormatter]="insuranceFormatter"
         [resultFormatter]="insuranceFormatter"
+        [popupClass]="'overflow-auto height-250 mw-90 popup'"
         [ngClass]="{
           'is-valid':
             customerForm.controls['insuranceId'].valid &&
