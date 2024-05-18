@@ -44,7 +44,6 @@ export class AssignmentDeclarationEditorComponent {
     user: UserEmployee;
   }>;
   readonly today: Date = new Date();
-  readonly year = signal<number>(0);
 
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
@@ -62,11 +61,12 @@ export class AssignmentDeclarationEditorComponent {
       isAccepted: [false, [ValidateTrue]],
       signature: [undefined],
       signatureCity: [undefined, [Validators.required, Validators.maxLength(30)]],
+      year: [undefined, [Validators.required]],
     });
 
     this.dataModel$ = combineLatest({ user: this.userService.user$, queryParams: this.activatedRoute.queryParams }).pipe(
       tap((o) => {
-        this.year.set(+o.queryParams['year'] || this.today.getFullYear());
+        this.documentForm.controls['year'].setValue(+o.queryParams['year'] || this.today.getFullYear());
         this.documentForm.controls['customerId'].setValue(o.queryParams['customer']);
       }),
       mergeMap((o) => {
