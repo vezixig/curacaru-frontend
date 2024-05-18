@@ -15,8 +15,8 @@ export interface AppointmentListState {
 const initialState: AppointmentListState = {
   employeeId: undefined,
   customerId: undefined,
-  dateStart: DateTimeService.getStartAndEndOfWeek().start,
-  dateEnd: DateTimeService.getStartAndEndOfWeek().end,
+  dateStart: DateTimeService.toNgbDate(DateTimeService.today),
+  dateEnd: DateTimeService.toNgbDate(DateTimeService.today),
   onlyOpen: false,
   page: 1,
 };

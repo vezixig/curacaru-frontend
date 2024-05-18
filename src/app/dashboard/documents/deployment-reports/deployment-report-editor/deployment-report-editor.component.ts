@@ -4,9 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ClearanceType } from '@curacaru/enums/clearance-type';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
-import { Customer, MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
+import { Customer, UserEmployee } from '@curacaru/models';
 import { DeploymentReportTime } from '@curacaru/models/deployment-report-time.model';
 import { DeploymentReport } from '@curacaru/models/deployment-report-view.model';
+import { ClearanceTypeNamePipe } from '@curacaru/pipes/clarance-type-name.pipe';
+import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 import { TimeFormatPipe } from '@curacaru/pipes/time.pipe';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
@@ -17,14 +19,24 @@ import { faCheck, faGear, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map, mergeMap, startWith, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map, mergeMap, startWith, tap } from 'rxjs';
 
 @Component({
   selector: 'deployment-report-signature',
-  imports: [ReactiveFormsModule, InfoComponent, CommonModule, TimeFormatPipe, FontAwesomeModule, SignatureComponent, RouterModule],
   standalone: true,
   templateUrl: './deployment-report-editor.component.html',
   styleUrls: ['./deployment-report-editor.component.scss'],
+  imports: [
+    ReactiveFormsModule,
+    InfoComponent,
+    CommonModule,
+    TimeFormatPipe,
+    FontAwesomeModule,
+    SignatureComponent,
+    RouterModule,
+    MonthNamePipe,
+    ClearanceTypeNamePipe,
+  ],
 })
 export class DeploymentReportEditorComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -37,7 +49,6 @@ export class DeploymentReportEditorComponent {
   private readonly toastrService = inject(ToastrService);
   private readonly modalService = inject(NgbModal);
 
-  private readonly destroy$ = new Subject<void>();
   private readonly $onRefresh = new Subject();
 
   months = DateTimeService.months;
@@ -53,9 +64,6 @@ export class DeploymentReportEditorComponent {
   }>;
 
   readonly documentForm: FormGroup;
-  readonly filterModel$: Observable<{
-    customers: MinimalCustomerListEntry[];
-  }>;
 
   constructor() {
     this.documentForm = this.formBuilder.group({
@@ -68,22 +76,7 @@ export class DeploymentReportEditorComponent {
       signatureCity: ['', [Validators.required, Validators.maxLength(30)]],
     });
 
-    this.documentForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() =>
-      this.router.navigate([], {
-        queryParams: {
-          year: this.documentForm.controls['year'].value,
-          month: this.documentForm.controls['month'].value,
-          customerId: !this.documentForm.controls['customerId'].value ? undefined : this.documentForm.controls['customerId'].value,
-          clearanceType: this.documentForm.controls['clearanceType'].value,
-        },
-        queryParamsHandling: 'merge',
-      })
-    );
-
-    this.filterModel$ = this.apiService.getMinimalCustomerListDeploymentReports().pipe(map((customers) => ({ customers })));
-
     this.dataModel$ = combineLatest({
-      filter: this.filterModel$,
       queryParams: this.activatedRoute.queryParams,
       user: this.userService.user$,
       update: this.$onRefresh.pipe(startWith({})),

@@ -7,7 +7,7 @@ import { ClearanceType } from '@curacaru/enums/clearance-type';
 })
 export class ClearanceTypeNamePipe implements PipeTransform {
   transform(input: ClearanceType): string {
-    switch (input) {
+    switch (+input) {
       case ClearanceType.reliefAmount:
         return 'Entlastungsbetrag §45b SGB XI';
       case ClearanceType.careBenefit:
