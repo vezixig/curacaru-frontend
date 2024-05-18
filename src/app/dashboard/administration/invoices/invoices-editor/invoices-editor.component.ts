@@ -3,7 +3,7 @@ import { Component, inject, signal, TemplateRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ApiService, DateTimeService, UserService } from '@curacaru/services';
-import { type Observable, combineLatest, map, mergeMap, of, tap } from 'rxjs';
+import { type Observable, combineLatest, map, mergeMap, of, tap, merge } from 'rxjs';
 import { InvoiceRepository } from '../invoice.repository';
 import { RideCostsTypeNamePipe } from '@curacaru/pipes/ride-costs-type-name.pipe';
 import { RideCostsType } from '@curacaru/enums/ride-cost-type.enum';
@@ -17,13 +17,23 @@ import { UUID } from 'angular2-uuid';
 import { ToastrService } from 'ngx-toastr';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { InvoiceAddModel } from '../models/invoice-add.model';
+import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
+import { ClearanceTypeNamePipe } from '@curacaru/pipes/clarance-type-name.pipe';
 
 @Component({
-  imports: [ReactiveFormsModule, CommonModule, RideCostsTypeNamePipe, FontAwesomeModule, RouterModule, SignatureComponent],
-
   standalone: true,
   selector: 'cura-invoices-editor',
   templateUrl: './invoices-editor.component.html',
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    RideCostsTypeNamePipe,
+    FontAwesomeModule,
+    RouterModule,
+    SignatureComponent,
+    MonthNamePipe,
+    ClearanceTypeNamePipe,
+  ],
 })
 export class InvoicesEditorComponent {
   /* injections */
@@ -84,7 +94,6 @@ export class InvoicesEditorComponent {
 
     this.model$ = combineLatest({
       user: this.userService.user$,
-      customers: this.apiService.getMinimalCustomerList(),
       company: this.apiService.getCompanyPrices(),
       queryParams: this.activatedRoute.queryParams,
     }).pipe(
@@ -103,18 +112,15 @@ export class InvoicesEditorComponent {
         }
       }),
       mergeMap((next) => {
-        if (this.invoiceForm.controls.customerId.value && this.invoiceForm.controls.clearanceType.value) {
-          return this.documentRepository
-            .getDeploymentReport(
-              this.invoiceForm.controls.year.value!,
-              this.invoiceForm.controls.month.value!,
-              this.invoiceForm.controls.customerId.value,
-              this.invoiceForm.controls.clearanceType.value
-            )
-            .pipe(map((deploymentReport) => ({ ...next, deploymentReport })));
-        } else {
-          return of({ ...next, deploymentReport: undefined });
-        }
+        return combineLatest({
+          customer: this.apiService.getCustomer(this.invoiceForm.controls.customerId.value!),
+          report: this.documentRepository.getDeploymentReport(
+            this.invoiceForm.controls.year.value!,
+            this.invoiceForm.controls.month.value!,
+            this.invoiceForm.controls.customerId.value!,
+            this.invoiceForm.controls.clearanceType.value!
+          ),
+        }).pipe(map((result) => ({ ...next, deploymentReport: result.report, customer: result.customer })));
       }),
       tap((next) => {
         this.reportId = next.deploymentReport?.reportId;

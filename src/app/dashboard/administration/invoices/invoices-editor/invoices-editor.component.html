@@ -4,37 +4,14 @@
   @if(model$ | async; as model) {
 
   <form [formGroup]="invoiceForm" class="p-0" (ngSubmit)="onSave()">
-    <label class="mt-2 fw-light" for="inputYear">Jahr und Monat der Leistungserbringung</label>
-    <div class="input-group">
-      <input
-        id="inputYear"
-        class="form-control"
-        type="number"
-        formControlName="year"
-        [ngClass]="{ 'is-invalid': invoiceForm.controls['year'].invalid }"
-      />
-      <select id="selectMonth" class="form-control" formControlName="month">
-        @for (month of months; track month) {
-        <option [value]="month.value">{{ month.name }}</option>
-        }
-      </select>
-    </div>
+    <label class="mt-2 fw-light">Jahr und Monat der Leistungserbringung</label>
+    <p class="ms-2 m-0 fs-5">{{ invoiceForm.controls["month"].value ?? 0 | monthName }} {{ invoiceForm.controls["year"].value }}</p>
 
-    <label for="selectCustomer" class="mt-2 fw-light">Kunde</label>
-    <select id="selectCustomer" class="form-select" formControlName="customerId">
-      <option></option>
-      @for (customer of model.customers; track customer) {
-      <option [value]="customer.customerId">{{ customer.customerName }}</option>
-      }
-    </select>
+    <label class="mt-2 fw-light">Kunde</label>
+    <p class="ms-2 m-0 fs-5">{{ model.customer.lastName }}, {{ model.customer.firstName }}</p>
 
     <label for="selectClearanceType" class="mt-2 fw-light">Abrechnungsoption</label>
-    <select id="selectClearanceType" class="form-select" formControlName="clearanceType">
-      <option value="3">Selbstzahler</option>
-      <option value="0">Entlastungsbetrag §45b SGB XI</option>
-      <option value="1">..% Pflegesachleistungen §36 SGB XI (max. 40%)</option>
-      <option value="2">Verhinderungspflege § 39 SGB XI</option>
-    </select>
+    <p class="ms-2 m-0 fs-5">{{ invoiceForm.controls["clearanceType"].value ?? 0 | clearanceTypeName }}</p>
 
     <label for="inputInvoiceNumber" class="mt-2 fw-light">Rechnungsnummer und Datum</label>
     <div class="input-group">
@@ -56,11 +33,11 @@
     </div>
 
     <label class="mt-2 fw-light">Bearbeitet von</label>
-    <p class="ms-2 mt-1 m-0 fs-6">{{ model.user.firstName }} {{ model.user.lastName }}</p>
+    <p class="ms-2 mt-1 m-0 fs-5">{{ model.user.firstName }} {{ model.user.lastName }}</p>
 
     @if(model.deploymentReport != null) { @if( model.deploymentReport.hasInvoice == false) {
     <label class="mt-2 fw-light">Stunden (gesamt), Stundenlohn Unternehmen, Zwischensumme</label>
-    <p class="ms-2 mt-1 m-0 fs-6">
+    <p class="ms-2 mt-1 m-0 fs-5">
       {{ totalDuration() | number : "1.2-2" }} h x {{ model.company.pricePerHour | currency }} =
       <span style="text-decoration-line: underline; text-decoration-style: single">{{
         totalDuration() * model.company.pricePerHour | currency
@@ -68,7 +45,7 @@
     </p>
 
     <label class="mt-2 fw-light">Anfahrtskosten {{ model.company.rideCostsType | rideCostsTypeName }}</label>
-    <p class="ms-2 mt-1 m-0 fs-6">
+    <p class="ms-2 mt-1 m-0 fs-5">
       @if(model.company.rideCostsType == rideCostsType.Inclusive || model.company.rideCostsType == rideCostsType.None) { - }
       <!--- ride costs per appointment -->
       @if(model.company.rideCostsType == rideCostsType.FlatRate) {
@@ -83,7 +60,7 @@
       }
     </p>
     <label class="mt-2 fw-light">Rechnungsbetrag</label>
-    <p style="text-decoration-line: underline; text-decoration-style: double" class="ms-2 mt-1 m-0">
+    <p style="text-decoration-line: underline; text-decoration-style: double" class="ms-2 mt-1 m-0 fs-5">
       {{ rideCosts() + totalDuration() * model.company.pricePerHour | currency }}
     </p>
 

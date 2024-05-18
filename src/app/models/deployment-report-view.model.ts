@@ -3,6 +3,7 @@ import { DeploymentReportTime } from './deployment-report-time.model';
 
 export interface DeploymentReport {
   employeeName: string;
+  customerName: string;
   hasInvoice: boolean;
   hasUnfinishedAppointment: boolean;
   hasPlannedAppointment: boolean;
