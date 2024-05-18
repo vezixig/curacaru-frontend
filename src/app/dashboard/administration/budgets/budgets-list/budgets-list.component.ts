@@ -9,10 +9,10 @@ import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { faGear, faInfoCircle, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { Subject, forkJoin, mergeMap, takeUntil } from 'rxjs';
-import { PagingComponent } from '../../../shared/paging/paging.component';
 import { Page } from '@curacaru/models/page.model';
 import { Store } from '@ngrx/store';
 import { BudgetsListState } from '@curacaru/state/budgets-list.state';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 
 @Component({
   providers: [BudgetService],

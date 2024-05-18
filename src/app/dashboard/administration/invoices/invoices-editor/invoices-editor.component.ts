@@ -14,9 +14,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheck, faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
-import { InvoiceAddModel } from '@curacaru/dashboard/invoices/models/invoice-add.model';
 import { ToastrService } from 'ngx-toastr';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
+import { InvoiceAddModel } from '../models/invoice-add.model';
 
 @Component({
   imports: [ReactiveFormsModule, CommonModule, RideCostsTypeNamePipe, FontAwesomeModule, RouterModule, SignatureComponent],

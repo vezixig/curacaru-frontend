@@ -5,11 +5,11 @@ import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { ApiService } from '../../services/api.service';
-import { ValidateInstitutionCode } from '../../validators/institution-code.validator';
-import { ValidateCurrency } from '../../validators/currency-validator';
-import { Company } from '../../models/company.model';
 import { UserService } from '@curacaru/services/user.service';
+import { Company } from '@curacaru/models';
+import { ApiService } from '@curacaru/services';
+import { ValidateCurrency } from '@curacaru/validators/currency-validator';
+import { ValidateInstitutionCode } from '@curacaru/validators/institution-code.validator';
 
 @Component({
   imports: [CommonModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule],

@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output, input } from 
 import { RouterModule } from '@angular/router';
 import { Employee } from '@curacaru/models';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
+import { LoaderCardComponent } from '@curacaru/shared/loader-card/loader-card.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { LoaderCardComponent } from '../../../shared/loader-card/loader-card.component';
 
 @Component({
   selector: 'cura-employee-list-mobile',

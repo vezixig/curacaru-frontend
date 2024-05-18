@@ -23,10 +23,10 @@ import { Observable, Subject, combineLatest, debounceTime, filter, forkJoin, map
   selector: 'deployment-report-signature',
   imports: [ReactiveFormsModule, InfoComponent, CommonModule, TimeFormatPipe, FontAwesomeModule, SignatureComponent, RouterModule],
   standalone: true,
-  templateUrl: './deployment-report-signature.component.html',
-  styleUrls: ['./deployment-report-signature.component.scss'],
+  templateUrl: './deployment-report-editor.component.html',
+  styleUrls: ['./deployment-report-editor.component.scss'],
 })
-export class DeploymentReportSignatureComponent {
+export class DeploymentReportEditorComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly apiService = inject(ApiService);
   private readonly formBuilder = inject(FormBuilder);

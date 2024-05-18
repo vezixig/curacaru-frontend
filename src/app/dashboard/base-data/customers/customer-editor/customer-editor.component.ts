@@ -7,16 +7,13 @@ import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, firstValueFrom, mergeMap } from 'rxjs';
-import { Customer } from '../../../models/customer.model';
-import { Insurance } from '../../../models/insurance.model';
-import { ApiService } from '../../../services/api.service';
-import { EmployeeBasic } from '../../../models/employee-basic.model';
-import { ValidateInsuredPersonNumber as ValidateInsuredPersonNumber } from '../../../validators/insured-person-number.validator';
-import { UserService } from '../../../services/user.service';
 import { InputComponent } from '@curacaru/shared/input/input.component';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { Gender } from '@curacaru/enums/gender.enum';
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
+import { ApiService, UserService } from '@curacaru/services';
+import { Customer, EmployeeBasic, Insurance } from '@curacaru/models';
+import { ValidateInsuredPersonNumber } from '@curacaru/validators/insured-person-number.validator';
 
 @Component({
   providers: [ApiService],

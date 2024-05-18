@@ -4,8 +4,8 @@ import { CustomerListEntry } from '@curacaru/models';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LoaderTrComponent } from '@curacaru/shared/loader-tr/loader-tr.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { CustomerStatusPipe } from '../../../pipes/customer-status-name.pipe';
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
+import { CustomerStatusPipe } from '@curacaru/pipes/customer-status-name.pipe';
 
 @Component({
   selector: 'cura-customer-list-table',

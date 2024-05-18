@@ -5,7 +5,6 @@ import { faGear, faHouse, faKey } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { ToastrService } from 'ngx-toastr';
 import {
   BehaviorSubject,
@@ -16,19 +15,19 @@ import {
   catchError,
   combineLatest,
   debounceTime,
-  finalize,
   mergeMap,
   startWith,
   takeUntil,
   tap,
 } from 'rxjs';
-import { ApiService } from '../../../services/api.service';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { Insurance } from '../../../models/insurance.model';
 import { Store } from '@ngrx/store';
 import { ChangePageAction, InsurancesListState } from '@curacaru/state/insurances-list.state';
 import { Page } from '@curacaru/models/page.model';
-import { PagingComponent } from '../../../shared/paging/paging.component';
+import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
+import { Insurance } from '@curacaru/models';
+import { ApiService } from '@curacaru/services';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

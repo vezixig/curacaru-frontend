@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BaseRepository } from '../../services/repositories/base.repository';
 import { UUID } from 'angular2-uuid';
-import { InvoiceListEntry } from '@curacaru/dashboard/invoices/models/invoice-list-entry.model';
-import { InvoiceNumber } from '@curacaru/models/invioce-number.model';
-import { InvoiceAddModel } from '@curacaru/dashboard/invoices/models/invoice-add.model';
+import { InvoiceNumber } from '@curacaru/models/';
 import { Page } from '@curacaru/models/page.model';
+import { BaseRepository } from '@curacaru/services/repositories/base.repository';
+import { InvoiceListEntry } from './models/invoice-list-entry.model';
+import { InvoiceAddModel } from './models/invoice-add.model';
 
 /**
  * Repository for appointment related requests

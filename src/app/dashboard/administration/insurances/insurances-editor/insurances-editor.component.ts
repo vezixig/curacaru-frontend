@@ -9,9 +9,9 @@ import { UUID } from 'angular2-uuid';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { ApiService } from '../../../services/api.service';
-import { Insurance } from '../../../models/insurance.model';
-import { ValidateInstitutionCode } from '../../../validators/institution-code.validator';
+import { Insurance } from '@curacaru/models';
+import { ApiService } from '@curacaru/services';
+import { ValidateInstitutionCode } from '@curacaru/validators/institution-code.validator';
 
 @Component({
   imports: [CommonModule, FontAwesomeModule, FormsModule, NgxSkeletonLoaderModule, RouterModule, ReactiveFormsModule],

@@ -6,6 +6,7 @@ export * from './customer.model';
 export * from './employee-basic.model';
 export * from './employee.model';
 export * from './insurance.model';
+export * from './invoice-number.model';
 export * from './minimal-customer-list-entry.model';
 export * from './ngbtime';
 export * from './signup-data.model';

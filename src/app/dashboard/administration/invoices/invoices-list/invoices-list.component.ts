@@ -8,12 +8,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subject, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
 import { InvoiceRepository } from '../invoice.repository';
 import { InvoiceListEntry } from '../models/invoice-list-entry.model';
-import {
-  InvoiceChangeCustomerAction,
-  InvoiceChangePageAction,
-  InvoicesChangeFilterAction,
-  InvoicesListState,
-} from '@curacaru/state/invoices-list.state';
+import { InvoiceChangePageAction, InvoicesChangeFilterAction, InvoicesListState } from '@curacaru/state/invoices-list.state';
 import { faCircleInfo, faDownload, faGear, faHashtag, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
@@ -24,7 +19,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { faCalendar, faUser } from '@fortawesome/free-regular-svg-icons';
 import { Page } from '@curacaru/models/page.model';
-import { PagingComponent } from '../../../shared/paging/paging.component';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 
 @Component({
   selector: 'curacaru-invoices-list',

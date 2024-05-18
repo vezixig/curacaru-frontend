@@ -18,8 +18,8 @@ import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, combineLatest, finalize, map, mergeMap, startWith } from 'rxjs';
-import { PagingComponent } from '../../../shared/paging/paging.component';
 import { Page } from '@curacaru/models/page.model';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 
 @Component({
   providers: [MonthNamePipe],

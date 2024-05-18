@@ -5,8 +5,8 @@ import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LoaderCardComponent } from '@curacaru/shared/loader-card/loader-card.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { CustomerStatusPipe } from '../../../pipes/customer-status-name.pipe';
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
+import { CustomerStatusPipe } from '@curacaru/pipes/customer-status-name.pipe';
 
 @Component({
   selector: 'cura-customer-list-mobile',
