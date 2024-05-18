@@ -22,6 +22,7 @@ import { SignatureComponent } from '@curacaru/shared/signature/signature.compone
 import { AppointmentService } from '@curacaru/services/appointment.service';
 import { AppointmentBase } from '@curacaru/models/appointment-base.model';
 import { InfoComponent } from '@curacaru/shared/info-box/info.component';
+import { MonthNamePipe } from '@curacaru/pipes/month-name.pipe';
 
 @Component({
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
@@ -30,13 +31,14 @@ import { InfoComponent } from '@curacaru/shared/info-box/info.component';
   templateUrl: './time-tracker-editor.component.html',
   imports: [
     AsyncPipe,
-    InfoComponent,
     CommonModule,
     DatePipe,
     DecimalPipe,
     FontAwesomeModule,
     FormsModule,
+    InfoComponent,
     InputComponent,
+    MonthNamePipe,
     NgbDatepickerModule,
     NgxSkeletonLoaderModule,
     ReactiveFormsModule,
@@ -63,7 +65,6 @@ export class TimeTrackerEditorComponent implements OnDestroy {
   faGear = faGear;
   faTrashCan = faTrashCan;
   faEraser = faEraser;
-  months = DateTimeService.months;
 
   readonly canvasWidth = signal(120);
   readonly isLoadingWorkingHours = signal(false);

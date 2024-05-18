@@ -9,14 +9,7 @@
 
     <div class="form-group mb-2">
       <label class="fw-light">Jahr und Monat der Leistungserbringung</label>
-      <div class="input-group">
-        <input type="number" class="form-control" value="2024" formControlName="year" (ngModelChange)="onSelectedYearChange($event)" />
-        <select class="form-control" formControlName="month" (ngModelChange)="onSelectedMonthChange($event)">
-          @for (month of months; track month) {
-          <option [value]="month.value">{{ month.name }}</option>
-          }
-        </select>
-      </div>
+      <p class="ms-3 mt-1 m-0 fs-6">{{ reportForm.get("month")?.value | monthName }} {{ reportForm.get("year")?.value }}</p>
     </div>
 
     @if(model$ | async; as model) {

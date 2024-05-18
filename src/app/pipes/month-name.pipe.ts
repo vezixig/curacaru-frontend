@@ -7,6 +7,6 @@ import { DateTimeService } from '@curacaru/services';
 })
 export class MonthNamePipe implements PipeTransform {
   transform(value: number): string {
-    return DateTimeService.months[value - 1].name;
+    return DateTimeService.months[value - 1]?.name ?? 'Unbekannt';
   }
 }
