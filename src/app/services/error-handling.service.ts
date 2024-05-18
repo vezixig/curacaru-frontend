@@ -1,18 +1,19 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Toast, ToastrService } from 'ngx-toastr';
-import { EMPTY, of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { EMPTY } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ErrorHandlerService {
+export class ErrorHandlingService {
   constructor(public toastrService: ToastrService) {}
 
   handleError(error: any) {
     if (error instanceof HttpErrorResponse) {
       const httpError = <HttpErrorResponse>error;
-      this.toastrService.error(`${this.getErrorTitle(httpError.status)}: ${error.error}`, 'Das hat leider nicht geklappt');
+      const text = typeof error.error === 'string' ? ': ' + error.error : '';
+      this.toastrService.error(`${this.getErrorTitle(httpError.status)}${text}`, 'Das hat leider nicht geklappt');
     } else {
       console.log(error);
       this.toastrService.error(`Das hat leider nicht geklappt`);

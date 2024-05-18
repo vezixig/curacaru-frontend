@@ -7,7 +7,7 @@ import { Observable, Subject, combineLatest, firstValueFrom, map, mergeMap, star
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
-import { ApiService, ErrorHandlerService, LocationService, ScreenService, UserService } from '@curacaru/services';
+import { ApiService, ErrorHandlingService, LocationService, ScreenService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { ChangeEmployeeFilterAction, ChangePageAction } from '@curacaru/state/customer-list.state';
@@ -51,7 +51,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
   private readonly screenService = inject(ScreenService);
-  private readonly errorHandlerService = inject(ErrorHandlerService);
+  private readonly errorHandlerService = inject(ErrorHandlingService);
 
   user?: UserEmployee;
   isMobile = this.screenService.isMobile;

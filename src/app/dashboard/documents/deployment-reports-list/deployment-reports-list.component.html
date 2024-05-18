@@ -1,20 +1,7 @@
 <div class="row">
-  <h4>Einsatznachweise</h4>
+  <h4 class="h-underline">Einsatznachweise</h4>
 
   @if(filterModel$ | async; as filterModel) {
-
-  <button
-    type="button"
-    [routerLink]="['/dashboard/documents/deployment-reports/sign']"
-    [queryParams]="{
-      year: filterForm.get('year')?.value ?? undefined, 
-      month: filterForm.get('month')?.value ?? undefined, 
-      customerId: filterForm.get('customerId')?.value ?? undefined,
-      }"
-    class="btn btn-primary text-white btn-block mb-3"
-  >
-    Einsatznachweis erstellen
-  </button>
 
   <form [formGroup]="filterForm" class="p-0">
     <div class="row gx-3">
@@ -175,11 +162,5 @@
   <!-- paging -->
   <cura-paging [page]="documents" (pageChange)="onPageChanged($event)" />
 
-  } @else {
-  <div class="row">
-    <div class="alert alert-secondary mt-3" role="alert">
-      <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Es wurden keine Einsätze gefunden, die den gewählten Filtern entsprechen.
-    </div>
-  </div>
   } }}
 </div>

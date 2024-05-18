@@ -88,8 +88,8 @@ export const routes: Routes = [
     path: 'dashboard/documents/assignment-declarations/sign',
     pathMatch: 'full',
     loadComponent: () =>
-      import('@curacaru/dashboard/documents/assignment-declaration-signature/assignment-declaration-signature.component').then(
-        (o) => o.AssignmentDeclarationSignatureComponent
+      import('@curacaru/dashboard/documents/assignment-declaration-editor/assignment-declaration-editor.component').then(
+        (o) => o.AssignmentDeclarationEditorComponent
       ),
   },
   {

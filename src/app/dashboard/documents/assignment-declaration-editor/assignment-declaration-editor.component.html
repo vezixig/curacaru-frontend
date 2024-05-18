@@ -1,0 +1,86 @@
+<div class="row" class="">
+  <h4 class="h-underline">Abtretungserklärung erstellen</h4>
+
+  @if(dataModel$ | async; as dataModel) {
+  <form [formGroup]="documentForm" class="p-0">
+    @if(dataModel.customer && dataModel.customer.insuranceId && dataModel.customer.insuredPersonNumber && dataModel.customer.insuranceStatus ==
+    insuranceStatus.Statutory) {
+    <label class="mt-3 fw-light" for="selectCustomer">Kunde</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.lastName }}, {{ dataModel.customer.firstName }}</p>
+
+    <label class="mt-3 fw-light" for="inputYear">Ausstellungsjahr der Abtretungserklärung</label>
+    <p class="ms-2 m-0 fs-5">{{ year() }}</p>
+
+    <label class="mt-3 fw-light">Bearbeitet von</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.associatedEmployee?.name }}</p>
+
+    <label class="mt-3 fw-light">Geburtsdatum des Kunden</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.birthDate | date }}</p>
+
+    <label class="mt-3 fw-light">Straße und Hausnummer des Kunden</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.street }}</p>
+
+    <label class="mt-3 fw-light">Postleitzahl und Ort des Kunden</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.zipCode }} Duisburg</p>
+
+    <label class="mt-3 fw-light">Krankenkasse und Versichertennummer des Kunden</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.insurance?.name | fallbackSpace }} - {{ dataModel.customer.insuredPersonNumber }}</p>
+
+    <label class="mt-3 fw-light">Straße und Hausnummer der Krankenkasse</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.insurance?.street | fallbackSpace }}</p>
+
+    <label class="mt-3 fw-light">Postleitzahl und Ort der Krankenkasse</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.insurance?.zipCode | fallbackSpace }} {{ dataModel.customer.insurance?.city }}</p>
+
+    <label class="mt-3 fw-light">Abtretungserklärung</label>
+
+    <p class="ms-2 m-0 fs-6">
+      Hiermit erteile ich mein Einverständnis, dass der Betreuungsdienst „{{ dataModel.user.companyName }}“ die Leistungen gemäß §45b SGB XI für das
+      Jahr {{ year() }} direkt mit meiner Pflegekasse abrechnen darf. Mit Vorlage einer Rechnung inklusive eines von mir unterschriebenen
+      Einsatznachweises ist der Betreuungsdienst berechtigt, die erbrachten Leistungen abzurechnen. Ich erkläre mich zudem damit einverstanden, dass
+      der Betreuungsdienst bei meiner Pflegekasse Auskünfte über die zur Verfügung stehenden Leistungen gemäß §45b SGB XI einholen darf.
+    </p>
+
+    <div class="form-check mt-3">
+      <input class="form-check-input" type="checkbox" formControlName="isAccepted" id="checkCheck" />
+      <label class="form-check-label" for="checkCheck"> Hiermit erkläre ich mich mit der Abtretungserklärung einverstanden. </label>
+    </div>
+
+    <label class="fw-light mt-3">Ort</label>
+    <div class="row">
+      <div class="col-sm-12 col-md-5">
+        <input maxlength="30" type="text" class="form-control" formControlName="signatureCity" />
+      </div>
+      <div class="col-5">den {{ today | date }}</div>
+    </div>
+
+    <div class="row g-2 mt-2">
+      <div class="col">
+        <button
+          [disabled]="!documentForm.valid || isSaving()"
+          (click)="onStartSigning(signature)"
+          type="submit"
+          class="form-control btn btn-primary text-white h-100"
+        >
+          <span>Unterschrift Kunde</span>
+        </button>
+      </div>
+      <div class="col">
+        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary h-100">
+          <span>Verwerfen</span>
+        </button>
+      </div>
+    </div>
+    } @else if(dataModel.customer) {
+    <cura-info>
+      Um die Abtretungserklärung für <span class="fw-bold">{{ dataModel.customer.firstName }} {{ dataModel.customer.lastName }}</span> zu erstellen,
+      ordne dem Kunden in der Kundenverwaltung bitte erst eine Versicherung und Versichertennummer zu und setze den Versichertenstatus auf gesetzlich.
+    </cura-info>
+    }
+  </form>
+
+  <ng-template #signature>
+    <cura-signature [signatureName]="dataModel.customer.lastName + ', ' + dataModel.customer.firstName" (signatureTaken)="onSigned($event)" />
+  </ng-template>
+  }
+</div>
