@@ -1,7 +1,6 @@
-import { AsyncPipe, CommonModule, DatePipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { VersionInfo } from './version.info.model';
 
 @Component({
@@ -13,5 +12,5 @@ import { VersionInfo } from './version.info.model';
 })
 export class VersionInfoComponent {
   httpClient = inject(HttpClient);
-  versionData$ = this.httpClient.get<VersionInfo[]>('/assets/version.json').pipe(tap(console.log));
+  versionData$ = this.httpClient.get<VersionInfo[]>('/assets/version.json');
 }

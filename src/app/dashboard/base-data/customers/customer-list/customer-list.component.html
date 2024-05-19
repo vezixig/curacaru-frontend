@@ -6,7 +6,8 @@
 }
 
 <!-- Filter -->
-@if(filterModel$ | async; as filterModel) {
+@if(filterModel$ | async; as filterModel) { @if (user?.isManager) {
+
 <div class="form-group p-0">
   <label class="fw-light" for="dpFromDate">Mitarbeiter</label>
   <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onFilterChanged()">
@@ -25,8 +26,9 @@
     (change)="onFilterChanged()"
     id="checkShowInactiveCustomers"
   />
-  <label class="form-check-label fw-light" for="checkShowInactiveCustomers"> Inaktive Kunden anzeigen</label>
+  <label class="form-check-label fw-light" for="checkShowInactiveCustomers"> Nur inaktive Kunden anzeigen</label>
 </div>
+}
 
 <!-- customers -->
 @if(isMobile()) {

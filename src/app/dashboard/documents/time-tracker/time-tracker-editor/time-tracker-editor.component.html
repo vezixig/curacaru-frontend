@@ -4,12 +4,12 @@
   <form [formGroup]="reportForm" class="p-0">
     <div class="form-group mb-2">
       <label class="fw-light">Mitarbeiter</label>
-      <p class="ms-3 mt-1 m-0 fs-6">{{ reportForm.get("employeeName")?.value }}</p>
+      <p class="ms-3 mt-1 m-0 fs-5">{{ reportForm.get("employeeName")?.value }}</p>
     </div>
 
     <div class="form-group mb-2">
       <label class="fw-light">Jahr und Monat der Leistungserbringung</label>
-      <p class="ms-3 mt-1 m-0 fs-6">{{ reportForm.get("month")?.value | monthName }} {{ reportForm.get("year")?.value }}</p>
+      <p class="ms-3 mt-1 m-0 fs-5">{{ reportForm.get("month")?.value | monthName }} {{ reportForm.get("year")?.value }}</p>
     </div>
 
     @if(model$ | async; as model) {

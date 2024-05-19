@@ -7,21 +7,21 @@
   <div class="card-body">
     <h6 class="card-subtitle mb-4 text-body-secondary">Veröffentlicht am {{ version.releaseDate | date }}</h6>
 
-    @if(version.features?.length > 0) {
+    @if(version.features.length > 0) {
     <ul class="list-group mb-4">
       <li class="list-group-item list-group-item-secondary" aria-current="true">Neue Features</li>
       @for(feature of version.features; track feature) {
       <li class="list-group-item">{{ feature }}</li>
       }
     </ul>
-    } @if(version.changes?.length > 0) {
+    } @if(version.changes.length > 0) {
     <ul class="list-group mb-4">
       <li class="list-group-item list-group-item-secondary" aria-current="true">Änderungen</li>
       @for(change of version.changes; track change) {
       <li class="list-group-item">{{ change }}</li>
       }
     </ul>
-    } @if(version.bugfixes?.length > 0) {
+    } @if(version.bugfixes.length > 0) {
     <ul class="list-group mb-4">
       <li class="list-group-item list-group-item-secondary" aria-current="true">Fehlerkorrekturen</li>
       @for(bugfix of version.bugfixes; track bugfix) {

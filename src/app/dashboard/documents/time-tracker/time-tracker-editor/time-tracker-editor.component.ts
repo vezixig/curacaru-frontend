@@ -187,7 +187,6 @@ export class TimeTrackerEditorComponent implements OnDestroy {
 
   onDeleteAppointment(workingHours: WorkingHours) {
     var appointment: AppointmentBase = { ...workingHours, date: DateTimeService.toDate(workingHours.date.toString()) };
-    console.log(appointment);
     this.appointmentService.DeleteAppointment(appointment, this.$onRefresh);
   }
 

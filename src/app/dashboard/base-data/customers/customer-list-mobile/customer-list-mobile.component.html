@@ -15,12 +15,7 @@
           <fa-icon [icon]="['fas', 'phone']" [fixedWidth]="true" />
         </a>
         }
-        <button
-          type="button"
-          [routerLink]="['/dashboard/customers', customer.id]"
-          class="btn btn-outline-secondary btn-sm"
-          title="Mitarbeiter bearbeiten"
-        >
+        <button type="button" [routerLink]="['/dashboard/customers', customer.id]" class="btn btn-outline-secondary btn-sm" title="Kunden bearbeiten">
           <fa-icon [icon]="['fas', 'gear']" [fixedWidth]="true" />
         </button>
         @if (isManager()) {
@@ -30,6 +25,9 @@
           <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
         </button>
         }
+        <!-- shortcut menu -->
+        @if(customer.status == customerStatus.Customer) {
+
         <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
           <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
             <fa-icon [icon]="['fas', 'ellipsis']" [fixedWidth]="true" />
@@ -41,7 +39,7 @@
             <button ngbDropdownItem (click)="onShowInvoices.emit(customer)">Rechnungen</button>
           </div>
         </div>
-        }
+        } }
       </div>
     </div>
     <div class="card-body">
@@ -59,3 +57,7 @@
   </div>
   }
 </div>
+
+@if(customers().length === 0 && !isLoading()) {
+<div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="['fas', 'circle-info']" /> Es wurden keine Kunden gefunden.</div>
+}

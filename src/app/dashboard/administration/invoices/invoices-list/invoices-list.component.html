@@ -1,18 +1,8 @@
 <div class="row">
-  <h4>Rechnungsliste</h4>
+  <h4 class="h-underline">Rechnungsliste</h4>
 
   @if(model$ | async; as model) {
-  <Button
-    type="button"
-    [routerLink]="['/dashboard/invoices/new']"
-    [queryParams]="{
-      year: filterForm.controls['year'].value,
-      month: filterForm.controls['month'].value,
-      customerId: filterForm.controls['customerId'].value == '' ? undefined : filterForm.controls['customerId'].value
-    }"
-    class="btn btn-primary text-white btn-block mb-3"
-    >Rechnung erstellen</Button
-  >
+
   <form [formGroup]="filterForm" class="p-0">
     <!-- year -->
     <div class="row gx-3">
