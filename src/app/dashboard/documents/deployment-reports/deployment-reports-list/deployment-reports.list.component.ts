@@ -23,8 +23,14 @@ import { Store } from '@ngrx/store';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin, map, startWith, switchMap } from 'rxjs';
+import { InfoComponent } from '@curacaru/shared/info-box/info.component';
 
 @Component({
+  providers: [ApiService, MonthNamePipe, ClearanceTypeNamePipe],
+  selector: 'cura-deployment',
+  standalone: true,
+  templateUrl: './deployment-reports-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ClearanceTypeNamePipe,
     CommonModule,
@@ -36,12 +42,8 @@ import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin,
     PagingComponent,
     ReactiveFormsModule,
     RouterModule,
+    InfoComponent,
   ],
-  providers: [ApiService, MonthNamePipe, ClearanceTypeNamePipe],
-  selector: 'cura-deployment',
-  standalone: true,
-  templateUrl: './deployment-reports-list.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeploymentReportsListComponent {
   private readonly apiService = inject(ApiService);

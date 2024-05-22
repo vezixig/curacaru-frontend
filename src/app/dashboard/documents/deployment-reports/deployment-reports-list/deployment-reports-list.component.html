@@ -162,5 +162,7 @@
   <!-- paging -->
   <cura-paging [page]="documents" (pageChange)="onPageChanged($event)" />
 
+  } @else {
+  <cura-info class="mt-2 p-0">Keine Einsatznachweise gefunden.</cura-info>
   } }}
 </div>

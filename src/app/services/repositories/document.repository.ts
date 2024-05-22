@@ -39,7 +39,6 @@ export class DocumentRepository extends BaseRepository {
       options.params = options.params.set('employeeId', employeeId.toString());
     }
     options.params = options.params.set('page', page.toString());
-    options.params = options.params.set('pageSize', 5);
 
     return this.client.get<Page<DeploymentReportListEntry>>(`${this.apiUrl}/documents/deployment-reports/${year}/${month}`, options);
   }
