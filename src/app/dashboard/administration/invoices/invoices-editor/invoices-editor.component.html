@@ -1,0 +1,114 @@
+<div class="row">
+  <h4 class="h-underline">Rechnung erstellen</h4>
+
+  @if(model$ | async; as model) {
+
+  <form [formGroup]="invoiceForm" class="p-0" (ngSubmit)="onSave()">
+    <label class="mt-2 fw-light">Jahr und Monat der Leistungserbringung</label>
+    <p class="ms-2 m-0 fs-5">{{ invoiceForm.controls["month"].value ?? 0 | monthName }} {{ invoiceForm.controls["year"].value }}</p>
+
+    <label class="mt-2 fw-light">Kunde</label>
+    <p class="ms-2 m-0 fs-5">{{ model.customer.lastName }}, {{ model.customer.firstName }}</p>
+
+    <label for="selectClearanceType" class="mt-2 fw-light">Abrechnungsoption</label>
+    <p class="ms-2 m-0 fs-5">{{ invoiceForm.controls["clearanceType"].value ?? 0 | clearanceTypeName }}</p>
+
+    <label for="inputInvoiceNumber" class="mt-2 fw-light">Rechnungsnummer und Datum</label>
+    <div class="input-group">
+      <input
+        id="inputInvoiceNumber"
+        class="form-control"
+        type="text"
+        maxlength="50"
+        formControlName="invoiceNumber"
+        [ngClass]="{ 'is-invalid': invoiceForm.controls['invoiceNumber'].invalid }"
+      />
+      <input
+        id="inputInvoiceDate"
+        class="form-control"
+        type="date"
+        formControlName="invoiceDate"
+        [ngClass]="{ 'is-invalid': invoiceForm.controls['invoiceDate'].invalid }"
+      />
+    </div>
+
+    <label class="mt-2 fw-light">Bearbeitet von</label>
+    <p class="ms-2 mt-1 m-0 fs-5">{{ model.user.firstName }} {{ model.user.lastName }}</p>
+
+    @if(model.deploymentReport != null) { @if( model.deploymentReport.hasInvoice == false) {
+    <label class="mt-2 fw-light">Stunden (gesamt), Stundenlohn Unternehmen, Zwischensumme</label>
+    <p class="ms-2 mt-1 m-0 fs-5">
+      {{ totalDuration() | number : "1.2-2" }} h x {{ model.company.pricePerHour | currency }} =
+      <span style="text-decoration-line: underline; text-decoration-style: single">{{
+        totalDuration() * model.company.pricePerHour | currency
+      }}</span>
+    </p>
+
+    <label class="mt-2 fw-light">Anfahrtskosten {{ model.company.rideCostsType | rideCostsTypeName }}</label>
+    <p class="ms-2 mt-1 m-0 fs-5">
+      @if(model.company.rideCostsType == rideCostsType.Inclusive || model.company.rideCostsType == rideCostsType.None) { - }
+      <!--- ride costs per appointment -->
+      @if(model.company.rideCostsType == rideCostsType.FlatRate) {
+      {{ model.deploymentReport.times.length }} {{ model.deploymentReport.times.length === 1 ? "Einsatz" : "Einsätze" }} x
+      {{ model.company.rideCosts | currency }} =
+      <span style="text-decoration-line: underline; text-decoration-style: single">{{ rideCosts() | currency }}</span>
+      }
+      <!--- ride costs per km -->
+      @if(model.company.rideCostsType == rideCostsType.Kilometer) {
+      {{ totalDistance() | number : "1.2-2" }} km x {{ model.company.rideCosts | currency }} =
+      <span style="text-decoration-line: underline; text-decoration-style: single">{{ rideCosts() | currency }}</span>
+      }
+    </p>
+    <label class="mt-2 fw-light">Rechnungsbetrag</label>
+    <p style="text-decoration-line: underline; text-decoration-style: double" class="ms-2 mt-1 m-0 fs-5">
+      {{ rideCosts() + totalDuration() * model.company.pricePerHour | currency }}
+    </p>
+
+    <div class="row g-2 mt-3">
+      <div class="col">
+        <button
+          [disabled]="invoiceForm.get('signature')?.value != ''"
+          [class.btn-outline-primary]="!invoiceForm.get('signature')?.value"
+          [class.btn-outline-success]="invoiceForm.get('signature')?.value"
+          class="form-control btn h-100"
+          type="button"
+          (click)="openOffCanvas(signature)"
+        >
+          Unterschrift Manager @if(invoiceForm.get('signature')?.value != '') {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
+      </div>
+
+      <div class="col">
+        <button type="submit" [disabled]="invoiceForm.invalid || isSaving()" class="form-control btn btn-primary text-white h-100">
+          Rechnung erstellen @if (isSaving()) {
+          <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+          }
+        </button>
+      </div>
+      <div class="col">
+        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
+      </div>
+    </div>
+
+    <ng-template #signature>
+      <cura-signature [signatureName]="model.user.firstName + ' ' + model.user.lastName" (signatureTaken)="onSigned($event)" />
+    </ng-template>
+
+    } @else {
+    <div class="row m-1">
+      <div class="alert alert-warning mt-3" role="alert">
+        <fa-icon [icon]="faCircleExclamation" [fixedWidth]="true" /> Die Rechnung für diesen Einsatznachweis wurde bereits erstellt.
+      </div>
+    </div>
+    } } @if(model.deploymentReport === null) {
+    <div class="row m-1">
+      <div class="alert alert-secondary mt-3" role="alert">
+        <fa-icon [icon]="faCircleInfo" [fixedWidth]="true" /> Für diesen Monat und Abrechnungsoption wurde kein Einsatznachweis erstellt.
+      </div>
+    </div>
+    }
+  </form>
+  }
+</div>

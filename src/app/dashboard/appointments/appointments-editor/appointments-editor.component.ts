@@ -109,13 +109,24 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
         const employeeId = this.appointmentForm.get('employeeId')?.value;
         const timeStartValue = this.appointmentForm.get('timeStart')?.value;
         const timeEndValue = this.appointmentForm.get('timeEnd')?.value;
-        return employeeId != null && employeeId != '' && timeStartValue != null && timeStartValue != '' && timeEndValue != null && timeEndValue != '';
+        const dateValue = this.appointmentForm.get('date')?.value;
+        return (
+          employeeId != null &&
+          employeeId != '' &&
+          timeStartValue != null &&
+          timeStartValue != '' &&
+          timeEndValue != null &&
+          timeEndValue != '' &&
+          dateValue != null &&
+          dateValue != ''
+        );
       }),
       switchMap(() => {
         const employeeId =
           this.appointmentForm.get('employeeReplacementId')?.value != '' && this.appointmentForm.get('employeeReplacementId')?.value != null
             ? this.appointmentForm.get('employeeReplacementId')?.value
             : this.appointmentForm.get('employeeId')?.value;
+
         return this.appointmentRepository.getIsBlockingAppointment(
           employeeId,
           DateTimeService.toDate(this.appointmentForm.get('date')?.value),
@@ -133,7 +144,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       customerId: [null, [Validators.required]],
       date: ['', { Validators: Validators.required, updateOn: 'blur' }],
       distanceToCustomer: [0],
-      clearanceType: [null, [Validators.required]],
+      clearanceType: [null],
       employeeId: ['', [Validators.required]],
       employeeReplacementId: [''],
       isSignedByCustomer: [false],
@@ -423,7 +434,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
   onSave() {
     const appointment: Appointment = {
-      clearanceType: this.appointmentForm.get('clearanceType')?.value,
+      clearanceType: this.isPlanning ? undefined : this.appointmentForm.get('clearanceType')?.value,
       costs: 0,
       costsLastYearBudget: 0,
       customerId: this.appointmentForm.get('customerId')?.value,
@@ -450,6 +461,11 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
 
     if (appointment.employeeId === appointment.employeeReplacementId) {
       this.toastr.warning('Mitarbeiter und Vertretung dürfen nicht identisch sein');
+      return;
+    }
+
+    if (!this.isPlanning && this.selectedClearanceType == undefined) {
+      this.toastr.warning('Bitte wähle eine Abrechnungsart aus');
       return;
     }
 

@@ -1,0 +1,10 @@
+<h4>Mitarbeiterliste</h4>
+<Button type="button" [routerLink]="['/dashboard/employees/new']" class="btn btn-primary mb-3 w-100">Mitarbeiter hinzufügen</Button>
+
+@if(isMobile()) {
+<cura-employee-list-mobile [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
+} @else {
+<cura-employee-list-table [isLoading]="isLoading()" [employees]="employees()" (delete)="onDelete($event)" />
+}
+
+<cura-paging [page]="page()" (pageChange)="onPageChange($event)" />

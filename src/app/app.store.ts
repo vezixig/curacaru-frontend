@@ -5,12 +5,18 @@ import { TimeTrackerState, timeTrackerReducer } from './state/time-tracker.state
 import { DeploymentReportListState, deploymentReportListReducer } from './state/deployment-report-list.state';
 import { AssignmentDeclarationListState, assignmentDeclarationListReducer } from './state/assignment-declaration-list.state';
 import { InvoicesListState, invoicesListReducer } from './state/invoices-list.state';
+import { EmployeeListState, employeeListReducer } from './state/employee-list.state';
+import { BudgetsListState, budgetsListReducer } from './state/budgets-list.state';
+import { InsurancesListState, insurancesListReducer } from './state/insurances-list.state';
 
 export interface AppStore {
   appointmentList: ActionReducer<AppointmentListState, Action>;
   assignmentDeclarationList: ActionReducer<AssignmentDeclarationListState, Action>;
+  budgetsList: ActionReducer<BudgetsListState, Action>;
   deploymentReportList: ActionReducer<DeploymentReportListState, Action>;
+  employeeList: ActionReducer<EmployeeListState, Action>;
   customerList: ActionReducer<CustomerListState, Action>;
+  insurancesList: ActionReducer<InsurancesListState, Action>;
   invoicesList: ActionReducer<InvoicesListState, Action>;
   timeTracker: ActionReducer<TimeTrackerState, Action>;
 }
@@ -18,8 +24,11 @@ export interface AppStore {
 export const appStore: AppStore = {
   appointmentList: appointmentListReducer,
   assignmentDeclarationList: assignmentDeclarationListReducer,
+  budgetsList: budgetsListReducer,
   customerList: customerListReducer,
   deploymentReportList: deploymentReportListReducer,
+  employeeList: employeeListReducer,
   invoicesList: invoicesListReducer,
+  insurancesList: insurancesListReducer,
   timeTracker: timeTrackerReducer,
 };

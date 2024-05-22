@@ -1,0 +1,63 @@
+<div class="d-md-none p-0">
+  @if (isLoading()) {
+  <div class="my-3"><cura-loader-card /></div>
+  } @for (customer of customers(); track customer) {
+  <div class="card my-3">
+    <div class="card-header d-flex">
+      <span class="lead text-truncate">{{ customer.lastName }}, {{ customer.firstName }}</span>
+      <div class="btn-group ms-auto" role="group">
+        @if (customer.latitude != 0 && customer.longitude != 0) {
+        <a (click)="onNavigate.emit(customer)" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
+          <fa-icon [icon]="['fas', 'location-dot']" [fixedWidth]="true" />
+        </a>
+        } @if (customer.phone != '') {
+        <a href="tel:{{ customer.phone | replace : ' ' : '' }}" class="btn btn-outline-secondary btn-sm" title="Kunden anrufen">
+          <fa-icon [icon]="['fas', 'phone']" [fixedWidth]="true" />
+        </a>
+        }
+        <button type="button" [routerLink]="['/dashboard/customers', customer.id]" class="btn btn-outline-secondary btn-sm" title="Kunden bearbeiten">
+          <fa-icon [icon]="['fas', 'gear']" [fixedWidth]="true" />
+        </button>
+        @if (isManager()) {
+        <!-- delete customer -->
+        @if(customer.status != customerStatus.Former) {
+        <button type="button" (click)="onDelete.emit(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
+          <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
+        </button>
+        }
+        <!-- shortcut menu -->
+        @if(customer.status == customerStatus.Customer) {
+
+        <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
+          <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
+            <fa-icon [icon]="['fas', 'ellipsis']" [fixedWidth]="true" />
+          </button>
+          <div class="dropdown-menu" ngbDropdownMenu>
+            <button ngbDropdownItem (click)="onShowAppointments.emit(customer)">Termine</button>
+            <button ngbDropdownItem [routerLink]="['/dashboard/budgets', customer.id]">Budgets</button>
+            <button ngbDropdownItem (click)="onShowDeploymentReports.emit(customer)">Einsatznachweise</button>
+            <button ngbDropdownItem (click)="onShowInvoices.emit(customer)">Rechnungen</button>
+          </div>
+        </div>
+        } }
+      </div>
+    </div>
+    <div class="card-body">
+      <ul class="card-text list-unstyled">
+        @if (customer.phone != '') {
+        <li><fa-icon [icon]="['fas', 'phone']" [fixedWidth]="true" /> {{ customer.phone }}</li>
+        }
+        <li><fa-icon [icon]="['fas', 'house']" [fixedWidth]="true" /> {{ customer.street }} - {{ customer.zipCode }} {{ customer.city }}</li>
+        @if (customer.associatedEmployeeName) {
+        <li><fa-icon [icon]="['far', 'user']" [fixedWidth]="true" /> {{ customer.associatedEmployeeName }}</li>
+        }
+        <li><fa-icon [icon]="['far', 'id-card']" [fixedWidth]="true" /> {{ customer.status | customerStatus }}</li>
+      </ul>
+    </div>
+  </div>
+  }
+</div>
+
+@if(customers().length === 0 && !isLoading()) {
+<div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="['fas', 'circle-info']" /> Es wurden keine Kunden gefunden.</div>
+}

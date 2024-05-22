@@ -48,7 +48,6 @@ export class DashboardComponent {
         this.error = error.status != 404;
         this.isLoading = false;
         this.hasCompany = false;
-        console.error(error);
       },
     });
   }

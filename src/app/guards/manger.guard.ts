@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { UserService } from '@curacaru/services';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class ManagerGuard {

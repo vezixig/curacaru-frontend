@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { Budget } from '@curacaru/models/budget.model';
 import { UUID } from 'angular2-uuid';
 import { BudgetUpdate } from '@curacaru/models/BudgetUpdate';
+import { Page } from '@curacaru/models/page.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,10 @@ export class BudgetService {
   constructor(private httpClient: HttpClient) {}
 
   /** Gets the list of budgets */
-  getBudgetList = () => this.httpClient.get<BudgetListEntry[]>(`${this.apiUrl}/budgets/list`);
+  getBudgetList(page: number) {
+    var params = { page: page };
+    return this.httpClient.get<Page<BudgetListEntry>>(`${this.apiUrl}/budgets/list`, { params });
+  }
 
   /** Gets the current budget of a customer
    * @param customerId The customer id

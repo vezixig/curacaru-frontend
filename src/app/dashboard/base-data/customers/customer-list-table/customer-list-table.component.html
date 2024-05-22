@@ -1,0 +1,68 @@
+<table class="d-none d-md-table table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Kunde</th>
+      <th scope="col">Telefonnummer</th>
+      <th scope="col">PLZ</th>
+      <th scope="col">Stadt</th>
+      <th scope="col">Bearbeiter</th>
+      <th scope="col">Status</th>
+      <th class="text-end" scope="col">Aktion</th>
+    </tr>
+  </thead>
+  <tbody>
+    @if (isLoading()) {
+    <cura-loader-tr [columnCount]="7" />
+    } @for (customer of customers(); track customer) {
+    <tr>
+      <td>{{ customer.lastName }}, {{ customer.firstName }}</td>
+      <td>{{ customer.phone }}</td>
+      <td>{{ customer.zipCode }}</td>
+      <td>{{ customer.city }}</td>
+      <td>{{ customer.associatedEmployeeName }}</td>
+      <td>{{ customer.status | customerStatus }}</td>
+      <td class="text-end">
+        <div class="btn-group" role="group">
+          <button
+            type="button"
+            [routerLink]="['/dashboard/customers', customer.id]"
+            class="btn btn-outline-secondary btn-sm"
+            title="Kunden bearbeiten"
+          >
+            <fa-icon [icon]="['fas', 'gear']" [fixedWidth]="true" />
+          </button>
+          @if (isManager()) {
+
+          <!-- delete customer -->
+          @if(customer.status != customerStatus.Former) {
+
+          <button type="button" (click)="onDelete.emit(customer)" class="btn btn-outline-secondary btn-sm" title="Kunden löschen">
+            <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
+          </button>
+          }
+
+          <!-- quick actions -->
+          @if(customer.status == customerStatus.Customer) {
+          <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
+            <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
+              <fa-icon [icon]="['fas', 'ellipsis']" [fixedWidth]="true" />
+            </button>
+            <div class="dropdown-menu" ngbDropdownMenu>
+              <button ngbDropdownItem (click)="onNavigate.emit(customer)">Navigation zum Kunden</button>
+              <button ngbDropdownItem (click)="onShowAppointments.emit(customer)">Termine</button>
+              <button ngbDropdownItem [routerLink]="['/dashboard/budgets', customer.id]">Budgets</button>
+              <button ngbDropdownItem (click)="onShowDeploymentReports.emit(customer)">Einsatznachweise</button>
+              <button ngbDropdownItem (click)="onShowInvoices.emit(customer)">Rechnungen</button>
+            </div>
+          </div>
+          } }
+        </div>
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+
+@if(customers().length === 0 && !isLoading()) {
+<div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="['fas', 'circle-info']" /> Es wurden keine Kunden gefunden.</div>
+}

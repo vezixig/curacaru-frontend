@@ -29,36 +29,23 @@ import {
   NgbOffcanvas,
 } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import {
-  EMPTY,
-  Observable,
-  Subject,
-  catchError,
-  combineLatest,
-  debounceTime,
-  finalize,
-  forkJoin,
-  map,
-  startWith,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { EMPTY, Observable, Subject, catchError, combineLatest, debounceTime, forkJoin, map, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
 import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { TimeFormatPipe } from '../../../pipes/time.pipe';
-import { CustomerListEntry } from '../../../models/customer-list-entry.model';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
-import { UserEmployee } from '@curacaru/models';
+import { MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { NgbDatePipe } from '@curacaru/pipes/ngb-date-pipe';
 import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
 import { Store } from '@ngrx/store';
 import { AppointmentRepository } from '@curacaru/services/repositories/appointment.repository';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
+import { PagingComponent } from '@curacaru/shared/paging/paging.component';
+import { Page } from '@curacaru/models/page.model';
 
 @Component({
   imports: [
@@ -69,6 +56,7 @@ import { SignatureComponent } from '@curacaru/shared/signature/signature.compone
     NgbDatePipe,
     NgbDatepickerModule,
     NgxSkeletonLoaderModule,
+    PagingComponent,
     ReactiveFormsModule,
     ReplacePipe,
     RouterModule,
@@ -128,10 +116,11 @@ export class AppointmentsListComponent implements OnDestroy {
   readonly showPriceInfo$: Observable<boolean>;
   readonly filterModel$: Observable<{
     employees: EmployeeBasic[];
-    customers: CustomerListEntry[];
+    customers: MinimalCustomerListEntry[];
     user: UserEmployee;
   }>;
   readonly dataModel$: Observable<{
+    page: Page<AppointmentListEntry[]>;
     appointments: AppointmentListEntry[];
   }>;
   readonly filterForm: FormGroup;
@@ -145,7 +134,7 @@ export class AppointmentsListComponent implements OnDestroy {
 
     this.filterModel$ = forkJoin({
       employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getCustomerList(),
+      customers: this.apiService.getMinimalCustomerList(),
       user: this.userService.user$,
     }).pipe(
       catchError((error) => {
@@ -159,6 +148,7 @@ export class AppointmentsListComponent implements OnDestroy {
       customerId: [undefined],
       start: [DateTimeService.toNgbDate(new Date())],
       end: [DateTimeService.toNgbDate(new Date())],
+      onlyOpen: [false],
     });
 
     this.filterForm
@@ -172,6 +162,12 @@ export class AppointmentsListComponent implements OnDestroy {
       .valueChanges.pipe(takeUntil(this.$onDestroy))
       .subscribe((next) => {
         this.store.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: next }));
+      });
+    this.filterForm
+      .get('onlyOpen')!
+      .valueChanges.pipe(takeUntil(this.$onDestroy))
+      .subscribe((next) => {
+        this.store.dispatch(AppointmentListActions.changeOnlyOpen({ onlyOpen: next }));
       });
 
     // Data Model
@@ -199,16 +195,23 @@ export class AppointmentsListComponent implements OnDestroy {
           this.filterForm.patchValue({ customerId: next.state.appointmentList.customerId }, { emitEvent: false });
         }
 
+        if (next.state.appointmentList.onlyOpen != this.filterForm.get('onlyOpen')?.value) {
+          this.filterForm.patchValue({ onlyOpen: next.state.appointmentList.onlyOpen }, { emitEvent: false });
+        }
+
         return this.apiService
           .getAppointmentList(
             this.filterForm.get('start')?.value,
             this.filterForm.get('end')?.value,
+            next.state.appointmentList.page,
+            next.state.appointmentList.onlyOpen,
             this.filterForm.get('customerId')?.value,
             next.filter.user.isManager ? this.filterForm.get('employeeId')?.value : undefined
           )
           .pipe(
-            map((appointments) => ({
-              appointments: appointments.map(this.deserializeDates).map((appointment) => {
+            map((page) => ({
+              page: page,
+              appointments: page.items.map(this.deserializeDates).map((appointment) => {
                 appointment.canSign =
                   appointment.employeeReplacementId == next.filter.user.id ||
                   (!appointment.employeeReplacementId && appointment.employeeId == next.filter.user.id);
@@ -251,26 +254,6 @@ export class AppointmentsListComponent implements OnDestroy {
     this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: ngbStartDate, dateEnd: ngbStartDate }));
   }
 
-  onTakeSignature(appointment: AppointmentListEntry, isEmployee: boolean) {
-    this.signatureTaking = { appointment, isEmployee };
-    this.signatureName.set(
-      isEmployee
-        ? (appointment.employeeReplacementName ?? '') != ''
-          ? appointment.employeeReplacementName!
-          : appointment.employeeName
-        : appointment.customerName
-    );
-    this.signatureTitle.set(isEmployee ? 'Unterschrift Mitarbeiter' : 'Unterschrift Kunde');
-    this.offcanvasService.open(this.signatureTemplate, { position: 'bottom', panelClass: 'signature-panel', backdrop: 'static' });
-  }
-
-  onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
-    this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
-
-  // isHovered = (date: NgbDate) => this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-  // isInside = (date: NgbDate) => this.toDate && date.after(this.fromDate()) && date.before(this.toDate);
-  // isRange = (date: NgbDate) => date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
-
   onDateSelection(date: NgbDate) {
     // this.fromDate.set(date);
     // this.toDate = date;
@@ -289,6 +272,26 @@ export class AppointmentsListComponent implements OnDestroy {
     const start = DateTimeService.toTimeString(appointment.timeStart, false);
     const end = DateTimeService.toTimeString(appointment.timeEnd, false);
     modalRef.componentInstance.text = `Soll der Termin am ${date} von ${start}-${end} wirklich gelöscht werden?`;
+  }
+
+  onOpenAppointmentLocation = (appointment: AppointmentListEntry) =>
+    this.locationService.openLocationLink(`${appointment.street} ${appointment.zipCode} ${appointment.city}`);
+
+  onPageChange($event: number) {
+    this.store.dispatch(AppointmentListActions.changePage({ page: $event }));
+  }
+
+  onTakeSignature(appointment: AppointmentListEntry, isEmployee: boolean) {
+    this.signatureTaking = { appointment, isEmployee };
+    this.signatureName.set(
+      isEmployee
+        ? (appointment.employeeReplacementName ?? '') != ''
+          ? appointment.employeeReplacementName!
+          : appointment.employeeName
+        : appointment.customerName
+    );
+    this.signatureTitle.set(isEmployee ? 'Unterschrift Mitarbeiter' : 'Unterschrift Kunde');
+    this.offcanvasService.open(this.signatureTemplate, { position: 'bottom', panelClass: 'signature-panel', backdrop: 'static' });
   }
 
   validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
@@ -328,10 +331,6 @@ export class AppointmentsListComponent implements OnDestroy {
       });
   }
 
-  takeSignature(template: TemplateRef<any>, name: string, isEmployee: boolean) {
-    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
-  }
-
   onSignatureTaken($event: string) {
     if (this.signatureTaking == null || $event == '') return;
 
@@ -351,6 +350,10 @@ export class AppointmentsListComponent implements OnDestroy {
         this.toastr.error(`Unterschrift konnte nicht gespeichert werden: [${error.status}] ${error.error}`);
       },
     });
+  }
+
+  takeSignature(template: TemplateRef<any>, name: string, isEmployee: boolean) {
+    this.offcanvasService.open(template, { position: 'bottom', panelClass: 'signature-panel' });
   }
 
   private deserializeDates(obj: any): AppointmentListEntry {

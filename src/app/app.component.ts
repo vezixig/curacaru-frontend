@@ -8,7 +8,7 @@ import { LoginComponent } from '@curacaru/auth/login/login.component';
 import { UserService } from '@curacaru/services';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo, faEllipsis, faGear, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
-import { faEnvelope, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faCircleLeft, faCircleRight, faEnvelope, faIdCard, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   imports: [DashboardComponent, LoginComponent],
@@ -25,12 +25,24 @@ export class AppComponent implements OnInit {
   private router = inject(Router);
 
   constructor(library: FaIconLibrary) {
-    library.addIcons(faPhone, faEnvelope, faEllipsis, faLocationDot, faHouse, faUser, faGear, faTrashCan, faCircleInfo);
+    library.addIcons(
+      faCircleInfo,
+      faCircleLeft,
+      faCircleRight,
+      faEllipsis,
+      faEnvelope,
+      faGear,
+      faHouse,
+      faIdCard,
+      faLocationDot,
+      faPhone,
+      faTrashCan,
+      faUser
+    );
   }
 
   ngOnInit(): void {
     this.authService.error$.subscribe((error) => {
-      console.error(error);
       this.isAuthenticated = false;
     });
 

@@ -1,0 +1,53 @@
+[
+  {
+    "version": "0.8.0",
+    "releaseDate": "2024-06-01",
+    "bugfixes": [
+      "Bei kleinen Bildschirmen kann die Navigationsleiste jetzt gescrollt angezeigt",
+      "Mitarbeiter nicht einen Termin nicht bearbeitet haben, konnten den Button zum Abschließen sehen"
+    ],
+    "features": [
+      "Seite zur Anzeige der Versionsinformationen hinzugefügt",
+      "Automatische Abrechnung erfolgt jetzt über alle Budget-Optionen hinweg",
+      "Möglichkeit Kunden einen Staus zuzuweisen hinzugefügt",
+      "In der Kundenliste können über einen Schalter alle inaktiven Kunden angezeigt werden",
+      "Alle Listen werden jetzt seitenweise angezeigt und haben eine Navigation am unteren Rand",
+      "Ein Schalter in der Terminliste um nur offene Termine anzuzeigen wurde hinzugefügt",
+      "Beim Löschen eines Kunden können optional alle offenen Termine und/oder die Budgets gelöscht werden"
+    ],
+    "changes": [
+      "Bei Eingabe des Namens einer Versicherung werden jetzt alle passenden Versicherungen angezeigt",
+      "Gelöschte Kunden werden jetzt in den Status 'Ehemaliger Kunde' versetzt und nicht mehr zur Auswahl angezeigt",
+      "Einsatznachweise, Abtretungserklärungen, Zeiterfassungen und Rechnungen können jetzt nur noch über die Schnellanlage angelegt werden"
+    ]
+  },
+  {
+    "version": "0.7.5",
+    "releaseDate": "2024-05-12",
+    "features": ["Sprungtasten für die Datumswahl hinzugefügt und Bereich auf einen Tag geändert"]
+  },
+  {
+    "version": "0.7.4",
+    "releaseDate": "2024-05-05",
+    "features": ["Möglichkeit die Versicherung eines Kunden anhand der IK-Nummer zu suchen"],
+    "bugfixes": ["Die Nummer für eine neue Rechnung wurde nicht vorgeschlagen"]
+  },
+  {
+    "version": "0.7.3",
+    "releaseDate": "2024-04-29",
+    "changes": ["Im Planungsmodus für Termine werden keine 0€ Budgets mehr angezeigt"],
+    "bugfixes": [
+      "Fehlermeldung 'Termin kann nicht vor dem aktuellen Monat liegen' wird nicht mehr beim Öffnen des Termineditors angezeigt",
+      "Fehler bei der Berechnung der Termindauer korrigiert."
+    ]
+  },
+  {
+    "version": "0.7.2",
+    "releaseDate": "2024-04-29",
+    "bugfixes": [
+      "Manager können jetzt die Abtretungserklärungen der Mitarbeiter einsehen",
+      "Prüfung der Versichertennummer bei PKV bis auf weiteres deaktiviert",
+      "Gelöschte Kunden werden jetzt direkt aus der Kundenliste entfernt"
+    ]
+  }
+]

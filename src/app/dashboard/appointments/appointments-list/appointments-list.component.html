@@ -61,7 +61,7 @@
       <select id="selectCustomer" class="form-select" name="customerSelect" formControlName="customerId">
         <option></option>
         @for (customer of filterModel.customers; track customer) {
-        <option [value]="customer.id">{{ customer.lastName }}, {{ customer.firstName }}</option>
+        <option [value]="customer.customerId">{{ customer.customerName }}</option>
         }
       </select>
     </div>
@@ -76,8 +76,12 @@
         }
       </select>
     </div>
-
     }
+
+    <div class="form-check form-switch m-2">
+      <input class="form-check-input" type="checkbox" role="switch" formControlName="onlyOpen" id="checkOnlyOpen" />
+      <label class="form-check-label fw-light" for="checkOnlyOpen"> Nur offene Termine anzeigen</label>
+    </div>
   </form>
 
   @if(dataModel$ | async; as dataModel) {
@@ -238,7 +242,7 @@
           <fa-icon [icon]="faCheck" class="text-success ms-2" />
           }
         </button>
-        } @if (appointment.isSignedByCustomer && appointment.isSignedByEmployee && !appointment.isDone) {
+        } @if (appointment.canSign && appointment.isSignedByCustomer && appointment.isSignedByEmployee && !appointment.isDone) {
         <button type="button" (click)="onFinish(appointment)" class="btn btn-outline-secondary btn-sm" title="Termin abschließen">
           <fa-icon [icon]="faCheck" [fixedWidth]="true" /> Abschließen
         </button>
@@ -254,7 +258,11 @@
 
   } @else {
   <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Termine gefunden.</div>
-  } }
+  }
+
+  <cura-paging [page]="dataModel.page" (pageChange)="onPageChange($event)" />
+
+  }
   <!-- show table loader -->
   @if(isLoading) {
   <table class="table mt-3">

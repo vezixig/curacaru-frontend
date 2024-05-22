@@ -17,6 +17,7 @@ import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
+import { Page } from '@curacaru/models/page.model';
 
 @Injectable({
   providedIn: 'root',
@@ -65,7 +66,9 @@ export class ApiService {
   deleteAppointment = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/appointment/${id}`);
 
   /** Delete the customer with the given id */
-  deleteCustomer = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/customer/${id}`);
+  deleteCustomer(id: UUID, deleteOpenAppointments: boolean, deleteBudgets: boolean) {
+    return this.httpClient.delete(`${this.apiUrl}/customer/${id}`, { params: { deleteOpenAppointments, deleteBudgets } });
+  }
 
   /** Deletes the insurance with the given id */
   deleteInsurance = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/insurance/${id}`);
@@ -87,17 +90,21 @@ export class ApiService {
   getAppointment = (id: UUID) => this.httpClient.get<Appointment>(`${this.apiUrl}/appointment/${id}`);
 
   /** Gets the list of appointments from the API filtered by the query */
-  getAppointmentList(from: NgbDate, to: NgbDate, customer?: number, employee?: number) {
+  getAppointmentList(from: NgbDate, to: NgbDate, page: number, onlyOpen: boolean, customer?: number, employee?: number) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('from', DateTimeService.toDateString(from));
     options.params = options.params.append('to', DateTimeService.toDateString(to));
+    options.params = options.params.append('page', page);
     if (employee) {
       options.params = options.params.append('employeeId', employee.toString());
     }
     if (customer) {
       options.params = options.params.append('customerId', customer.toString());
     }
-    return this.httpClient.get<AppointmentListEntry[]>(`${this.apiUrl}/appointment/list`, options);
+    if (onlyOpen) {
+      options.params = options.params.append('onlyOpen', 'true');
+    }
+    return this.httpClient.get<Page<AppointmentListEntry[]>>(`${this.apiUrl}/appointment/list`, options);
   }
 
   /** Gets the city name for the given zip code */
@@ -113,7 +120,15 @@ export class ApiService {
   getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`);
 
   /** Gets the list of customers from the API */
-  getCustomerList = () => this.httpClient.get<CustomerListEntry[]>(`${this.apiUrl}/customer/list`);
+  getCustomerList(page: number, onlyActive: boolean, employeeId?: UUID) {
+    const options = { params: new HttpParams() };
+    options.params = options.params.append('page', page);
+    options.params = options.params.append('onlyActive', onlyActive);
+    if (employeeId) {
+      options.params = options.params.append('employeeId', employeeId.toString());
+    }
+    return this.httpClient.get<Page<CustomerListEntry>>(`${this.apiUrl}/customer/list`, options);
+  }
 
   /** Gets a deployment report */
   getDeploymentReport = (customerId: UUID, insuranceStatus: InsuranceStatus) =>
@@ -142,7 +157,7 @@ export class ApiService {
   getEmployee = (id: UUID) => this.httpClient.get<Employee>(`${this.apiUrl}/employee/${id}`);
 
   /** Gets the list of employees from the API. */
-  getEmployeeList = () => this.httpClient.get<Employee[]>(`${this.apiUrl}/employee/list`);
+  getEmployeeList = (page: number) => this.httpClient.get<Page<Employee>>(`${this.apiUrl}/employee/list`, { params: { page } });
 
   /**
    * Gets the list of employees wit only basic information from the API
@@ -157,7 +172,7 @@ export class ApiService {
   getInsuranceByName = (term: string) => this.httpClient.get<Insurance[]>(`${this.apiUrl}/insurance?search=${term}`);
 
   /** Gets all insurances */
-  getInsuranceList = () => this.httpClient.get<Insurance[]>(`${this.apiUrl}/insurance/list`);
+  getInsuranceList = (page: number) => this.httpClient.get<Page<Insurance>>(`${this.apiUrl}/insurance/list`, { params: { page } });
 
   /** Gets the employee of the current user */
   getUser = () => this.httpClient.get<UserEmployee>(`${this.apiUrl}/employee`);

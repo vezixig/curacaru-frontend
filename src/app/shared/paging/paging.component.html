@@ -1,0 +1,60 @@
+@if(page() && page()!.pageCount > 1) {
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    <!-- previous page arrows -->
+    <li class="page-item" [class.disabled]="page()!.page == 1">
+      <a class="page-link" (click)="pageChange.emit(page()!.page - 1)" onClick="blur()">
+        <fa-icon [icon]="['far', 'circle-left']" [fixedWidth]="true" />
+      </a>
+    </li>
+
+    <!-- first page -->
+    @if(page()!.page > 2) {
+    <li class="page-item">
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(1)">1</a>
+    </li>
+    @if(page()!.page > 3) {
+    <li class="page-item">
+      <a class="page-link text-secondary">...</a>
+    </li>
+    } }
+
+    <!-- previous page -->
+    @if(page()!.page > 1) {
+    <li class="page-item">
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(page()!.page - 1)">{{ page()!.page - 1 }}</a>
+    </li>
+    }
+
+    <!-- current page -->
+    <li class="page-item active" aria-current="page">
+      <a class="page-link">{{ page()?.page }}</a>
+    </li>
+
+    <!-- next page -->
+    @if(page()!.page < page()!.pageCount) {
+    <li class="page-item">
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(page()!.page + 1)">{{ page()!.page + 1 }}</a>
+    </li>
+    }
+
+    <!-- last page -->
+    @if(page()!.page < page()!.pageCount - 1) { @if(page()!.page < page()!.pageCount - 2) {
+    <li class="page-item">
+      <a class="page-link text-secondary">...</a>
+    </li>
+    }
+    <li class="page-item">
+      <a class="page-link text-secondary" onClick="blur()" (click)="pageChange.emit(page()!.pageCount)">{{ page()!.pageCount }}</a>
+    </li>
+    }
+
+    <!-- next page arrows -->
+    <li class="page-item">
+      <a class="page-link" onClick="blur()" (click)="pageChange.emit(page()!.page + 1)" [class.disabled]="page()!.page == page()!.pageCount">
+        <fa-icon [icon]="['far', 'circle-right']" [fixedWidth]="true" />
+      </a>
+    </li>
+  </ul>
+</nav>
+}

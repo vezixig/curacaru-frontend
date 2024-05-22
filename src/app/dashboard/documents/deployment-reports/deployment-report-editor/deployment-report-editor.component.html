@@ -1,0 +1,151 @@
+<div class="row" class="">
+  <h4 class="h-underline">Einsatznachweis erstellen</h4>
+
+  @if (dataModel$ | async; as dataModel) {
+  <!-- document -->
+  @if(dataModel.document) {
+
+  <form [formGroup]="documentForm" class="p-0" (ngSubmit)="onSave()">
+    <label class="mt-2 fw-light" for="inputYear">Jahr und Monat der Leistungserbringung</label>
+    <p class="ms-2 m-0 fs-5">{{ documentForm.controls["month"].value | monthName }} {{ documentForm.controls["year"].value }}</p>
+
+    <label for="selectCustomer" class="mt-2 fw-light">Kunde</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.customer.lastName }}, {{ dataModel.customer.firstName }}</p>
+
+    <label for="selectClearanceType" class="mt-2 fw-light">Abrechnungsoption</label>
+    <p class="ms-2 m-0 fs-5">{{ documentForm.controls["clearanceType"].value | clearanceTypeName }}</p>
+
+    <label class="mt-2 fw-light">Bearbeitet von</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.document.employeeName }}</p>
+    <label class="mt-2 fw-light">Vertreten von</label>
+    <p class="ms-2 m-0 fs-5">{{ dataModel.document.replacementEmployeeNames === "" ? "-" : dataModel.document.replacementEmployeeNames }}</p>
+
+    <label class="mt-2 fw-light">Arbeitszeiten</label>
+    <div class="table ms-2">
+      <table class="w-100">
+        <thead>
+          <tr class="d-flex">
+            <th class="col-3 col-md-2" scope="col">Datum</th>
+            <th class="col-3 d-none d-md-table-cell" scope="col">Beginn</th>
+            <th class="col-3 d-none d-md-table-cell" scope="col">Ende</th>
+            <th class="col-4 d-md-none" scope="col">Uhrzeit</th>
+            <th class="col-3 d-md-none text-end" scope="col">Dauer</th>
+            <th class="col-3 d-none d-md-table-cell" scope="col">Arbeitszeit gesamt</th>
+            <th class="col" scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(time of dataModel.document.times; track time) {
+          <tr class="d-flex" [class.table-warning]="!time.isDone && !time.isPlanned" [class.table-secondary]="time.isPlanned">
+            <td class="col-3 col-md-3">{{ time.date | date : "dd.MM.yy" }}</td>
+            <td class="col-3 d-none d-md-table-cell">{{ time.start | timeFormat }} Uhr</td>
+            <td class="col-3 d-none d-md-table-cell">{{ time.end | timeFormat }} Uhr</td>
+            <td class="col-4 d-md-none">{{ time.start | timeFormat }}-{{ time.end | timeFormat }}</td>
+            <td class="col-3 d-md-none text-end">{{ time.duration | number : "1.2-2" }} h</td>
+            <td class="col-2 d-none d-md-table-cell">{{ time.duration | number : "1.2-2" }} h</td>
+            <td class="col text-center">
+              <div class="btn-group" role="group">
+                @if(time.isPlanned) {
+                <button type="button" class="btn btn-outline-secondary btn-sm" title="Termin löschen" (click)="onDeleteAppointment(time)">
+                  <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+                </button>
+                } @if(!time.isDone && !time.isPlanned) {
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm"
+                  title="Termin bearbeiten"
+                  [routerLink]="['/dashboard/appointments', time.appointmentId]"
+                >
+                  <fa-icon [icon]="faGear" [fixedWidth]="true" />
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="mt-3 mb-4 fw-light">
+      Summe der Arbeitszeiten:
+      <span class="ms-2 fw-bold">{{ dataModel.document.totalDuration | number : "1.0-2" }} Stunde@if(dataModel.document.totalDuration != 1) {n}</span>
+    </p>
+
+    <!-- unfinished appointments message -->
+    @if(dataModel.document.hasUnfinishedAppointment) {
+    <cura-info type="warning">Es gibt noch nicht abgeschlossene Termine für diesen Monat.</cura-info>
+    }
+    <!-- planned appointments message -->
+    @if(dataModel.document.hasPlannedAppointment) {
+    <cura-info>Es gibt noch geplante, nicht eingetragene Termine für diesen Monat.</cura-info>
+    }
+
+    <!-- created message-->
+    @if (!dataModel.document.isCreated) {
+    <label class="mt-2 fw-light">Ort</label>
+    <div class="row">
+      <div class="col-sm-12 col-md-5">
+        <input maxlength="30" type="text" class="form-control" formControlName="signatureCity" />
+      </div>
+      <div class="col-5 d-flex align-items-center">den {{ today | date }}</div>
+    </div>
+
+    <!-- buttons -->
+    <div class="row g-2 mt-2">
+      <div class="col">
+        <button
+          [disabled]="documentForm.get('signatureEmployee')?.value != '' || dataModel.document.hasUnfinishedAppointment"
+          type="button"
+          (click)="openOffCanvas(employeeSignature)"
+          [class.btn-outline-primary]="documentForm.get('signatureEmployee')?.value == ''"
+          [class.btn-outline-success]="documentForm.get('signatureEmployee')?.value != ''"
+          class="form-control btn h-100"
+        >
+          <span>Unterschrift Mitarbeiter</span>
+          @if(documentForm.get('signatureEmployee')?.value != '') {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
+      </div>
+      <div class="col">
+        <button
+          [disabled]="documentForm.get('signatureCustomer')?.value != '' || dataModel.document.hasUnfinishedAppointment"
+          type="button"
+          (click)="openOffCanvas(customerSignature)"
+          [class.btn-outline-primary]="documentForm.get('signatureCustomer')?.value == ''"
+          [class.btn-outline-success]="documentForm.get('signatureCustomer')?.value != ''"
+          class="form-control btn h-100"
+        >
+          <span>Unterschrift Kunde</span>
+          @if(documentForm.get('signatureCustomer')?.value != '') {
+          <fa-icon [icon]="faCheck" class="text-success ms-2" />
+          }
+        </button>
+      </div>
+      <div class="col">
+        <button [disabled]="documentForm.invalid" type="submit" class="form-control btn btn-primary text-white h-100">
+          Einsatznachweis erstellen
+        </button>
+      </div>
+      <div class="col">
+        <button type="button" routerLink=".." class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
+      </div>
+    </div>
+    } @else {
+    <cura-info>Der Einsatznachweis für diesen Monat wurde bereits erfasst.</cura-info>
+    }
+
+    <ng-template #employeeSignature>
+      <cura-signature [signatureName]="dataModel.user.firstName + ' ' + dataModel.user.lastName" (signatureTaken)="onEmployeeSigned($event)" />
+    </ng-template>
+
+    <ng-template #customerSignature>
+      <cura-signature
+        [signatureName]="dataModel.customer.lastName + ', ' + dataModel.customer.firstName"
+        (signatureTaken)="onCustomerSigned($event)"
+      />
+    </ng-template>
+  </form>
+  }}
+</div>

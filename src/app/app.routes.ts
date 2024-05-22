@@ -30,18 +30,20 @@ export const routes: Routes = [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       {
         path: 'list',
-        loadComponent: () => import('@curacaru/dashboard/budgets/budgets-list/budgets-list.component').then((o) => o.BudgetListComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/administration/budgets/budgets-list/budgets-list.component').then((o) => o.BudgetListComponent),
       },
       {
         path: ':id',
-        loadComponent: () => import('@curacaru/dashboard/budgets/budgets-editor/budgets-editor.component').then((o) => o.BudgetsEditorComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/administration/budgets/budgets-editor/budgets-editor.component').then((o) => o.BudgetsEditorComponent),
       },
     ],
   },
   {
     path: 'dashboard/company',
     canActivate: [ManagerGuard],
-    loadComponent: () => import('@curacaru/dashboard/company/company.component').then((o) => o.CompanyComponent),
+    loadComponent: () => import('@curacaru/dashboard/administration/company/company.component').then((o) => o.CompanyComponent),
     pathMatch: 'full',
   },
   {
@@ -50,37 +52,42 @@ export const routes: Routes = [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       {
         path: 'list',
-        loadComponent: () => import('@curacaru/dashboard/customers/customer-list/customer-list.component').then((o) => o.CustomerListComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/customers/customer-list/customer-list.component').then((o) => o.CustomerListComponent),
       },
       {
         path: 'new',
         canActivate: [ManagerGuard],
-        loadComponent: () => import('@curacaru/dashboard/customers/customer-editor/customer-editor.component').then((o) => o.CustomerEditorComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/customers/customer-editor/customer-editor.component').then((o) => o.CustomerEditorComponent),
       },
       {
         path: ':id',
-        loadComponent: () => import('@curacaru/dashboard/customers/customer-editor/customer-editor.component').then((o) => o.CustomerEditorComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/customers/customer-editor/customer-editor.component').then((o) => o.CustomerEditorComponent),
       },
     ],
   },
   {
     path: 'dashboard/documents/deployment-reports',
     loadComponent: () =>
-      import('@curacaru/dashboard/documents/deployment-reports-list/deployment-reports.list.component').then((o) => o.DeploymentReportsListComponent),
+      import('@curacaru/dashboard/documents/deployment-reports/deployment-reports-list/deployment-reports.list.component').then(
+        (o) => o.DeploymentReportsListComponent
+      ),
   },
   {
     path: 'dashboard/documents/deployment-reports/sign',
     pathMatch: 'full',
     loadComponent: () =>
-      import('@curacaru/dashboard/documents/deployment-report-signature/deployment-report-signature.component').then(
-        (o) => o.DeploymentReportSignatureComponent
+      import('@curacaru/dashboard/documents/deployment-reports/deployment-report-editor/deployment-report-editor.component').then(
+        (o) => o.DeploymentReportEditorComponent
       ),
   },
   {
     path: 'dashboard/documents/assignment-declarations',
     pathMatch: 'full',
     loadComponent: () =>
-      import('@curacaru/dashboard/documents/assignment-declarations-list/assignment-declarations-list.component').then(
+      import('@curacaru/dashboard/documents/assignment-declarations/assignment-declarations-list/assignment-declarations-list.component').then(
         (o) => o.AssignmentDeclarationsListComponent
       ),
   },
@@ -88,8 +95,8 @@ export const routes: Routes = [
     path: 'dashboard/documents/assignment-declarations/sign',
     pathMatch: 'full',
     loadComponent: () =>
-      import('@curacaru/dashboard/documents/assignment-declaration-signature/assignment-declaration-signature.component').then(
-        (o) => o.AssignmentDeclarationSignatureComponent
+      import('@curacaru/dashboard/documents/assignment-declarations/assignment-declaration-editor/assignment-declaration-editor.component').then(
+        (o) => o.AssignmentDeclarationEditorComponent
       ),
   },
   {
@@ -99,15 +106,18 @@ export const routes: Routes = [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       {
         path: 'list',
-        loadComponent: () => import('@curacaru/dashboard/employees/employee-list/employee-list.component').then((o) => o.EmployeeListComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/employees/employee-list/employee-list.component').then((o) => o.EmployeeListComponent),
       },
       {
         path: 'new',
-        loadComponent: () => import('@curacaru/dashboard/employees/employee-editor/employee-editor.component').then((o) => o.EmployeeEditorComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/employees/employee-editor/employee-editor.component').then((o) => o.EmployeeEditorComponent),
       },
       {
         path: ':id',
-        loadComponent: () => import('@curacaru/dashboard/employees/employee-editor/employee-editor.component').then((o) => o.EmployeeEditorComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/employees/employee-editor/employee-editor.component').then((o) => o.EmployeeEditorComponent),
       },
     ],
   },
@@ -119,17 +129,21 @@ export const routes: Routes = [
       {
         path: 'list',
         loadComponent: () =>
-          import('@curacaru/dashboard/insurances/insurances-list/insurances-list.component').then((o) => o.InsurancesListComponent),
+          import('@curacaru/dashboard/administration/insurances/insurances-list/insurances-list.component').then((o) => o.InsurancesListComponent),
       },
       {
         path: 'new',
         loadComponent: () =>
-          import('@curacaru/dashboard/insurances/insurances-editor/insurances-editor.component').then((o) => o.InsurancesEditorComponent),
+          import('@curacaru/dashboard/administration/insurances/insurances-editor/insurances-editor.component').then(
+            (o) => o.InsurancesEditorComponent
+          ),
       },
       {
         path: ':id',
         loadComponent: () =>
-          import('@curacaru/dashboard/insurances/insurances-editor/insurances-editor.component').then((o) => o.InsurancesEditorComponent),
+          import('@curacaru/dashboard/administration/insurances/insurances-editor/insurances-editor.component').then(
+            (o) => o.InsurancesEditorComponent
+          ),
       },
     ],
   },
@@ -140,11 +154,13 @@ export const routes: Routes = [
       { path: '', redirectTo: 'list', pathMatch: 'full' },
       {
         path: 'list',
-        loadComponent: () => import('@curacaru/dashboard/invoices/invoices-list/invoices-list.component').then((o) => o.InvoicesListComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/administration/invoices/invoices-list/invoices-list.component').then((o) => o.InvoicesListComponent),
       },
       {
         path: 'new',
-        loadComponent: () => import('@curacaru/dashboard/invoices/invoices-editor/invoices-editor.component').then((o) => o.InvoicesEditorComponent),
+        loadComponent: () =>
+          import('@curacaru/dashboard/administration/invoices/invoices-editor/invoices-editor.component').then((o) => o.InvoicesEditorComponent),
       },
     ],
   },
@@ -160,14 +176,21 @@ export const routes: Routes = [
       {
         path: 'list',
         loadComponent: () =>
-          import('@curacaru/dashboard/time-tracker/time-tracker-list/time-tracker-list.component').then((o) => o.TimeTrackerListComponent),
+          import('@curacaru/dashboard/documents/time-tracker/time-tracker-list/time-tracker-list.component').then((o) => o.TimeTrackerListComponent),
       },
       {
         path: 'new',
         loadComponent: () =>
-          import('@curacaru/dashboard/time-tracker/time-tracker-editor/time-tracker-editor.component').then((o) => o.TimeTrackerEditorComponent),
+          import('@curacaru/dashboard/documents/time-tracker/time-tracker-editor/time-tracker-editor.component').then(
+            (o) => o.TimeTrackerEditorComponent
+          ),
       },
     ],
+  },
+  {
+    path: 'dashboard/version',
+    pathMatch: 'full',
+    loadComponent: () => import('@curacaru/dashboard/version-info/version-info.component').then((o) => o.VersionInfoComponent),
   },
   { path: 'dashboard', redirectTo: 'dashboard/appointments', pathMatch: 'full' },
 ];

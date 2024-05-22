@@ -7,6 +7,7 @@ import { WorkingTimeReportSignature } from '@curacaru/models/working-hours-repor
 import { DateTimeService } from './date-time.service';
 import { WorkingHoursReportListEntry } from '@curacaru/models/working-time-list-entry.model';
 import { WorkingTimeReport } from '@curacaru/models/working-time-report.model';
+import { Page } from '@curacaru/models/page.model';
 
 @Injectable({
   providedIn: 'root',
@@ -42,8 +43,15 @@ export class WorkingTimeService {
     return this.httpClient.get<WorkingHours[]>(`${this.apiUrl}/work-time/employee/${employeeId}?year=${year}&month=${month}`);
   }
 
-  getWorkTimeList(year: number, month: number) {
-    return this.httpClient.get<WorkingHoursReportListEntry[]>(`${this.apiUrl}/work-time/list?month=${month}&year=${year}`);
+  getWorkTimeList(year: number, month: number, page: number, pageSize: number = 20) {
+    return this.httpClient.get<Page<WorkingHoursReportListEntry>>(`${this.apiUrl}/work-time/list`, {
+      params: {
+        year: year,
+        month: month,
+        page: page,
+        pageSize: pageSize,
+      },
+    });
   }
 
   getWorkTimeReport(employeeId: UUID, year: number, month: number) {
