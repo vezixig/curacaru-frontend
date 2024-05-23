@@ -7,7 +7,7 @@ import { DashboardComponent } from '@curacaru/dashboard/dashboard.component';
 import { LoginComponent } from '@curacaru/auth/login/login.component';
 import { UserService } from '@curacaru/services';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCircleInfo, faEllipsis, faGear, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faEllipsis, faGear, faGlobe, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { faCircleLeft, faCircleRight, faEnvelope, faIdCard, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
       faEllipsis,
       faEnvelope,
       faGear,
+      faGlobe,
       faHouse,
       faIdCard,
       faLocationDot,

@@ -192,5 +192,13 @@ export const routes: Routes = [
     pathMatch: 'full',
     loadComponent: () => import('@curacaru/dashboard/version-info/version-info.component').then((o) => o.VersionInfoComponent),
   },
+
+  {
+    path: 'dashboard/administration/website-integration',
+    canActivate: [ManagerGuard],
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('@curacaru/dashboard/administration/website-integration/website-integration.component').then((o) => o.WebsiteIntegrationComponent),
+  },
   { path: 'dashboard', redirectTo: 'dashboard/appointments', pathMatch: 'full' },
 ];

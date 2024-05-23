@@ -1,0 +1,97 @@
+<h3 class="h-underline">Website-Integration</h3>
+
+@if(model$ | async; as model) { @if(model.id === '' ) {
+<p class="lh-lg">
+  Die Webseiten-Integration ermöglicht es dir, ein Kontaktformular für Neukunden und Interessenten auf deiner Webseite einzubinden.<br />
+  Die Anfragen werden direkt in die Anwendung übertragen und können dort bearbeitet werden.<br />
+  Um dieses Feature nutzen zu können, musst du es einmalig aktivieren und den Code in deine Webseite einbinden.
+</p>
+<button class="btn btn-primary" (click)="onActivate()">Website-Integration aktivieren</button>
+} @else {
+
+<label for="exampleColorInput" class="form-label fw-light">HTML-Code</label>
+<input
+  type="text"
+  class="form-control"
+  id="inputHtml"
+  [value]="'&lt;iframe style=&quot;width:800px; height:500px;&quot; src=&quot;https://app.curacaru.de/contact?id=' + model.id + '&quot; /&gt;'"
+/>
+
+<label for="exampleColorInput" class="form-label fw-light mt-3">Farbschema</label>
+<div class="input-group">
+  <input
+    type="color"
+    class="form-control form-control-color"
+    [(ngModel)]="model.color"
+    id="exampleColorInput"
+    value="#563d7c"
+    title="Choose your color"
+  />
+  <input type="text" class="form-control" [(ngModel)]="model.color" value="#563d7c" />
+</div>
+
+<label class="form-label fw-light mt-3">Schriftgröße</label>
+<div class="input-group">
+  <input type="range" class="form-range" min="8" max="23" step="1" [(ngModel)]="model.fontSize" value="16" />
+  <input type="text" readonly class="form-control" [(ngModel)]="model.fontSize" value="16" />
+</div>
+
+<label class="form-label fw-light mt-3">Vorschau</label>
+<div class="border rounded container p-3 m-0" style="min-height: 450px; max-width: 720px; position: relative; padding-bottom: 70px !important">
+  <div [style.fontSize]="model.fontSize + 'pt'" style="margin-bottom: 1em">1 / 6</div>
+  <h2 [style.fontSize]="model.fontSize + 'pt'">Für wen benötigen Sie Unterstützung?</h2>
+
+  <p [style.fontSize]="model.fontSize + 'pt'">Wählen Sie bitte eine Option aus.</p>
+  <button
+    type="button"
+    class="btn me-2"
+    [style.fontSize]="model.fontSize + 'pt'"
+    [style.backgroundColor]="model.color"
+    style="color: #fff"
+    name="options"
+    id="radioSelf"
+  >
+    Für mich selbst
+  </button>
+  <button
+    type="button"
+    class="btn me-2"
+    [style.fontSize]="model.fontSize + 'pt'"
+    [style.borderColor]="model.color"
+    [style.color]="model.color"
+    style="color: #fff"
+    name="options"
+    id="radioSelf"
+  >
+    Für jemand anderen
+  </button>
+
+  <button
+    class="btn"
+    [style.fontSize]="model.fontSize + 'pt'"
+    [style.backgroundColor]="model.color"
+    style="color: #fff; position: absolute; bottom: 1em; right: 1em"
+  >
+    Weiter
+  </button>
+</div>
+
+<!-- Buttons -->
+<div class="row g-2 mt-2">
+  <div class="col">
+    <button [disabled]="isLoading() || isSaving()" type="submit" class="form-control btn btn-primary text-white h-100" (click)="onSave(model)">
+      @if (isSaving()) {
+      <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+      }
+      <span>Daten speichern</span>
+      @if (isSaving()) {
+      <span>...</span>
+      }
+    </button>
+  </div>
+  <div class="col">
+    <button type="button" (click)="onCancel()" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
+  </div>
+</div>
+
+} }
