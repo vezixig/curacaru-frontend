@@ -1,156 +1,131 @@
+@if (isLoading()) {
+<ngx-skeleton-loader />
+} @else {
+
 <div class="row">
-  <h4 class="h-underline">Kunden {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
+  <h4 class="h-underline">{{ isCustomer() ? "Kunde" : "Interessenten" }} {{ isNew ? "hinzufügen" : "bearbeiten" }}</h4>
 
   <form (ngSubmit)="handleSave()" [formGroup]="customerForm">
-    <div class="form-group mb-2">
-      <label class="fw-light" for="selectCustomerStatus">Kundenstatus:</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <select class="form-select" aria-label="Default select example" id="selectCustomerStatus" formControlName="status">
-        <option [ngValue]="customerStatus.Interested">Interessent</option>
-        <option [ngValue]="customerStatus.Customer">Kunde</option>
-        <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>
-      </select>
-      }
-    </div>
+    <p class="mt-3 mb-2 fs-4 fw-light text-secondary">Dienstdaten</p>
 
-    <div class="form-group mb-2">
-      <label class="fw-light" for="selectAssociatedEmployeeId">Bearbeitet von:</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <select class="form-select" aria-label="Default select example" id="selectAssociatedEmployeeId" formControlName="associatedEmployeeId">
-        <option value=""></option>
-        @for (employee of employees; track employee) {
-        <option [value]="employee.id">{{ employee.name }}</option>
+    <div class="row">
+      <!-- status -->
+      <div class="col-md-6 col-sm-12">
+        <div class="form-group mb-2">
+          <label class="fw-light" for="selectCustomerStatus">Kundenstatus:</label>
+          <select class="form-select" aria-label="Default select example" id="selectCustomerStatus" formControlName="status">
+            @if(!isCustomer()) {
+            <option [ngValue]="customerStatus.Interested">Interessent</option>
+            }
+            <option [ngValue]="customerStatus.Customer">Kunde</option>
+            <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- employee -->
+      @if(customerForm.get("status")?.value !== customerStatus.Interested) {
+      <div class="col-md-6 col-sm-12 form-group mb-2">
+        <label class="fw-light" for="selectAssociatedEmployeeId">Bearbeitet von:</label>
+        <select class="form-select" aria-label="Default select example" id="selectAssociatedEmployeeId" formControlName="associatedEmployeeId">
+          <option value=""></option>
+          @for (employee of employees(); track employee) {
+          <option [value]="employee.id">{{ employee.name }}</option>
+          }
+        </select>
+      </div>
+      }
+
+      <!-- products -->
+      <label class="fw-light" for="selectSalutation">Betreuungsleistungen</label>
+      <div formArrayName="products" class="row">
+        @for (control of productsGroup.controls; track control) {
+        <div class="form-group mb-2 col-xl-3 col-lg-4 col-md-6 col-sm-12 text-truncate" [formGroupName]="$index">
+          <div class="form-check">
+            <input class="form-check-input" formControlName="isSelected" type="checkbox" [id]="'check-product-' + control.value!.id" />
+            <label class="form-check-label" [for]="'check-product-' + control.value!.id">
+              {{ control.value!.name }}
+            </label>
+          </div>
+        </div>
         }
-      </select>
-      }
-    </div>
+      </div>
 
-    <div class="mb-4"></div>
+      <p class="mt-3 mb-2 fs-4 fw-light text-secondary">Persönliche Daten</p>
 
-    <!-- salutation, first and lastname -->
-    <div class="d-none d-md-block form-group mb-2">
-      <label class="fw-light" for="selectSalutation">Anrede, Vor- und Nachname</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <div class="input-group">
+      <!-- salutation -->
+      <div class="col-md-6 col-sm-12 form-group mb-2">
+        <label class="fw-light" for="selectSalutation">Anrede</label>
         <select class="form-select" id="selectSalutation" formControlName="salutation">
           <option [ngValue]="0">Frau</option>
           <option [ngValue]="1">Herr</option>
         </select>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="firstName"
-          id="inputFirstName"
-          maxlength="50"
-          [ngClass]="{
-            'is-valid': customerForm.controls['firstName'].valid,
-            'is-invalid': customerForm.controls['firstName'].invalid && customerForm.controls['firstName'].touched
-          }"
-          placeholder="Vornamen eingeben"
-        />
-        <input
-          type="text"
-          [ngClass]="{
-            'is-valid': customerForm.controls['lastName'].valid,
-            'is-invalid': customerForm.controls['lastName'].invalid && customerForm.controls['lastName'].touched
-          }"
-          class="form-control"
-          maxlength="50"
-          formControlName="lastName"
-          id="inputLastName"
-          placeholder="Nachnamen eingeben"
-        />
       </div>
-      }
-    </div>
 
-    <div class="d-md-none form-group mb-2">
-      <label class="fw-light" for="selectSalutation">Anrede</label>
-      <select class="form-select" id="selectSalutation" formControlName="salutation">
-        <option [ngValue]="0">Frau</option>
-        <option [ngValue]="1">Herr</option>
-      </select>
-    </div>
+      <div class="w-100 d-none d-md-block"></div>
 
-    <!-- name [mobile]-->
-    <cura-input
-      class="d-md-none"
-      [maxLength]="50"
-      key="firstName"
-      [isLoading]="isLoading"
-      label="Vorname"
-      [form]="customerForm"
-      placeholder="Vornamen eingeben"
-    />
-    <cura-input
-      class="d-md-none"
-      [maxLength]="50"
-      key="lastName"
-      [isLoading]="isLoading"
-      label="Nachname"
-      [form]="customerForm"
-      placeholder="Nachnamen eingeben"
-    />
+      <!-- first name -->
+      <cura-input class="col-md-6 col-sm-12" [maxLength]="50" key="firstName" label="Vorname" [form]="customerForm" placeholder="Vornamen eingeben" />
+      <!-- last name -->
+      <cura-input
+        class="col-md-6 col-sm-12"
+        [maxLength]="50"
+        key="lastName"
+        label="Nachname"
+        [form]="customerForm"
+        placeholder="Nachnamen eingeben"
+      />
 
-    <!-- street -->
-    <cura-input
-      key="street"
-      [maxLength]="150"
-      [isLoading]="isLoading"
-      label="Straße und Hausnummer"
-      [form]="customerForm"
-      placeholder="Straße und Hausnummer eingeben"
-    />
+      <!-- street -->
+      <cura-input
+        key="street"
+        class="col-md-6 col-sm-12"
+        [maxLength]="150"
+        label="Straße und Hausnummer"
+        [form]="customerForm"
+        placeholder="Straße und Hausnummer eingeben"
+      />
 
-    <!-- zip code and city-->
-    <div class="form-group mb-2">
-      <label class="fw-light" for="inputZipCode">Postleitzahl</label>
+      <!-- zip code and city-->
+      <div class="form-group mb-2 col-md-6 col-sm-12">
+        <label class="fw-light" for="inputZipCode">Postleitzahl</label>
 
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <div class="input-group">
-        <input
-          type="text"
-          [ngClass]="{
-            'is-valid': customerForm.controls['zipCode'].valid,
-            'is-invalid': customerForm.controls['zipCode'].invalid && customerForm.controls['zipCode'].touched
-          }"
-          maxlength="5"
-          class="form-control"
-          sa
-          formControlName="zipCode"
-          id="inputZipCode"
-          placeholder="PLZ eingeben"
-        />
-        <span class="input-group-text">{{ cityName }}</span>
+        <div class="input-group">
+          <input
+            type="text"
+            [ngClass]="{
+              'is-valid': customerForm.controls['zipCode'].valid && customerForm.controls['zipCode'].dirty,
+              'is-invalid': customerForm.controls['zipCode'].invalid && customerForm.controls['zipCode'].touched
+            }"
+            maxlength="5"
+            class="form-control"
+            sa
+            formControlName="zipCode"
+            id="inputZipCode"
+            placeholder="PLZ eingeben"
+          />
+          <span class="input-group-text">{{ cityName() }}</span>
+        </div>
       </div>
-      }
-    </div>
 
-    <cura-input key="birthDate" [isLoading]="isLoading" label="Geburtsdatum" [form]="customerForm" placeholder="Datum wählen" type="date" />
-    <cura-input
-      [maxLength]="50"
-      key="phone"
-      [isLoading]="isLoading"
-      label="Telefonnummer"
-      [form]="customerForm"
-      placeholder="Telefonnummer eingeben"
-    />
+      <cura-input key="birthDate" class="col-md-6 col-sm-12" label="Geburtsdatum" [form]="customerForm" placeholder="Datum wählen" type="date" />
 
-    <!-- Notfallkontakt -->
-    <div class="form-group mb-2">
-      <label class="fw-light" for="inputEmergencyContactName">Kontaktperson und Telefonnummer</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <div class="input-group">
+      <div class="w-100 d-none d-md-block"></div>
+
+      <cura-input
+        class="col-md-6 col-sm-12"
+        [maxLength]="50"
+        key="phone"
+        label="Telefonnummer"
+        [form]="customerForm"
+        placeholder="Telefonnummer eingeben"
+      />
+
+      <p class="mt-3 mb-2 fs-4 fw-light text-secondary">Notfallkontakt</p>
+
+      <!-- Notfallkontakt -->
+      <div class="form-group mb-2 col-md-6 col-sm-12">
+        <label class="fw-light" for="inputEmergencyContactName">Kontaktperson</label>
         <input
           type="text"
           class="form-control"
@@ -159,6 +134,10 @@
           id="inputEmergencyContactName"
           placeholder="Namen eingeben"
         />
+      </div>
+
+      <div class="form-group mb-2 col-md-6 col-sm-12">
+        <label class="fw-light" for="inputEmergencyContactPhone">Telefonnummer</label>
         <input
           type="text"
           class="form-control"
@@ -168,25 +147,21 @@
           placeholder="Telefonnummer eingeben"
         />
       </div>
-      }
-    </div>
 
-    <!-- Versicherung -->
-    <div class="d-none d-md-block form-group mb-3">
-      <label class="fw-light" for="inputInsurance">Krankenkasse, Versichertennummer und Status</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
+      <p class="mt-3 mb-2 fs-4 fw-light text-secondary">Versicherungsdaten</p>
 
-      <ng-template #rt let-r="result" let-t="term">
-        <p class="text-truncate">
-          <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
-          <br />
-          <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
-        </p>
-      </ng-template>
+      <!-- Versicherung -->
+      <div class="col-md-6 col-sm-12 form-group mb-3">
+        <label class="fw-light" for="inputInsurance">Krankenkasse</label>
 
-      <div class="input-group">
+        <ng-template #rt let-r="result" let-t="term">
+          <p class="text-truncate">
+            <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+            <br />
+            <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
+          </p>
+        </ng-template>
+
         <input
           [disabled]="!isManager"
           id="inputInsurance"
@@ -201,20 +176,28 @@
             'is-valid':
               customerForm.controls['insuranceId'].valid &&
               customerForm.controls['insuranceId'].value != '' &&
-              customerForm.controls['insuranceId'].value != undefined,
+              customerForm.controls['insuranceId'].value != undefined &&
+              customerForm.controls['careLevel'].dirty,
             'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
           }"
-          [ngbTypeahead]="search"
+          [ngbTypeahead]="searchInsurance"
           placeholder="Krankenkasse oder IK-Nummer"
           [editable]="false"
           [ngModelOptions]="{ standalone: true }"
         />
+        @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
+      </div>
 
+      <div class="col-md-6 col-sm-12 form-group mb-3">
+        <label class="fw-light" for="inputInsuredPersonNumber">Versichertennummer</label>
         <input
           type="text"
           maxlength="10"
           [ngClass]="{
-            'is-valid': customerForm.controls['insuredPersonNumber'].valid && customerForm.controls['insuredPersonNumber'].value != '',
+            'is-valid':
+              customerForm.controls['insuredPersonNumber'].valid &&
+              customerForm.controls['insuredPersonNumber'].value != '' &&
+              customerForm.controls['careLevel'].dirty,
             'is-invalid': customerForm.controls['insuredPersonNumber'].invalid && customerForm.controls['insuredPersonNumber'].touched
           }"
           class="form-control"
@@ -222,6 +205,10 @@
           id="inputInsuredPersonNumber"
           placeholder="Versichertennummer"
         />
+      </div>
+
+      <div class="col-md-6 col-sm-12 form-group mb-3">
+        <label class="fw-light" for="inputInsuredPersonNumber">Versicherungsstatus</label>
         <select
           class="form-select"
           formControlName="insuranceStatus"
@@ -230,7 +217,7 @@
           id="inputEmergencyContactPhone"
           placeholder="Telefonnummer eingeben"
           [ngClass]="{
-            'is-valid': customerForm.controls['insuranceStatus'].valid,
+            'is-valid': customerForm.controls['insuranceStatus'].valid && customerForm.controls['careLevel'].dirty,
             'is-invalid': customerForm.controls['insuranceStatus'].invalid && customerForm.controls['insuranceStatus'].touched
           }"
         >
@@ -239,94 +226,27 @@
           <option [ngValue]="2">Selbstzahler</option>
         </select>
       </div>
-      } @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
-    </div>
 
-    <div class="d-md-none form-group mb-2 w-100">
-      <ng-template #rt let-r="result" let-t="term">
-        <p class="text-truncate">
-          <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
-          <br />
-          <small><ngb-highlight [result]="r.institutionCode" [term]="t"></ngb-highlight></small>
-        </p>
-      </ng-template>
-
-      <label class="fw-light" for="inputInsurance">Versicherung</label>
-      <input
-        [disabled]="!isManager"
-        id="inputInsurance"
-        type="text"
-        class="form-control"
-        [resultTemplate]="rt"
-        [(ngModel)]="selectedInsurance"
-        [inputFormatter]="insuranceFormatter"
-        [resultFormatter]="insuranceFormatter"
-        [popupClass]="'overflow-auto height-250 mw-90 popup'"
-        [ngClass]="{
-          'is-valid':
-            customerForm.controls['insuranceId'].valid &&
-            customerForm.controls['insuranceId'].value != '' &&
-            customerForm.controls['insuranceId'].value != undefined,
-          'is-invalid': customerForm.controls['insuranceId'].invalid && customerForm.controls['insuranceId'].touched
-        }"
-        [ngbTypeahead]="search"
-        placeholder="Krankenkasse"
-        [editable]="false"
-        [ngModelOptions]="{ standalone: true }"
-      />
-      @if(selectedInsurance) { <small class="form-text text-muted ms-2">IK-Nummer: {{ selectedInsurance.institutionCode }}</small> }
-    </div>
-    <cura-input
-      class="d-md-none"
-      key="insuredPersonNumber"
-      [isLoading]="isLoading"
-      label="Versichertennummer"
-      [form]="customerForm"
-      placeholder="Versichertennummer eingeben"
-    />
-
-    <div class="form-group mb-2 d-md-none">
-      <label class="fw-light" for="inputInsuranceStatus">Versicherungsstatus</label>
-      <select
-        class="form-select"
-        formControlName="insuranceStatus"
-        placeholder="Versicherungsstatus"
-        id="inputInsuranceStatus"
-        placeholder="Versicherungsstatus wählen"
-        [ngClass]="{
-          'is-valid': customerForm.controls['insuranceStatus'].valid,
-          'is-invalid': customerForm.controls['insuranceStatus'].invalid && customerForm.controls['insuranceStatus'].touched
-        }"
-      >
-        <option [ngValue]="0">Gesetzlich</option>
-        <option [ngValue]="1">Privat</option>
-        <option [ngValue]="2">Selbstzahler</option>
-      </select>
-    </div>
-
-    <!-- Pflegegrad -->
-    <div class="form-group mb-3">
-      <label class="fw-light" for="selectCareLevel">Pflegegrad</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <select
-        class="form-select"
-        id="selectCareLevel"
-        formControlName="careLevel"
-        [ngClass]="{
-          'is-valid': customerForm.controls['careLevel'].valid,
-          'is-invalid': customerForm.controls['careLevel'].invalid && customerForm.controls['careLevel'].touched
-        }"
-      >
-        <option value="0">Kein Pflegegrad</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
-      }
+      <!-- Pflegegrad -->
+      <div class="col-md-6 col-sm-12 form-group mb-3">
+        <label class="fw-light" for="selectCareLevel">Pflegegrad</label>
+        <select
+          class="form-select"
+          id="selectCareLevel"
+          formControlName="careLevel"
+          [ngClass]="{
+            'is-valid': customerForm.controls['careLevel'].valid && customerForm.controls['careLevel'].dirty,
+            'is-invalid': customerForm.controls['careLevel'].invalid && customerForm.controls['careLevel'].touched
+          }"
+        >
+          <option value="0">Kein Pflegegrad</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
     </div>
 
     <div class="form-group">
@@ -351,19 +271,26 @@
 
     <div class="row g-2 mt-2">
       <div class="col">
-        <button [disabled]="!customerForm.valid || isLoading || isSaving" type="submit" class="btn btn-primary form-control text-white h-100">
-          @if (isSaving) {
+        <button [disabled]="isLoading() || isSaving()" type="submit" class="btn btn-primary form-control text-white h-100">
+          @if (isSaving()) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
           }
           <span>Kunden {{ isNew ? "hinzufügen" : "speichern" }}</span>
-          @if (isSaving) {
+          @if (isSaving()) {
           <span>...</span>
           }
         </button>
       </div>
       <div class="col">
-        <button type="button" [routerLink]="['/dashboard/customers']" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
+        <button
+          type="button"
+          [routerLink]="[isCustomer() ? '/dashboard/customers' : '/dashboard/base-data/prospects']"
+          class="form-control btn btn-outline-secondary h-100"
+        >
+          Verwerfen
+        </button>
       </div>
     </div>
   </form>
 </div>
+}

@@ -14,4 +14,5 @@ export interface CustomerListEntry {
   status: CustomerStatus;
   street: string;
   zipCode: string;
+  createdAt: Date;
 }

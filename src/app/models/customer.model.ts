@@ -18,6 +18,7 @@ export interface Customer {
   insuranceId?: UUID;
   insurance?: Insurance;
   insuredPersonNumber?: string;
+  products: number[];
   insuranceStatus: InsuranceStatus;
   lastName: string;
   phone: string;

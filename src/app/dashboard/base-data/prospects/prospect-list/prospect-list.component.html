@@ -1,0 +1,17 @@
+<h4 class="h-underline">Interessentenliste</h4>
+
+<div class="p-0 pb-3 container-fluid">
+  <div class="row g-3">
+    @for (customer of page()?.items; track customer) {
+    <cura-prospect-list-entry
+      class="col-12 col-lg-6 col-xxl-4"
+      [routerLink]="['/dashboard/base-data/prospects/', customer.id]"
+      [customer]="customer"
+      (onDelete)="onDelete($event)"
+    />
+    }
+  </div>
+</div>
+
+<!-- paging -->
+<cura-paging [page]="page()" (pageChange)="onPageChange($event)" />

@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { Customer, UserEmployee } from '@curacaru/models';
 import { FallbackSpacePipe } from '@curacaru/pipes/fallback-space.pipe';
-import { ApiService, ErrorHandlingService, UserService } from '@curacaru/services';
+import { ApiService, ErrorHandlerService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { ValidateTrue } from '@curacaru/validators/true.validator';
@@ -53,7 +53,7 @@ export class AssignmentDeclarationEditorComponent {
   private readonly toasterService = inject(ToastrService);
   private readonly userService = inject(UserService);
   private readonly offCanvasService = inject(NgbOffcanvas);
-  private readonly errorHandlingService = inject(ErrorHandlingService);
+  private readonly errorHandlingService = inject(ErrorHandlerService);
 
   constructor() {
     this.documentForm = this.formBuilder.group({

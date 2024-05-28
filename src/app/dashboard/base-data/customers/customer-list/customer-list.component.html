@@ -1,4 +1,3 @@
-<!-- Header -->
 <h4 [class.h-underline]="!user?.isManager">Kundenliste</h4>
 
 @if (user?.isManager) {
@@ -30,19 +29,29 @@
 </div>
 }
 
+<div class="p-0 pb-3 container-fluid">
+  <div class="row g-3">
+    @for (customer of customers(); track customer) {
+    <cura-customer-list-entry
+      [customer]="customer"
+      class="col-12 col-lg-6 col-xxl-4"
+      [routerLink]="['/dashboard/customers/', customer.id]"
+      [isLoading]="isLoading()"
+      [isManager]="user!.isManager"
+      (onDelete)="handleDelete($event)"
+      (onNavigate)="handleNavigate($event)"
+      (onShowAppointments)="handleShowAppointments($event)"
+      (onShowDeploymentReports)="handleShowDeploymentReports($event)"
+      (onShowInvoices)="handleShowInvoices($event)"
+    />
+    }
+  </div>
+</div>
+
 <!-- customers -->
-@if(isMobile()) {
-<cura-customer-list-mobile
-  [customers]="customers()"
-  [isLoading]="isLoading()"
-  [isManager]="user!.isManager"
-  (onDelete)="handleDelete($event)"
-  (onNavigate)="handleNavigate($event)"
-  (onShowAppointments)="handleShowAppointments($event)"
-  (onShowDeploymentReports)="handleShowDeploymentReports($event)"
-  (onShowInvoices)="handleShowInvoices($event)"
-/>
-} @else {
+<!-- @if(isMobile()) { -->
+
+<!-- } @else {
 <cura-customer-list-table
   [customers]="customers()"
   [isLoading]="isLoading()"
@@ -53,7 +62,7 @@
   (onShowDeploymentReports)="handleShowDeploymentReports($event)"
   (onShowInvoices)="handleShowInvoices($event)"
 />
-}
+} -->
 
 <!-- paging -->
 <cura-paging [page]="page()" (pageChange)="onPageChange($event)" />

@@ -200,5 +200,24 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@curacaru/dashboard/administration/website-integration/website-integration.component').then((o) => o.WebsiteIntegrationComponent),
   },
+  {
+    path: 'dashboard/base-data/prospects',
+    canActivate: [ManagerGuard],
+
+    children: [
+      { path: '', redirectTo: 'list', pathMatch: 'full' },
+      {
+        path: 'list',
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/prospects/prospect-list/prospect-list.component').then((m) => m.ProspectListComponent),
+      },
+
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('@curacaru/dashboard/base-data/customers/customer-editor/customer-editor.component').then((o) => o.CustomerEditorComponent),
+      },
+    ],
+  },
   { path: 'dashboard', redirectTo: 'dashboard/appointments', pathMatch: 'full' },
 ];

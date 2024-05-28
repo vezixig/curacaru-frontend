@@ -4,7 +4,7 @@ import { Observable, Subject, finalize, map, mergeMap, startWith, tap } from 'rx
 import { WebsiteIntegrationModel } from './website-integration.model';
 import { WebsiteIntegrationRepository } from './website-integration.repository';
 import { FormsModule } from '@angular/forms';
-import { ErrorHandlingService } from '@curacaru/services';
+import { ErrorHandlerService } from '@curacaru/services';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -19,7 +19,7 @@ export class WebsiteIntegrationComponent {
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
 
-  private readonly errorHandlingService = inject(ErrorHandlingService);
+  private readonly errorHandlingService = inject(ErrorHandlerService);
   private readonly websiteIntegrationRepository = inject(WebsiteIntegrationRepository);
   private readonly toastrService = inject(ToastrService);
 
@@ -31,7 +31,7 @@ export class WebsiteIntegrationComponent {
       startWith({}),
       mergeMap(() =>
         this.websiteIntegrationRepository.getWebsiteIntegration().pipe(
-          map((o) => (o === null ? { id: '', color: '', fontSize: 0 } : o)),
+          map((o) => (o === null ? { id: '', color: '', fontSize: 0, isRounded: true } : o)),
           tap(() => this.isLoading.set(false))
         )
       )

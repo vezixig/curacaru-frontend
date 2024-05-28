@@ -1,0 +1,56 @@
+<div class="card">
+  <div class="card-body" style="position: relative">
+    <div class="my-2 ms-2">
+      <cura-portrait [initials]="initials()"></cura-portrait>
+      <p class="fs-5 p-0 my-0 text-truncate">{{ customer().lastName }}, {{ customer().firstName }}</p>
+      <p class="fw-light m-0">Hinzugefügt am: {{ customer().createdAt | date }}</p>
+    </div>
+    <!-- buttons -->
+    <div class="input-group button-tab">
+      @if (customer().latitude != 0 && customer().longitude != 0) {
+      <a (click)="onNavigate.emit(customer()); $event.stopPropagation()" class="btn btn-outline-secondary btn-sm" title="Navigation zum Kunden">
+        <fa-icon [icon]="['fas', 'location-dot']" [fixedWidth]="true" />
+      </a>
+      } @if (customer().phone != '') {
+      <a
+        (click)="$event.stopPropagation()"
+        href="tel:{{ customer().phone | replace : ' ' : '' }}"
+        class="btn btn-outline-secondary btn-sm"
+        title="Kunden anrufen"
+      >
+        <fa-icon [icon]="['fas', 'phone']" [fixedWidth]="true" />
+      </a>
+      }
+      <button type="button" class="btn btn-outline-secondary btn-sm" title="Kunden bearbeiten">
+        <fa-icon [icon]="['fas', 'gear']" [fixedWidth]="true" />
+      </button>
+      @if (isManager()) {
+      <!-- delete customer -->
+      @if(customer().status != customerStatus.Former) {
+      <button
+        type="button"
+        (click)="onDelete.emit(customer()); $event.stopPropagation()"
+        class="btn btn-outline-secondary btn-sm"
+        title="Kunden löschen"
+      >
+        <fa-icon [icon]="['far', 'trash-can']" [fixedWidth]="true" />
+      </button>
+      }
+      <!-- shortcut menu -->
+      @if(customer().status == customerStatus.Customer) {
+
+      <div class="btn-group" ngbDropdown role="group" (click)="$event.stopPropagation()">
+        <button type="button" class="btn btn-outline-secondary btn-sm" ngbDropdownToggle>
+          <fa-icon [icon]="['fas', 'ellipsis']" [fixedWidth]="true" />
+        </button>
+        <div class="dropdown-menu" ngbDropdownMenu>
+          <button ngbDropdownItem (click)="onShowAppointments.emit(customer())">Termine</button>
+          <button ngbDropdownItem [routerLink]="['/dashboard/budgets', customer().id]">Budgets</button>
+          <button ngbDropdownItem (click)="onShowDeploymentReports.emit(customer())">Einsatznachweise</button>
+          <button ngbDropdownItem (click)="onShowInvoices.emit(customer())">Rechnungen</button>
+        </div>
+      </div>
+      } }
+    </div>
+  </div>
+</div>

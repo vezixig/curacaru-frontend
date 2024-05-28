@@ -13,7 +13,7 @@
       class="form-control text-start"
       [id]="'input' + key"
       [ngClass]="{
-        'is-valid': form.controls[key].valid && form.controls[key].touched && form.controls[key].validator,
+        'is-valid': form.controls[key].valid && form.controls[key].dirty && form.controls[key].validator,
         'is-invalid': form.controls[key].invalid && form.controls[key].touched
       }"
       [formControlName]="key"

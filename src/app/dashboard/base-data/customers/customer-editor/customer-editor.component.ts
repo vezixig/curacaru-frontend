@@ -1,19 +1,21 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { UUID } from 'angular2-uuid';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, OperatorFunction, Subscription, debounceTime, distinctUntilChanged, firstValueFrom, mergeMap } from 'rxjs';
+import { Observable, OperatorFunction, Subscription, combineLatest, debounceTime, distinctUntilChanged, firstValueFrom, mergeMap } from 'rxjs';
 import { InputComponent } from '@curacaru/shared/input/input.component';
 import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { Gender } from '@curacaru/enums/gender.enum';
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
-import { ApiService, UserService } from '@curacaru/services';
+import { ApiService, ErrorHandlerService, UserService } from '@curacaru/services';
 import { Customer, EmployeeBasic, Insurance } from '@curacaru/models';
 import { ValidateInsuredPersonNumber } from '@curacaru/validators/insured-person-number.validator';
+import { ProductsRepository } from '@curacaru/services/repositories/products.repository';
+import { Product } from '@curacaru/models/product';
 
 @Component({
   providers: [ApiService],
@@ -21,18 +23,28 @@ import { ValidateInsuredPersonNumber } from '@curacaru/validators/insured-person
   standalone: true,
   styleUrls: ['./customer-editor.component.scss'],
   templateUrl: './customer-editor.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule, InputComponent, AsyncPipe],
 })
 export class CustomerEditorComponent implements OnInit, OnDestroy {
-  cityName = '';
-  customerForm: FormGroup;
-  employees: EmployeeBasic[] = [];
-  isLoading = false;
+  private readonly apiService = inject(ApiService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
+  private readonly toastr = inject(ToastrService);
+  private readonly productsRepository = inject(ProductsRepository);
+  private readonly errorHandlerService = inject(ErrorHandlerService);
+
+  readonly cityName = signal('');
+  readonly customerForm: FormGroup;
+  readonly employees = signal<EmployeeBasic[]>([]);
+  readonly products = signal<Product[]>([]);
+  readonly isLoading = signal(false);
   isNew = true;
-  isSaving = false;
-  isManager$ = this.userService.isManager$;
-  isManager: boolean = false;
+  readonly isSaving = signal(false);
+  readonly isManager = signal(false);
   customerStatus = CustomerStatus;
+  isCustomer = signal(true);
 
   insuranceFormatter = (insurance: Insurance) => insurance.name;
 
@@ -48,19 +60,16 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   private customerId?: UUID;
   private _selectedInsurance: Insurance | undefined;
   private changeZipCodeSubscription?: Subscription;
-  private getCustomerSubscription?: Subscription;
-  private getEmployeeListSubscription?: Subscription;
+
   private getZipCodeSubscription?: Subscription;
   private postCustomerSubscription?: Subscription;
   private updateCustomerSubscription?: Subscription;
 
-  constructor(
-    private apiService: ApiService,
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private userService: UserService,
-    private toastr: ToastrService
-  ) {
+  get productsGroup() {
+    return this.customerForm.get('products') as FormArray;
+  }
+
+  constructor() {
     this.customerForm = this.formBuilder.group({
       associatedEmployeeId: [null],
       birthDate: ['', [Validators.required]],
@@ -81,35 +90,34 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       status: this.formBuilder.control<CustomerStatus | null>(CustomerStatus.Customer),
       street: ['', [Validators.required, Validators.maxLength(150)]],
       zipCode: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5), Validators.pattern('^[0-9]*$')]],
+      products: this.formBuilder.array([]),
     });
 
     this.customerForm.get('careLevel')?.valueChanges.subscribe((value) => this.handleCareLevelChange(value));
     this.customerForm.get('insuredPersonNumber')?.valueChanges.subscribe(() => this.handleInsuranceInfoChange());
     this.customerForm.get('insuranceStatus')?.valueChanges.subscribe(() => this.handleInsuranceInfoChange());
 
-    this.isManager$.subscribe((value) => {
-      if (!value) {
-        this.isManager = false;
-        this.customerForm.disable();
-      } else {
-        this.isManager = true;
-      }
-    });
-
     this.changeZipCodeSubscription = this.customerForm.get('zipCode')?.valueChanges.subscribe((value) => {
       this.handleZipCodeChange(value);
     });
 
-    this.getEmployeeListSubscription = this.apiService.getEmployeeBaseList().subscribe({
-      next: (result) => (this.employees = result),
-      error: (error) => this.toastr.error(`Mitarbeiterliste konnte nicht abgerufen werden: [${error.status}] ${error.error}`),
+    combineLatest({
+      employees: this.apiService.getEmployeeBaseList(),
+      isManager: this.userService.isManager$,
+      products: this.productsRepository.getProductsList(),
+    }).subscribe({
+      next: (result) => {
+        this.employees.set(result.employees);
+        this.products.set(result.products);
+        this.isManager.set(result.isManager);
+        if (!this.isManager) this.customerForm.disable();
+      },
+      error: (e) => this.errorHandlerService.handleError(e),
     });
   }
 
   ngOnDestroy(): void {
     this.changeZipCodeSubscription?.unsubscribe();
-    this.getCustomerSubscription?.unsubscribe();
-    this.getEmployeeListSubscription?.unsubscribe();
     this.getZipCodeSubscription?.unsubscribe();
     this.postCustomerSubscription?.unsubscribe();
     this.updateCustomerSubscription?.unsubscribe();
@@ -126,13 +134,13 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   // Tries to get the name of the city for the entered zip code
   handleZipCodeChange(zipCode: string) {
-    this.cityName = '';
+    this.cityName.set('');
     if (zipCode.length == 5) {
       this.getZipCodeSubscription?.unsubscribe();
       this.getZipCodeSubscription = this.apiService.getCityName(zipCode).subscribe({
-        next: (result) => (this.cityName = result),
-        error: (error) => {
-          this.cityName = 'Unbekannte PLZ';
+        next: (result) => this.cityName.set(result),
+        error: () => {
+          this.cityName.set('Unbekannte PLZ');
           this.customerForm.get('zipCode')?.setErrors({ unknownZipCode: true });
         },
       });
@@ -140,7 +148,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   }
 
   // Function for the typeahead to search for insurances
-  search: OperatorFunction<string, readonly Insurance[]> = (text$: Observable<string>) =>
+  searchInsurance: OperatorFunction<string, readonly Insurance[]> = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
@@ -153,15 +161,23 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     );
 
   handleSave(): void {
+    if (!this.customerForm.valid) {
+      Object.keys(this.customerForm.controls).forEach((key) => {
+        this.customerForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
     const customer: Customer = { ...this.customerForm.getRawValue() };
     customer.id = this.isNew ? undefined : this.customerId;
+    customer.products = this.productsGroup.controls.filter((o) => o.value?.isSelected).map((o) => o.value!.id);
     customer.insuranceId = customer.insuranceId === '' ? undefined : customer.insuranceId;
     customer.associatedEmployeeId = customer.associatedEmployeeId === '' ? undefined : customer.associatedEmployeeId;
+
     this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);
   }
 
   private CreateCustomer(employee: Customer) {
-    this.isSaving = true;
+    this.isSaving.set(true);
     this.postCustomerSubscription?.unsubscribe();
     this.postCustomerSubscription = this.apiService.createCustomer(employee).subscribe({
       complete: () => {
@@ -170,7 +186,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.toastr.error(`Kunde konnte nicht angelegt werden: [${error.status}] ${error.error}`);
-        this.isSaving = false;
+        this.isSaving.set(false);
       },
     });
   }
@@ -187,9 +203,9 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
 
   private LoadCustomer(): void {
     this.isNew = false;
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.customerId = this.router.url.split('/').pop() ?? '';
-    this.getCustomerSubscription = this.apiService.getCustomer(this.customerId).subscribe({
+    this.apiService.getCustomer(this.customerId).subscribe({
       next: (result) => {
         this.customerForm.patchValue({
           associatedEmployeeId: result.associatedEmployeeId,
@@ -214,33 +230,46 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
           zipCode: result.zipCode,
         });
 
+        this.products().forEach((product) => {
+          product.isSelected = result.products.includes(product.id);
+          this.productsGroup.push(
+            this.formBuilder.group({
+              id: new FormControl(product.id),
+              name: new FormControl(product.name),
+              isSelected: new FormControl(product.isSelected),
+            })
+          );
+        });
+
+        this.isCustomer.set(result.status !== CustomerStatus.Interested);
+
         this.handleCareLevelChange(result.careLevel);
         this.selectedInsurance = result.insurance;
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
       error: (error) => {
         if (error.status === 404) {
           this.toastr.error('Kunde wurde nicht gefunden');
-          this.router.navigate(['/dashboard/customers']);
+          this.isCustomer() ? this.router.navigate(['/dashboard/customers']) : this.router.navigate(['/dashboard/base-data/prospects']);
         } else {
           this.toastr.error(`Kunde konnte nicht geladen werden: [${error.status}] ${error.error}`);
-          this.isLoading = false;
+          this.isLoading.set(false);
         }
       },
     });
   }
 
   private UpdateCustomer(customer: Customer) {
-    this.isSaving = true;
+    this.isSaving.set(true);
     this.updateCustomerSubscription?.unsubscribe();
     this.updateCustomerSubscription = this.apiService.updateCustomer(customer).subscribe({
       complete: () => {
-        this.toastr.success('Änderungen am Kunden wurden gespeichert');
-        this.router.navigate(['/dashboard/customers']);
+        this.toastr.success('Änderungen wurden erfolgreich gespeichert');
+        this.isCustomer() ? this.router.navigate(['/dashboard/customers']) : this.router.navigate(['/dashboard/base-data/prospects']);
       },
       error: (error) => {
         this.toastr.error(`Fehler beim Speichern der Änderungen: [${error.status}] ${error.error}`);
-        this.isSaving = false;
+        this.isSaving.set(false);
       },
     });
   }
@@ -252,7 +281,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       this.customerForm.get('insuranceStatus')?.disable();
       this.customerForm.get('doClearanceSelfPayment')?.setValue(true);
       this.customerForm.get('doClearanceSelfPayment')?.disable();
-    } else if (this.isManager) {
+    } else if (this.isManager()) {
       this.customerForm.get('insuranceStatus')?.enable();
     }
 
@@ -262,7 +291,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       if (value >= 1) {
         this.customerForm.get('doClearanceReliefAmount')?.enable();
         this.customerForm.get('doClearanceSelfPayment')?.enable();
-      } else if (this.isManager) {
+      } else if (this.isManager()) {
         this.customerForm.get('doClearanceReliefAmount')?.setValue(false);
         this.customerForm.get('doClearanceReliefAmount')?.disable();
       }

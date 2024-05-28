@@ -4,4 +4,5 @@ export interface WebsiteIntegrationModel {
   id: UUID;
   color: string;
   fontSize: number;
+  isRounded: boolean;
 }
