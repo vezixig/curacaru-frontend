@@ -8,7 +8,7 @@ import { ChangePageAction, ProspectListState } from './prospect-list.state';
 import { Store } from '@ngrx/store';
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 import { RouterModule } from '@angular/router';
-import { ProspectListEntryComponent } from '../prospect-list-mobile/prospect-list-entry.component';
+import { ProspectListEntryComponent } from '../prospect-list-entry/prospect-list-entry.component';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import { LoaderCardComponent } from '@curacaru/shared/loader-card/loader-card.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -49,7 +49,7 @@ export class ProspectListComponent implements OnInit {
       .pipe(
         takeUntil(this.$onDestroy),
         tap(() => this.isLoading.set(true)),
-        mergeMap((o) => this.apiService.getCustomerList(o.state.prospectList.page, CustomerStatus.Interested))
+        mergeMap((o) => this.apiService.getCustomerList(o.state.prospectList.page, CustomerStatus.Interested, undefined, 'date'))
       )
       .subscribe({
         next: (o) => {

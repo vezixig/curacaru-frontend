@@ -1,7 +1,12 @@
 [
   {
+    "versuib": "0.9.0",
+    "releaseDate": "2024-09-01",
+    "features": ["Kontaktformular zur Integration in die Firmenwebseite hinzugefügt", "Interessentenliste zum Bereich Stammdaten hinzugefügt"]
+  },
+  {
     "version": "0.8.0",
-    "releaseDate": "2024-06-01",
+    "releaseDate": "2024-05-19",
     "bugfixes": [
       "Bei kleinen Bildschirmen kann die Navigationsleiste jetzt gescrollt angezeigt",
       "Mitarbeiter nicht einen Termin nicht bearbeitet haben, konnten den Button zum Abschließen sehen"

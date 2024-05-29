@@ -130,13 +130,16 @@ export class ApiService {
   getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`);
 
   /** Gets the list of customers from the API */
-  getCustomerList(page: number, customerStatus: CustomerStatus, employeeId?: UUID) {
+  getCustomerList(page: number, customerStatus: CustomerStatus, employeeId?: UUID, orderBy?: string) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('page', page);
     options.params = options.params.append('pageSize', 18);
     options.params = options.params.append('status', customerStatus);
     if (employeeId) {
       options.params = options.params.append('employeeId', employeeId.toString());
+    }
+    if (orderBy) {
+      options.params = options.params.append('orderBy', orderBy);
     }
     return this.httpClient.get<Page<CustomerListEntry>>(`${this.apiUrl}/customer/list`, options);
   }
