@@ -25,11 +25,11 @@
     (change)="onFilterChanged()"
     id="checkShowInactiveCustomers"
   />
-  <label class="form-check-label fw-light" for="checkShowInactiveCustomers"> Nur inaktive Kunden anzeigen</label>
+  <label class="form-check-label fw-light" for="checkShowInactiveCustomers"> Nur ehemalige Kunden anzeigen</label>
 </div>
 }
 
-<div class="p-0 pb-3 container-fluid">
+<div class="p-0 pb-3 container">
   <div class="row g-3">
     @for (customer of customers(); track customer) {
     <cura-customer-list-entry
@@ -47,22 +47,6 @@
     }
   </div>
 </div>
-
-<!-- customers -->
-<!-- @if(isMobile()) { -->
-
-<!-- } @else {
-<cura-customer-list-table
-  [customers]="customers()"
-  [isLoading]="isLoading()"
-  [isManager]="user!.isManager"
-  (onDelete)="handleDelete($event)"
-  (onNavigate)="handleNavigate($event)"
-  (onShowAppointments)="handleShowAppointments($event)"
-  (onShowDeploymentReports)="handleShowDeploymentReports($event)"
-  (onShowInvoices)="handleShowInvoices($event)"
-/>
-} -->
 
 <!-- paging -->
 <cura-paging [page]="page()" (pageChange)="onPageChange($event)" />

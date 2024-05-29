@@ -1,9 +1,11 @@
 <div class="card">
   <div class="card-body" style="position: relative">
-    <div class="my-2 ms-2">
-      <cura-portrait [initials]="initials()"></cura-portrait>
-      <p class="fs-5 p-0 my-0 text-truncate me-50">{{ customer()?.lastName }}, {{ customer()?.firstName }}</p>
-      <p class="fw-light m-0">Hinzugefügt am: {{ customer()?.createdAt | date }}</p>
+    <div class="mt-2 mb-1 ms-2">
+      <div class="d-flex flex-row align-items-center">
+        <cura-portrait [initials]="initials()"></cura-portrait>
+        <p class="fs-5 p-0 my-0 text-truncate me-50">{{ customer()?.lastName }}, {{ customer()?.firstName }}</p>
+      </div>
+      <p class="fw-light m-0 mt-2">Hinzugefügt am: {{ customer()?.createdAt | date }}</p>
     </div>
     <!-- buttons -->
     <div class="input-group button-tab">

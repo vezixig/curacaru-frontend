@@ -1,9 +1,19 @@
-<div class="card">
+<div class="card h-100">
   <div class="card-body" style="position: relative">
-    <div class="my-2 ms-2">
-      <cura-portrait [initials]="initials()"></cura-portrait>
-      <p class="fs-5 p-0 my-0 text-truncate">{{ customer().lastName }}, {{ customer().firstName }}</p>
-      <p class="fw-light m-0">Hinzugefügt am: {{ customer().createdAt | date }}</p>
+    <div class="mt-2 mb-1 ms-1">
+      <div class="d-flex flex-row align-items-center">
+        <cura-portrait [initials]="initials()"></cura-portrait>
+        <p class="fs-5 p-0 my-0 text-truncate">{{ customer().lastName }}, {{ customer().firstName }}</p>
+      </div>
+      <ul class="card-text list-unstyled mt-2 pt-1 ms-2 border-top text-truncate">
+        @if (customer().phone != '') {
+        <li><fa-icon [icon]="['fas', 'phone']" [fixedWidth]="true" /> {{ customer().phone }}</li>
+        }
+        <li><fa-icon [icon]="['fas', 'house']" [fixedWidth]="true" /> {{ customer().street }} - {{ customer().zipCode }} {{ customer().city }}</li>
+        @if (customer().associatedEmployeeName) {
+        <li><fa-icon [icon]="['far', 'user']" [fixedWidth]="true" /> {{ customer().associatedEmployeeName }}</li>
+        }
+      </ul>
     </div>
     <!-- buttons -->
     <div class="input-group button-tab">
