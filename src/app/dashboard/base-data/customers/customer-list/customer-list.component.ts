@@ -79,7 +79,8 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     })
       .pipe(
         takeUntil(this.$onDestroy),
-        tap(() => {
+        tap((o) => {
+          this.selectedEmployeeId.set(o.state.customerList.employeeId);
           this.customers.set([]);
           this.isLoading.set(true);
         }),
