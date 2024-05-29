@@ -6,11 +6,12 @@ import { WebsiteIntegrationRepository } from './website-integration.repository';
 import { FormsModule } from '@angular/forms';
 import { ErrorHandlerService } from '@curacaru/services';
 import { ToastrService } from 'ngx-toastr';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-website-integration',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FontAwesomeModule, FormsModule],
   templateUrl: './website-integration.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -18,6 +19,7 @@ export class WebsiteIntegrationComponent {
   readonly model$: Observable<WebsiteIntegrationModel>;
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
+  readonly iframeCode = signal('');
 
   private readonly errorHandlingService = inject(ErrorHandlerService);
   private readonly websiteIntegrationRepository = inject(WebsiteIntegrationRepository);
@@ -32,10 +34,19 @@ export class WebsiteIntegrationComponent {
       mergeMap(() =>
         this.websiteIntegrationRepository.getWebsiteIntegration().pipe(
           map((o) => (o === null ? { id: '', color: '', fontSize: 0, isRounded: true } : o)),
+          tap((model) =>
+            this.iframeCode.set('<iframe style="width:800px; height:500px;" src="https://app.curacaru.de/contact?id=' + model.id + '" />')
+          ),
           tap(() => this.isLoading.set(false))
         )
       )
     );
+  }
+
+  onCopy() {
+    navigator.clipboard.writeText(this.iframeCode()).then(() => {
+      this.toastrService.info('Der Code wurde in die Zwischenablage kopiert.');
+    });
   }
 
   onSave(model: WebsiteIntegrationModel) {

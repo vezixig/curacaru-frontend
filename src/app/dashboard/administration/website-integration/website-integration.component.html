@@ -10,12 +10,12 @@
 } @else {
 
 <label for="exampleColorInput" class="form-label fw-light">HTML-Code</label>
-<input
-  type="text"
-  class="form-control"
-  id="inputHtml"
-  [value]="'&lt;iframe style=&quot;width:800px; height:500px;&quot; src=&quot;https://app.curacaru.de/contact?id=' + model.id + '&quot; /&gt;'"
-/>
+<div class="input-group">
+  <input type="text" class="form-control" id="inputHtml" [value]="iframeCode()" />
+  <button type="button" title="Code in die Zwischenablage kopieren" class="btn btn-outline-secondary" (click)="onCopy()">
+    <fa-icon [icon]="['far', 'copy']"></fa-icon>
+  </button>
+</div>
 
 <label for="exampleColorInput" class="form-label fw-light mt-3">Farbschema</label>
 <div class="input-group">
@@ -36,7 +36,7 @@
   <input type="text" readonly class="form-control" [(ngModel)]="model.fontSize" value="16" />
 </div>
 
-<label class="form-label fw-light mt-3">Sonstige Einstellungen</label>
+<label class="form-label fw-light mt-3">Buttons</label>
 <div class="form-check form-switch">
   <input class="form-check-input" [(ngModel)]="model.isRounded" type="checkbox" id="checkRounded" />
   <label class="form-check-label" for="checkRounded">Abgerundete Ecken</label>
