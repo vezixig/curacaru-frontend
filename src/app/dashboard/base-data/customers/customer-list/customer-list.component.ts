@@ -22,13 +22,23 @@ import { DeleteCustomerModal } from '../delete-customer-modal/delete-customer-mo
 import { DeleteCustomerModalModel } from '../delete-customer-modal/delete-customer-model.model';
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 import { CustomerListEntryComponent } from '../customer-list-entry/customer-list-entry.component';
+import { InfoComponent } from '../../../../shared/info-box/info.component';
 
 @Component({
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
   templateUrl: './customer-list.component.html',
-  imports: [FontAwesomeModule, RouterModule, FormsModule, AsyncPipe, PagingComponent, LoaderFilterComponent, CustomerListEntryComponent],
+  imports: [
+    FontAwesomeModule,
+    RouterModule,
+    FormsModule,
+    AsyncPipe,
+    PagingComponent,
+    LoaderFilterComponent,
+    CustomerListEntryComponent,
+    InfoComponent,
+  ],
 })
 export class CustomerListComponent implements OnDestroy, OnInit {
   private readonly apiService = inject(ApiService);

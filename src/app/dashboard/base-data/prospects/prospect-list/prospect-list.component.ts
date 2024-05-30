@@ -13,13 +13,14 @@ import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import { LoaderCardComponent } from '@curacaru/shared/loader-card/loader-card.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
+import { InfoComponent } from '../../../../shared/info-box/info.component';
 
 @Component({
   selector: 'cura-prospect-list',
   standalone: true,
   templateUrl: './prospect-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ProspectListEntryComponent, ProspectListEntryComponent, PagingComponent, LoaderCardComponent],
+  imports: [CommonModule, RouterModule, ProspectListEntryComponent, ProspectListEntryComponent, PagingComponent, LoaderCardComponent, InfoComponent],
 })
 export class ProspectListComponent implements OnInit {
   private readonly apiService = inject(ApiService);

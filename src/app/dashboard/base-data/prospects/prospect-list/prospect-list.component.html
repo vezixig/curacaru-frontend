@@ -13,5 +13,9 @@
   </div>
 </div>
 
+@if(page()?.items?.length === 0) {
+<cura-info>Es wurden keine Interessenten gefunden</cura-info>
+}
+
 <!-- paging -->
 <cura-paging [page]="page()" (pageChange)="onPageChange($event)" />

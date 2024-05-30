@@ -18,7 +18,9 @@
             <option [ngValue]="customerStatus.Interested">Interessent</option>
             }
             <option [ngValue]="customerStatus.Customer">Kunde</option>
+            @if(isCustomer()) {
             <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>
+            }
           </select>
         </div>
       </div>

@@ -35,7 +35,7 @@ export class WebsiteIntegrationComponent {
         this.websiteIntegrationRepository.getWebsiteIntegration().pipe(
           map((o) => (o === null ? { id: '', color: '', fontSize: 0, isRounded: true } : o)),
           tap((model) =>
-            this.iframeCode.set('<iframe style="width:800px; height:500px;" src="https://app.curacaru.de/contact?id=' + model.id + '" />')
+            this.iframeCode.set('<iframe style="width:800px; height:650px;" src="https://app.curacaru.de/contact?id=' + model.id + '" />')
           ),
           tap(() => this.isLoading.set(false))
         )
