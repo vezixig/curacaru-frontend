@@ -165,7 +165,7 @@
         </ng-template>
 
         <input
-          [disabled]="!isManager"
+          [disabled]="!isManager()"
           id="inputInsurance"
           [resultTemplate]="rt"
           type="text"
@@ -277,7 +277,7 @@
           @if (isSaving()) {
           <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
           }
-          <span>Kunden {{ isNew ? "hinzufügen" : "speichern" }}</span>
+          <span>{{ isCustomer() ? "Kunde" : "Interessenten" }} {{ isNew ? "hinzufügen" : "speichern" }}</span>
           @if (isSaving()) {
           <span>...</span>
           }

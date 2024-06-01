@@ -26,7 +26,7 @@ import { Product } from '@curacaru/models/product';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule, InputComponent, AsyncPipe],
 })
-export class CustomerEditorComponent implements OnInit, OnDestroy {
+export class CustomerEditorComponent implements OnDestroy {
   private readonly apiService = inject(ApiService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
@@ -82,7 +82,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
       emergencyContactPhone: ['', [Validators.maxLength(50)]],
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       insuranceId: [''],
-      insuranceStatus: this.formBuilder.nonNullable.control<InsuranceStatus | null>(null, [Validators.required]),
+      insuranceStatus: this.formBuilder.nonNullable.control<InsuranceStatus | null>(null),
       insuredPersonNumber: ['', [Validators.maxLength(10)]],
       lastName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       phone: ['', [Validators.maxLength(50)]],
@@ -110,7 +110,14 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
         this.employees.set(result.employees);
         this.products.set(result.products);
         this.isManager.set(result.isManager);
-        if (!this.isManager) this.customerForm.disable();
+        if (!this.isManager()) this.customerForm.disable();
+
+        if (this.router.url.endsWith('new')) {
+          this.isNew = true;
+          this.handleCareLevelChange(this.customerForm.get('careLevel')?.value);
+        } else {
+          this.LoadCustomer();
+        }
       },
       error: (e) => this.errorHandlerService.handleError(e),
     });
@@ -121,15 +128,6 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     this.getZipCodeSubscription?.unsubscribe();
     this.postCustomerSubscription?.unsubscribe();
     this.updateCustomerSubscription?.unsubscribe();
-  }
-
-  ngOnInit(): void {
-    if (this.router.url.endsWith('new')) {
-      this.isNew = true;
-      this.handleCareLevelChange(this.customerForm.get('careLevel')?.value);
-    } else {
-      this.LoadCustomer();
-    }
   }
 
   // Tries to get the name of the city for the entered zip code
@@ -161,6 +159,15 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
     );
 
   handleSave(): void {
+    // insurance status is required if the customer is not a prospective
+    if (this.customerForm.get('status')?.value != CustomerStatus.Interested && this.customerForm.get('insuranceStatus')?.value == null) {
+      this.customerForm.get('insuranceStatus')?.setErrors({ required: true });
+      this.customerForm.get('insuranceStatus')?.markAsTouched();
+      return;
+    } else {
+      this.customerForm.get('insuranceStatus')?.setErrors(null);
+    }
+
     if (!this.customerForm.valid) {
       Object.keys(this.customerForm.controls).forEach((key) => {
         this.customerForm.get(key)?.markAsTouched();
@@ -240,6 +247,7 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
             })
           );
         });
+        if (!this.isManager()) this.productsGroup.disable();
 
         this.isCustomer.set(result.status !== CustomerStatus.Interested);
 
@@ -275,6 +283,8 @@ export class CustomerEditorComponent implements OnInit, OnDestroy {
   }
 
   private handleCareLevelChange(value: any): void {
+    if (!this.isManager()) return;
+
     // If the care level is set to 0, the insurance status must be self payment
     if (value == 0) {
       this.customerForm.get('insuranceStatus')?.setValue(2);
