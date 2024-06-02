@@ -7,8 +7,28 @@ import { DashboardComponent } from '@curacaru/dashboard/dashboard.component';
 import { LoginComponent } from '@curacaru/auth/login/login.component';
 import { UserService } from '@curacaru/services';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCircleInfo, faEllipsis, faGear, faGlobe, faHouse, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons';
-import { faAddressCard, faCircleLeft, faCircleRight, faCopy, faEnvelope, faIdCard, faTrashCan, faUser } from '@fortawesome/free-regular-svg-icons';
+import {
+  faCaretLeft,
+  faCaretRight,
+  faCircleInfo,
+  faEllipsis,
+  faGear,
+  faGlobe,
+  faHouse,
+  faLocationDot,
+  faPhone,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  faAddressCard,
+  faCalendar,
+  faCircleLeft,
+  faCircleRight,
+  faCopy,
+  faEnvelope,
+  faIdCard,
+  faTrashCan,
+  faUser,
+} from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   imports: [DashboardComponent, LoginComponent],
@@ -27,6 +47,9 @@ export class AppComponent implements OnInit {
   constructor(library: FaIconLibrary) {
     library.addIcons(
       faAddressCard,
+      faCalendar,
+      faCaretLeft,
+      faCaretRight,
       faCircleInfo,
       faCircleLeft,
       faCircleRight,

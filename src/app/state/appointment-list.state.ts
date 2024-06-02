@@ -8,6 +8,7 @@ export interface AppointmentListState {
   customerId?: UUID;
   dateStart: NgbDate;
   dateEnd: NgbDate;
+  dateMode: number;
   onlyOpen: boolean;
   page: number;
 }
@@ -17,6 +18,7 @@ const initialState: AppointmentListState = {
   customerId: undefined,
   dateStart: DateTimeService.toNgbDate(DateTimeService.today),
   dateEnd: DateTimeService.toNgbDate(DateTimeService.today),
+  dateMode: 1,
   onlyOpen: false,
   page: 1,
 };
@@ -26,7 +28,7 @@ export const AppointmentListActions = createActionGroup({
   events: {
     'Change employee filter': props<{ employeeId?: UUID }>(),
     'Change customer filter': props<{ customerId?: UUID }>(),
-    'Change date filter': props<{ dateStart: NgbDate; dateEnd: NgbDate }>(),
+    'Change date filter': props<{ dateStart: NgbDate; dateEnd: NgbDate; dateMode: number }>(),
     'Change only open': props<{ onlyOpen: boolean }>(),
     'Change page': props<{ page: number }>(),
   },
@@ -46,9 +48,8 @@ export const appointmentListReducer = createReducer(
   })),
   on(AppointmentListActions.changeDateFilter, (state, args) => ({
     ...state,
+    ...args,
     page: 1,
-    dateStart: args.dateStart,
-    dateEnd: args.dateEnd,
   })),
   on(AppointmentListActions.changeOnlyOpen, (state, args) => ({
     ...state,
