@@ -7,7 +7,7 @@ import { Observable, Subject, combineLatest, firstValueFrom, map, mergeMap, star
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
 import { EmployeeBasic, UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
-import { ApiService, ErrorHandlerService, LocationService, ScreenService, UserService } from '@curacaru/services';
+import { ApiService, DateTimeService, ErrorHandlerService, LocationService, ScreenService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { ChangeEmployeeFilterAction, ChangePageAction } from '@curacaru/state/customer-list.state';
@@ -136,6 +136,12 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   }
 
   handleShowAppointments(customer: CustomerListEntry) {
+    var today = new Date();
+    var begin = new Date();
+    begin.setDate(today.getDate() - 28);
+    this.appointmentListStore.dispatch(
+      AppointmentListActions.changeDateFilter({ dateEnd: DateTimeService.toNgbDate(today), dateStart: DateTimeService.toNgbDate(begin), dateMode: 3 })
+    );
     this.appointmentListStore.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: customer.id }));
     this.router.navigate(['/dashboard/appointments']);
   }

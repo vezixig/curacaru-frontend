@@ -1,124 +1,84 @@
-<div class="row">
-  <h4 class="h-underline">Einsatznachweise</h4>
+<h4 class="h-underline">Einsatznachweise</h4>
 
-  @if(filterModel$ | async; as filterModel) {
+@if(filterModel$ | async; as filterModel) {
 
-  <form [formGroup]="filterForm" class="p-0">
-    <div class="row gx-3">
-      <div class="col col-12 col-md">
-        <label class="fw-light" for="inputYear">Jahr</label>
-        <div class="input-group">
-          <input
-            id="inputYear"
-            class="form-control"
-            type="number"
-            formControlName="year"
-            [ngClass]="{ 'is-invalid': filterForm.controls['year'].invalid }"
-          />
-        </div>
+<form [formGroup]="filterForm" class="p-0">
+  <div class="row gx-3">
+    <div class="col col-12 col-md">
+      <label class="fw-light" for="inputYear">Jahr</label>
+      <div class="input-group">
+        <input
+          id="inputYear"
+          class="form-control"
+          type="number"
+          formControlName="year"
+          [ngClass]="{ 'is-invalid': filterForm.controls['year'].invalid }"
+        />
       </div>
-      <div class="col">
-        <label class="fw-light" for="selectMonth">Monat</label>
-        <select id="selectMonth" class="form-control" formControlName="month">
-          @for (month of months; track month) {
-          <option [value]="month.value">{{ month.name }}</option>
-          }
-        </select>
-      </div>
-      <div class="col col-12 col-md">
-        <label class="fw-light" for="selectCustomer">Kunde</label>
-        <select id="selectCustomer" class="form-select" formControlName="customerId">
-          <option></option>
-          @for (customer of filterModel.customers; track customer) {
-          <option [value]="customer.customerId">{{ customer.customerName }}</option>
-          }
-        </select>
-      </div>
-
-      @if (filterModel.user.isManager) {
-      <div class="col col-12 col-md">
-        <label class="fw-light" for="selectEmployee">Mitarbeiter</label>
-        <select id="selectEmployee" class="form-select" formControlName="employeeId">
-          <option></option>
-          @for (employee of filterModel.employees; track employee) {
-          <option [value]="employee.id">{{ employee.name }}</option>
-          }
-        </select>
-      </div>
-
-      }
     </div>
-  </form>
+    <div class="col">
+      <label class="fw-light" for="selectMonth">Monat</label>
+      <select id="selectMonth" class="form-control" formControlName="month">
+        @for (month of months; track month) {
+        <option [value]="month.value">{{ month.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="col col-12 col-md">
+      <label class="fw-light" for="selectCustomer">Kunde</label>
+      <select id="selectCustomer" class="form-select" formControlName="customerId">
+        <option></option>
+        @for (customer of filterModel.customers; track customer) {
+        <option [value]="customer.customerId">{{ customer.customerName }}</option>
+        }
+      </select>
+    </div>
 
-  @if(listModel$ | async; as documents) { @if(documents.items.length > 0) {
+    @if (filterModel.user.isManager) {
+    <div class="col col-12 col-md">
+      <label class="fw-light" for="selectEmployee">Mitarbeiter</label>
+      <select id="selectEmployee" class="form-select" formControlName="employeeId">
+        <option></option>
+        @for (employee of filterModel.employees; track employee) {
+        <option [value]="employee.id">{{ employee.name }}</option>
+        }
+      </select>
+    </div>
 
-  <table class="d-none d-md-table table mt-3 table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Jahr</th>
-        <th scope="col">Monat</th>
-        <th scope="col">Kunde</th>
-        <th scope="col">Bearbeitung</th>
-        <th scope="col">Vertretung</th>
-        <th scope="col">Abrechnungsoption</th>
-        <th class="text-center" scope="col">Status</th>
-        <th class="text-center" scope="col">Aktion</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (document of documents.items; track document) {
-      <tr>
-        <td>{{ document.year }}</td>
-        <td>{{ document.month | monthName }}</td>
-        <td>{{ document.customerName }}</td>
-        <td>{{ document.employeeName }}</td>
-        <td>{{ document.replacementEmployeeNames }}</td>
-        <td>{{ document.clearanceType | clearanceTypeName }}</td>
-        <td class="text-center">
-          <div width="16" height="16" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" class="status-bullet"></div>
-        </td>
-        <td class="text-center">
-          <div class="btn-group">
-            @if (!document.isCreated) {
-            <button
-              type="button"
-              class="btn btn-outline-secondary btn-sm"
-              title="Einsatznachweis erstellen"
-              [routerLink]="['/dashboard/documents/deployment-reports/sign']"
-              [queryParams]="{ year: document.year, month: document.month, clearanceType: document.clearanceType, customerId: document.customerId }"
-            >
-              <fa-icon [icon]="faGear" [fixedWidth]="true" />
-            </button>
-            } @else {
-            <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadReport(document)">
-              <fa-icon [icon]="faDownload" [fixedWidth]="true" />
-            </button>
-            @if(filterModel.user.isManager) {
-            <button
-              type="button"
-              (click)="onDeleteDeploymentReport(document)"
-              [disabled]="isLoading()"
-              class="btn btn-outline-secondary btn-sm"
-              title="Einsatznachweis löschen"
-            >
-              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-            </button>
-            } }
-          </div>
-        </td>
-      </tr>
-      }
-    </tbody>
-  </table>
+    }
+  </div>
+</form>
 
-  <div class="d-md-none p-0">
+@if(listModel$ | async; as documents) { @if(documents.items.length > 0) {
+
+<table class="d-none d-md-table table mt-3 table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Jahr</th>
+      <th scope="col">Monat</th>
+      <th scope="col">Kunde</th>
+      <th scope="col">Bearbeitung</th>
+      <th scope="col">Vertretung</th>
+      <th scope="col">Abrechnungsoption</th>
+      <th class="text-center" scope="col">Status</th>
+      <th class="text-center" scope="col">Aktion</th>
+    </tr>
+  </thead>
+  <tbody>
     @for (document of documents.items; track document) {
-    <div class="card my-3">
-      <div class="card-header d-flex px-2">
-        <img class="me-2" width="10" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" />
-        <span class="lead text-truncate">{{ document.customerName }}</span>
-        <div class="btn-group ms-auto" role="group">
-          @if(!document.isCreated) {
+    <tr>
+      <td>{{ document.year }}</td>
+      <td>{{ document.month | monthName }}</td>
+      <td>{{ document.customerName }}</td>
+      <td>{{ document.employeeName }}</td>
+      <td>{{ document.replacementEmployeeNames }}</td>
+      <td>{{ document.clearanceType | clearanceTypeName }}</td>
+      <td class="text-center">
+        <div width="16" height="16" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" class="status-bullet"></div>
+      </td>
+      <td class="text-center">
+        <div class="btn-group">
+          @if (!document.isCreated) {
           <button
             type="button"
             class="btn btn-outline-secondary btn-sm"
@@ -144,25 +104,63 @@
           </button>
           } }
         </div>
-      </div>
-      <div class="card-body">
-        <ul class="card-text list-unstyled">
-          <li class="pb-2">{{ document.clearanceType | clearanceTypeName }}</li>
-          <li><fa-icon [icon]="faCalendar" [fixedWidth]="true" /> {{ document.month | monthName }} {{ document.year }}</li>
-          @if(document.replacementEmployeeNames != '') {
-          <li><fa-icon [icon]="faUserAlt" [fixedWidth]="true" /> {{ document.replacementEmployeeNames }}</li>
-          }
-          <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ document.employeeName }}</li>
-        </ul>
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+
+<div class="d-md-none p-0">
+  @for (document of documents.items; track document) {
+  <div class="card my-3">
+    <div class="card-header d-flex px-2">
+      <img class="me-2" width="10" [class.bg-success]="document.isCreated" [class.bg-danger]="!document.isCreated" />
+      <span class="lead text-truncate">{{ document.customerName }}</span>
+      <div class="btn-group ms-auto" role="group">
+        @if(!document.isCreated) {
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          title="Einsatznachweis erstellen"
+          [routerLink]="['/dashboard/documents/deployment-reports/sign']"
+          [queryParams]="{ year: document.year, month: document.month, clearanceType: document.clearanceType, customerId: document.customerId }"
+        >
+          <fa-icon [icon]="faGear" [fixedWidth]="true" />
+        </button>
+        } @else {
+        <button type="button" class="btn btn-outline-secondary btn-sm" title="Einsatznachweis herunterladen" (click)="onDownloadReport(document)">
+          <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+        </button>
+        @if(filterModel.user.isManager) {
+        <button
+          type="button"
+          (click)="onDeleteDeploymentReport(document)"
+          [disabled]="isLoading()"
+          class="btn btn-outline-secondary btn-sm"
+          title="Einsatznachweis löschen"
+        >
+          <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+        </button>
+        } }
       </div>
     </div>
-    }
+    <div class="card-body">
+      <ul class="card-text list-unstyled">
+        <li class="pb-2">{{ document.clearanceType | clearanceTypeName }}</li>
+        <li><fa-icon [icon]="faCalendar" [fixedWidth]="true" /> {{ document.month | monthName }} {{ document.year }}</li>
+        @if(document.replacementEmployeeNames != '') {
+        <li><fa-icon [icon]="faUserAlt" [fixedWidth]="true" /> {{ document.replacementEmployeeNames }}</li>
+        }
+        <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ document.employeeName }}</li>
+      </ul>
+    </div>
   </div>
-
-  <!-- paging -->
-  <cura-paging [page]="documents" (pageChange)="onPageChanged($event)" />
-
-  } @else {
-  <cura-info class="mt-2 p-0">Keine Einsatznachweise gefunden.</cura-info>
-  } }}
+  }
 </div>
+
+<!-- paging -->
+<cura-paging [page]="documents" (pageChange)="onPageChanged($event)" />
+
+} @else {
+<cura-info class="mt-2 p-0">Keine Einsatznachweise gefunden.</cura-info>
+} }}

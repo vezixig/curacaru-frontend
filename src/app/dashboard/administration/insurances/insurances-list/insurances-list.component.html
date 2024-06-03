@@ -1,83 +1,81 @@
-<div class="row">
-  <h4>Versicherungsliste</h4>
-  <Button type="button" [routerLink]="['/dashboard/insurances/new']" class="btn btn-primary text-white btn-block">Versicherung hinzufügen</Button>
+<h4>Versicherungsliste</h4>
+<Button type="button" [routerLink]="['/dashboard/insurances/new']" class="btn btn-primary text-white btn-block">Versicherung hinzufügen</Button>
 
-  @if(insurances$ | async; as insurances) {
-  <table class="d-none d-md-table col-12 table mt-3 p-0 table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Versicherung</th>
-        <th scope="col">IK-Nummer</th>
-        <th scope="col">Straße</th>
-        <th scope="col">PLZ</th>
-        <th scope="col">Ort</th>
-        <th class="text-center" scope="col">Aktion</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (insurance of insurances.items; track insurance) {
-      <tr>
-        <td>{{ insurance.name }}</td>
-        <td>{{ insurance.institutionCode }}</td>
-        <td>{{ insurance.street }}</td>
-        <td>{{ insurance.zipCode }}</td>
-        <td>{{ insurance.city }}</td>
-        <td class="text-center">
-          @if (insurance.companyId !== null) {
-          <div class="btn-group" role="group">
-            <button
-              type="button"
-              [routerLink]="['/dashboard/insurances', insurance.id]"
-              class="btn btn-outline-secondary btn-sm"
-              title="Versicherung bearbeiten"
-            >
-              <fa-icon [icon]="faGear" [fixedWidth]="true" />
-            </button>
-            <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Versicherung löschen">
-              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-            </button>
-          </div>
-          }
-        </td>
-      </tr>
-      }
-    </tbody>
-  </table>
-
-  <div class="d-md-none p-0">
+@if(insurances$ | async; as insurances) {
+<table class="d-none d-md-table col-12 table mt-3 p-0 table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Versicherung</th>
+      <th scope="col">IK-Nummer</th>
+      <th scope="col">Straße</th>
+      <th scope="col">PLZ</th>
+      <th scope="col">Ort</th>
+      <th class="text-center" scope="col">Aktion</th>
+    </tr>
+  </thead>
+  <tbody>
     @for (insurance of insurances.items; track insurance) {
-    <div class="card my-2">
-      <div class="card-header d-flex align-items-center">
-        <span class="lead text-truncate">{{ insurance.name }}</span>
+    <tr>
+      <td>{{ insurance.name }}</td>
+      <td>{{ insurance.institutionCode }}</td>
+      <td>{{ insurance.street }}</td>
+      <td>{{ insurance.zipCode }}</td>
+      <td>{{ insurance.city }}</td>
+      <td class="text-center">
         @if (insurance.companyId !== null) {
-        <div class="btn-group ms-auto" role="group">
+        <div class="btn-group" role="group">
           <button
             type="button"
             [routerLink]="['/dashboard/insurances', insurance.id]"
             class="btn btn-outline-secondary btn-sm"
-            title="Mitarbeiter bearbeiten"
+            title="Versicherung bearbeiten"
           >
             <fa-icon [icon]="faGear" [fixedWidth]="true" />
           </button>
-          <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+          <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Versicherung löschen">
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </button>
         </div>
         }
-      </div>
-      <div class="card-body">
-        <ul class="card-text list-unstyled">
-          @if (insurance.institutionCode != '') {
-          <li><fa-icon [icon]="faKey" [fixedWidth]="true" /> {{ insurance.institutionCode }}</li>
-          }
-          <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ insurance.street }} - {{ insurance.zipCode }} {{ insurance.city }}</li>
-        </ul>
-      </div>
-    </div>
+      </td>
+    </tr>
     }
+  </tbody>
+</table>
+
+<div class="d-md-none p-0">
+  @for (insurance of insurances.items; track insurance) {
+  <div class="card my-2">
+    <div class="card-header d-flex align-items-center">
+      <span class="lead text-truncate">{{ insurance.name }}</span>
+      @if (insurance.companyId !== null) {
+      <div class="btn-group ms-auto" role="group">
+        <button
+          type="button"
+          [routerLink]="['/dashboard/insurances', insurance.id]"
+          class="btn btn-outline-secondary btn-sm"
+          title="Mitarbeiter bearbeiten"
+        >
+          <fa-icon [icon]="faGear" [fixedWidth]="true" />
+        </button>
+        <button type="button" (click)="handleDelete(insurance)" class="btn btn-outline-secondary btn-sm" title="Mitarbeiter löschen">
+          <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+        </button>
+      </div>
+      }
+    </div>
+    <div class="card-body">
+      <ul class="card-text list-unstyled">
+        @if (insurance.institutionCode != '') {
+        <li><fa-icon [icon]="faKey" [fixedWidth]="true" /> {{ insurance.institutionCode }}</li>
+        }
+        <li><fa-icon [icon]="faHouse" [fixedWidth]="true" /> {{ insurance.street }} - {{ insurance.zipCode }} {{ insurance.city }}</li>
+      </ul>
+    </div>
   </div>
-
-  <cura-paging [page]="insurances" (pageChange)="onPageChange($event)" />
-
   }
 </div>
+
+<cura-paging [page]="insurances" (pageChange)="onPageChange($event)" />
+
+}
