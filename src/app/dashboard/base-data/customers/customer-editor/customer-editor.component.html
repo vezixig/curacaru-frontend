@@ -10,19 +10,20 @@
 
     <div class="row">
       <!-- status -->
-      <div class="col-md-6 col-sm-12">
-        <div class="form-group mb-2">
-          <label class="fw-light" for="selectCustomerStatus">Kundenstatus:</label>
-          <select class="form-select" aria-label="Default select example" id="selectCustomerStatus" formControlName="status">
-            @if(!isCustomer()) {
-            <option [ngValue]="customerStatus.Interested">Interessent</option>
-            }
-            <option [ngValue]="customerStatus.Customer">Kunde</option>
-            @if(isCustomer()) {
-            <option [ngValue]="customerStatus.Former">Ehemaliger Kunde</option>
-            }
-          </select>
-        </div>
+      <div class="form-group mb-2 col-md-6 col-sm-12">
+        <label class="fw-light" for="selectCustomerStatus">Kundenstatus:</label><br />
+        @if(!isCustomer()) {
+        <input type="radio" class="btn-check" id="option_prospect" [value]="0" formControlName="status" />
+        <label class="btn" for="option_prospect">Interessent</label>
+        }
+
+        <input type="radio" class="btn-check" id="option_customer" [value]="1" formControlName="status" />
+        <label class="btn" for="option_customer">Kunde</label>
+
+        @if(isCustomer()) {
+        <input type="radio" class="btn-check" id="option_former" [value]="0" formControlName="status" />
+        <label class="btn" for="option_former">Ehemaliger Kunde</label>
+        }
       </div>
 
       <!-- employee -->
@@ -57,11 +58,17 @@
 
       <!-- salutation -->
       <div class="col-md-6 col-sm-12 form-group mb-2">
-        <label class="fw-light" for="selectSalutation">Anrede</label>
-        <select class="form-select" id="selectSalutation" formControlName="salutation">
+        <label class="fw-light" for="selectSalutation">Anrede</label><br />
+
+        <input type="radio" class="btn-check" id="option_ms" [value]="0" formControlName="salutation" />
+        <label class="btn" for="option_ms">Frau</label>
+
+        <input type="radio" class="btn-check" id="option_mr" [value]="1" formControlName="salutation" />
+        <label class="btn" for="option_mr">Herr</label>
+        <!-- <select class="form-select" id="selectSalutation" formControlName="salutation">
           <option [ngValue]="0">Frau</option>
           <option [ngValue]="1">Herr</option>
-        </select>
+        </select> -->
       </div>
 
       <div class="w-100 d-none d-md-block"></div>
@@ -210,89 +217,85 @@
       </div>
 
       <div class="col-md-6 col-sm-12 form-group mb-3">
-        <label class="fw-light" for="inputInsuredPersonNumber">Versicherungsstatus</label>
-        <select
-          class="form-select"
-          formControlName="insuranceStatus"
-          placeholder="Versicherungsstatus"
-          type="number"
-          id="inputEmergencyContactPhone"
-          placeholder="Telefonnummer eingeben"
-          [ngClass]="{
-            'is-valid': customerForm.controls['insuranceStatus'].valid && customerForm.controls['careLevel'].dirty,
-            'is-invalid': customerForm.controls['insuranceStatus'].invalid && customerForm.controls['insuranceStatus'].touched
-          }"
-        >
-          <option [ngValue]="0">Gesetzlich</option>
-          <option [ngValue]="1">Privat</option>
-          <option [ngValue]="2">Selbstzahler</option>
-        </select>
+        <label class="fw-light">Versicherungsstatus</label><br />
+
+        <input type="radio" class="btn-check" id="option_statutory" [value]="0" formControlName="insuranceStatus" />
+        <label class="btn" for="option_statutory">Gesetzlich</label>
+
+        <input type="radio" class="btn-check" id="option_private" [value]="1" formControlName="insuranceStatus" />
+        <label class="btn" for="option_private">Privat</label>
+
+        <input type="radio" class="btn-check" id="option_selfpay" [value]="2" formControlName="insuranceStatus" />
+        <label class="btn" for="option_selfpay">Selbstzahler</label>
       </div>
 
       <!-- Pflegegrad -->
       <div class="col-md-6 col-sm-12 form-group mb-3">
-        <label class="fw-light" for="selectCareLevel">Pflegegrad</label>
-        <select
-          class="form-select"
-          id="selectCareLevel"
-          formControlName="careLevel"
-          [ngClass]="{
-            'is-valid': customerForm.controls['careLevel'].valid && customerForm.controls['careLevel'].dirty,
-            'is-invalid': customerForm.controls['careLevel'].invalid && customerForm.controls['careLevel'].touched
-          }"
-        >
-          <option value="0">Kein Pflegegrad</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-      </div>
-    </div>
+        <label class="fw-light">Pflegegrad</label><br />
 
-    <div class="form-group">
-      <label class="fw-light">Abrechnungsoptionen</label>
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" formControlName="doClearanceSelfPayment" id="checkDoClearanceSelfPayment" />
-        <label class="form-check-label" for="checkDoClearanceSelfPayment"> Selbstzahler</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" formControlName="doClearanceReliefAmount" id="checkDoClearanceReliefAmount" />
-        <label class="form-check-label" for="checkDoClearanceReliefAmount"> Entlastungsbetrag §45b SGB XI</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" formControlName="doClearanceCareBenefit" id="checkDoClearanceCareBenefit" />
-        <label class="form-check-label" for="checkDoClearanceCareBenefit"> ..% Pflegesachleistungen §36 SGB XI (max. 40%)</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" formControlName="doClearancePreventiveCare" id="checkDoClearancePreventiveCare" />
-        <label class="form-check-label" for="checkDoClearancePreventiveCare"> Verhinderungspflege § 39 SGB XI</label>
-      </div>
-    </div>
+        <input type="radio" class="btn-check" id="option_level0" [value]="0" formControlName="careLevel" />
+        <label class="btn" for="option_level0">Kein Pflegegrad</label>
 
-    <div class="row g-2 mt-2">
-      <div class="col">
-        <button [disabled]="isLoading() || isSaving()" type="submit" class="btn btn-primary form-control text-white h-100">
-          @if (isSaving()) {
-          <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-          }
-          <span>{{ isCustomer() ? "Kunde" : "Interessenten" }} {{ isNew ? "hinzufügen" : "speichern" }}</span>
-          @if (isSaving()) {
-          <span>...</span>
-          }
-        </button>
+        <input type="radio" class="btn-check" id="option_level1" [value]="1" formControlName="careLevel" />
+        <label class="btn" for="option_level1">1</label>
+
+        <input type="radio" class="btn-check" id="option_level2" [value]="2" formControlName="careLevel" />
+        <label class="btn" for="option_level2">2</label>
+
+        <input type="radio" class="btn-check" id="option_level3" [value]="3" formControlName="careLevel" />
+        <label class="btn" for="option_level3">3</label>
+
+        <input type="radio" class="btn-check" id="option_level4" [value]="4" formControlName="careLevel" />
+        <label class="btn" for="option_level4">4</label>
+
+        <input type="radio" class="btn-check" id="option_level5" [value]="5" formControlName="careLevel" />
+        <label class="btn" for="option_level5">5</label>
       </div>
-      <div class="col">
-        <button
-          type="button"
-          [routerLink]="[isCustomer() ? '/dashboard/customers' : '/dashboard/base-data/prospects']"
-          class="form-control btn btn-outline-secondary h-100"
-        >
-          Verwerfen
-        </button>
+
+      <div class="form-group">
+        <label class="fw-light">Abrechnungsoptionen</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="doClearanceSelfPayment" id="checkDoClearanceSelfPayment" />
+          <label class="form-check-label" for="checkDoClearanceSelfPayment"> Selbstzahler</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="doClearanceReliefAmount" id="checkDoClearanceReliefAmount" />
+          <label class="form-check-label" for="checkDoClearanceReliefAmount"> Entlastungsbetrag §45b SGB XI</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="doClearanceCareBenefit" id="checkDoClearanceCareBenefit" />
+          <label class="form-check-label" for="checkDoClearanceCareBenefit"> ..% Pflegesachleistungen §36 SGB XI (max. 40%)</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="doClearancePreventiveCare" id="checkDoClearancePreventiveCare" />
+          <label class="form-check-label" for="checkDoClearancePreventiveCare"> Verhinderungspflege § 39 SGB XI</label>
+        </div>
+      </div>
+
+      <div class="row g-2 mt-2">
+        <div class="col">
+          <button [disabled]="isLoading() || isSaving()" type="submit" class="btn btn-primary form-control text-white h-100">
+            @if (isSaving()) {
+            <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+            }
+            <span>{{ isCustomer() ? "Kunde" : "Interessenten" }} {{ isNew ? "hinzufügen" : "speichern" }}</span>
+            @if (isSaving()) {
+            <span>...</span>
+            }
+          </button>
+        </div>
+        <div class="col">
+          <button
+            type="button"
+            [routerLink]="[isCustomer() ? '/dashboard/customers' : '/dashboard/base-data/prospects']"
+            class="form-control btn btn-outline-secondary h-100"
+          >
+            Verwerfen
+          </button>
+        </div>
       </div>
     </div>
   </form>
 </div>
+
 }

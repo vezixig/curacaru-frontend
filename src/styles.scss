@@ -124,3 +124,17 @@ select {
 .mw-90 {
   max-width: 90%;
 }
+
+.btn-check:checked + .btn {
+  background-color: #eee !important;
+  border-color: #bbb !important;
+}
+
+.btn-check:checked + .btn {
+  background-color: #eee !important;
+  border-color: #bbb !important;
+}
+
+input.btn-check {
+  display: none !important;
+}
