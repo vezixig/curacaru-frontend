@@ -163,7 +163,6 @@ export class CustomerEditorComponent implements OnDestroy {
     if (this.customerForm.get('status')?.value != CustomerStatus.Interested && this.customerForm.get('insuranceStatus')?.value == null) {
       this.customerForm.get('insuranceStatus')?.setErrors({ required: true });
       this.customerForm.get('insuranceStatus')?.markAsTouched();
-      return;
     } else {
       this.customerForm.get('insuranceStatus')?.setErrors(null);
     }
@@ -174,6 +173,7 @@ export class CustomerEditorComponent implements OnDestroy {
       });
       return;
     }
+
     const customer: Customer = { ...this.customerForm.getRawValue() };
     customer.id = this.isNew ? undefined : this.customerId;
     customer.products = this.productsGroup.controls.filter((o) => o.value?.isSelected).map((o) => o.value!.id);

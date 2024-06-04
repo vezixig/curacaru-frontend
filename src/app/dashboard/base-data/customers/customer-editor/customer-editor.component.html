@@ -216,7 +216,10 @@
         />
       </div>
 
-      <div class="col-md-6 col-sm-12 form-group mb-3">
+      <div
+        class="col-md-6 col-sm-12 form-group mb-3 border-danger"
+        [ngClass]="{ 'invalid border-bottom': customerForm.controls['insuranceStatus'].valid == false }"
+      >
         <label class="fw-light">Versicherungsstatus</label><br />
 
         <input type="radio" class="btn-check" id="option_statutory" [value]="0" formControlName="insuranceStatus" />
