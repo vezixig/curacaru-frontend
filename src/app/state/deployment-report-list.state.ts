@@ -30,6 +30,7 @@ export const deploymentReportListReducer = createReducer(
   initialState,
   on(DeploymentReportChangeFilterAction, (state, args) => ({
     ...state,
+    page: 1,
     customerId: args.customerId,
     employeeId: args.employeeId,
     year: args.year,
@@ -37,6 +38,7 @@ export const deploymentReportListReducer = createReducer(
   })),
   on(DeploymentReportChangeCustomerAction, (state, args) => ({
     ...state,
+    page: 1,
     customerId: args.customerId,
   })),
   on(DeploymentReportChangePageAction, (state, args) => ({
