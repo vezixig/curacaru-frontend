@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, model, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, firstValueFrom, map, mergeMap, startWith, takeUntil, tap } from 'rxjs';
+import { Subject, combineLatest, firstValueFrom, mergeMap, startWith, takeUntil, tap } from 'rxjs';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
-import { EmployeeBasic, UserEmployee } from '@curacaru/models';
+import { UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
 import { ApiService, DateTimeService, ErrorHandlerService, LocationService, ScreenService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
@@ -23,21 +23,26 @@ import { DeleteCustomerModalModel } from '../delete-customer-modal/delete-custom
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 import { CustomerListEntryComponent } from '../customer-list-entry/customer-list-entry.component';
 import { InfoComponent } from '../../../../shared/info-box/info.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { EmployeeSelectComponent } from '@curacaru/shared/employee-select/employee-select.component';
 
 @Component({
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
   templateUrl: './customer-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    FontAwesomeModule,
-    RouterModule,
-    FormsModule,
     AsyncPipe,
-    PagingComponent,
-    LoaderFilterComponent,
     CustomerListEntryComponent,
+    EmployeeSelectComponent,
+    FontAwesomeModule,
+    FormsModule,
     InfoComponent,
+    LoaderFilterComponent,
+    NgSelectModule,
+    PagingComponent,
+    RouterModule,
   ],
 })
 export class CustomerListComponent implements OnDestroy, OnInit {
@@ -59,9 +64,8 @@ export class CustomerListComponent implements OnDestroy, OnInit {
 
   customers = signal<CustomerListEntry[]>([]);
   page = signal<Page<CustomerListEntry> | undefined>(undefined);
-  filterModel$ = new Observable<{ employees: EmployeeBasic[] }>();
   isLoading = signal(true);
-  selectedEmployeeId = signal<UUID | undefined>(undefined);
+  selectedEmployeeId = model<UUID | undefined>(undefined);
   showInactiveCustomers = signal<boolean>(false);
 
   private $onRefresh = new Subject<void>();
@@ -75,13 +79,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   async ngOnInit() {
     this.user = await firstValueFrom(this.userService.user$);
 
-    this.filterModel$ = combineLatest({
-      employees: this.apiService.getEmployeeBaseList(),
-    }).pipe(
-      map((o) => {
-        return { employees: o.employees };
-      })
-    );
+    this.selectedEmployeeId.subscribe(() => this.onFilterChanged());
 
     combineLatest({
       refresh: this.$onRefresh.pipe(startWith({})),

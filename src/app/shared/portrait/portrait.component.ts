@@ -9,15 +9,16 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PortraitComponent {
-  initials = input<string>('');
-  color = computed(() => this.toColor(this.initials()));
+  name = input.required<string>();
+  initials = input.required<string>();
+  color = computed(() => this.intToRGB(this.name()));
 
   /** convert two characters to a color in format #rrggbb */
-  private toColor(str: string): string {
-    const hash = str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
-    const color = Math.floor(Math.abs(Math.sin(hash) * 16777215) % 16777215).toString(16);
-    return `#${color.padStart(6, '0')}`;
-  }
+  // private toColor(str: string): string {
+  //   const hash = str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
+  //   const color = Math.floor(Math.abs(Math.sin(hash) * 16777215) % 16777215).toString(16);
+  //   return `#${color.padStart(6, '0')}`;
+  // }
 
   // toColor(str: string): string {
   //   // Helper function to hash a string into a number
@@ -72,4 +73,24 @@ export class PortraitComponent {
   //   }
   //   return colour;
   // }
+
+  hashCode(str: string) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return hash;
+  }
+
+  intToRGB(name: string) {
+    const i = this.hashCode(name);
+    const c = (i & 0x00ffffff).toString(16).toUpperCase().padStart(6, '0');
+    let r = parseInt(c.substring(0, 2), 16);
+    let g = parseInt(c.substring(2, 4), 16);
+    let b = parseInt(c.substring(4, 6), 16);
+    if (r > 235) r = 235;
+    if (g > 235) g = 235;
+    if (b > 235) b = 235;
+    return `rgb(${r}, ${g}, ${b})`;
+  }
 }

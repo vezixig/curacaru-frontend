@@ -1,0 +1,7 @@
+@if(employees$ |async; as employees) {
+<ng-select [(ngModel)]="selectedEmployeeId" [disabled]="isDisabled()" (change)="onChange(selectedEmployeeId())">
+  @for (employee of employees; track employee) {
+  <ng-option [value]="employee.id">{{ employee.name }}</ng-option>
+  }
+</ng-select>
+}

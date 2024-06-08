@@ -1,5 +1,5 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
@@ -12,10 +12,11 @@ import { InsuranceStatus } from '@curacaru/enums/insurance-status.enum';
 import { Gender } from '@curacaru/enums/gender.enum';
 import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 import { ApiService, ErrorHandlerService, UserService } from '@curacaru/services';
-import { Customer, EmployeeBasic, Insurance } from '@curacaru/models';
+import { Customer, Insurance } from '@curacaru/models';
 import { ValidateInsuredPersonNumber } from '@curacaru/validators/insured-person-number.validator';
 import { ProductsRepository } from '@curacaru/services/repositories/products.repository';
 import { Product } from '@curacaru/models/product';
+import { EmployeeSelectComponent } from '@curacaru/shared/employee-select/employee-select.component';
 
 @Component({
   providers: [ApiService],
@@ -24,7 +25,17 @@ import { Product } from '@curacaru/models/product';
   styleUrls: ['./customer-editor.component.scss'],
   templateUrl: './customer-editor.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule, NgxSkeletonLoaderModule, NgbTypeaheadModule, InputComponent, AsyncPipe],
+  imports: [
+    CommonModule,
+    EmployeeSelectComponent,
+    FormsModule,
+    RouterModule,
+    ReactiveFormsModule,
+    NgxSkeletonLoaderModule,
+    NgbTypeaheadModule,
+    InputComponent,
+    AsyncPipe,
+  ],
 })
 export class CustomerEditorComponent implements OnDestroy {
   private readonly apiService = inject(ApiService);
@@ -37,7 +48,6 @@ export class CustomerEditorComponent implements OnDestroy {
 
   readonly cityName = signal('');
   readonly customerForm: FormGroup;
-  readonly employees = signal<EmployeeBasic[]>([]);
   readonly products = signal<Product[]>([]);
   readonly isLoading = signal(false);
   isNew = true;
@@ -102,12 +112,10 @@ export class CustomerEditorComponent implements OnDestroy {
     });
 
     combineLatest({
-      employees: this.apiService.getEmployeeBaseList(),
       isManager: this.userService.isManager$,
       products: this.productsRepository.getProductsList(),
     }).subscribe({
       next: (result) => {
-        this.employees.set(result.employees);
         this.products.set(result.products);
         this.isManager.set(result.isManager);
         if (!this.isManager()) this.customerForm.disable();
@@ -183,10 +191,10 @@ export class CustomerEditorComponent implements OnDestroy {
     this.isNew ? this.CreateCustomer(customer) : this.UpdateCustomer(customer);
   }
 
-  private CreateCustomer(employee: Customer) {
+  private CreateCustomer(customer: Customer) {
     this.isSaving.set(true);
     this.postCustomerSubscription?.unsubscribe();
-    this.postCustomerSubscription = this.apiService.createCustomer(employee).subscribe({
+    this.postCustomerSubscription = this.apiService.createCustomer(customer).subscribe({
       complete: () => {
         this.toastr.success('Ein neuer Kunde wurde angelegt');
         this.router.navigate(['/dashboard/customers']);
