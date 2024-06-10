@@ -30,7 +30,7 @@ canvas {
 
 .submitButtonHorizontal {
   position: absolute;
-  right: 0px;
+  left: 0px;
   height: 100%;
   width: 95px;
 }
@@ -76,4 +76,8 @@ canvas {
   left: 0;
   top: 0;
   z-index: -1;
+}
+
+canvas {
+  position: absolute;
 }
