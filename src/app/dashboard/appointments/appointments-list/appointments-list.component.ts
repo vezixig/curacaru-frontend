@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, TemplateRef, ViewChild, inject, model, signal } from '@angular/core';
+import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -33,12 +33,10 @@ import { EMPTY, Observable, Subject, catchError, combineLatest, debounceTime, fo
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
-import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { TimeFormatPipe } from '../../../pipes/time.pipe';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
-import { MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { NgbDatePipe } from '@curacaru/pipes/ngb-date-pipe';
 import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
 import { Store } from '@ngrx/store';
@@ -47,6 +45,9 @@ import { SignatureComponent } from '@curacaru/shared/signature/signature.compone
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import { Page } from '@curacaru/models/page.model';
 import { DatepickerComponent } from '@curacaru/shared/datepicker/datepicker.component';
+import { EmployeeSelectComponent } from '../../../shared/employee-select/employee-select.component';
+import { CustomerSelectComponent } from '../../../shared/customer-select/customer-select.component';
+import { UserEmployee } from '@curacaru/models';
 
 @Component({
   providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }],
@@ -69,6 +70,8 @@ import { DatepickerComponent } from '@curacaru/shared/datepicker/datepicker.comp
     SignatureComponent,
     TimeFormatPipe,
     DatepickerComponent,
+    EmployeeSelectComponent,
+    CustomerSelectComponent,
   ],
 })
 export class AppointmentsListComponent implements OnDestroy {
@@ -116,8 +119,6 @@ export class AppointmentsListComponent implements OnDestroy {
   readonly signatureTitle = signal('');
   readonly showPriceInfo$: Observable<boolean>;
   readonly filterModel$: Observable<{
-    employees: EmployeeBasic[];
-    customers: MinimalCustomerListEntry[];
     user: UserEmployee;
   }>;
   readonly dataModel$: Observable<{
@@ -134,8 +135,6 @@ export class AppointmentsListComponent implements OnDestroy {
     this.showPriceInfo$ = this.apiService.getCompanyPrices().pipe(map((result) => result.pricePerHour == 0));
 
     this.filterModel$ = forkJoin({
-      employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getMinimalCustomerList(),
       user: this.userService.user$,
     }).pipe(
       catchError((error) => {

@@ -32,12 +32,11 @@ export class EmployeeSelectComponent implements ControlValueAccessor {
 
   employees$ = this.apiService.getEmployeeBaseList();
 
-  writeValue(id: number): void {
+  writeValue(id: UUID): void {
     this.selectedEmployeeId.set(id);
   }
   registerOnChange(fn: any): void {
     this.onChange = fn;
-    console.log('registerOnChange');
   }
   registerOnTouched(fn: any): void {
     this.onTouched = fn;

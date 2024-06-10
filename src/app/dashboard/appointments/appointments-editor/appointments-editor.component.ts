@@ -28,8 +28,14 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { AppointmentRepository } from '@curacaru/services/repositories/appointment.repository';
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { InfoComponent } from '@curacaru/shared/info-box/info.component';
+import { CustomerSelectComponent } from '@curacaru/shared/customer-select/customer-select.component';
+import { EmployeeSelectComponent } from '@curacaru/shared/employee-select/employee-select.component';
 
 @Component({
+  selector: 'cura-appointments-editor',
+  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
+  standalone: true,
+  templateUrl: './appointments-editor.component.html',
   imports: [
     InfoComponent,
     CommonModule,
@@ -42,11 +48,9 @@ import { InfoComponent } from '@curacaru/shared/info-box/info.component';
     RouterModule,
     ReactiveFormsModule,
     NgbTypeaheadModule,
+    CustomerSelectComponent,
+    EmployeeSelectComponent,
   ],
-  selector: 'cura-appointments-editor',
-  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
-  standalone: true,
-  templateUrl: './appointments-editor.component.html',
 })
 export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   faCalendar = faCalendar;
@@ -59,8 +63,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   canFinish = false;
   canOpen = false;
   canSign = signal(false);
-  customers: MinimalCustomerListEntry[] = [];
-  employees: EmployeeBasic[] = [];
   hasBudgetError = false;
   isDone = false;
   isExpired = false;
@@ -95,6 +97,7 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
   private nextMonth = new NgbDate(new Date().getFullYear(), new Date().getMonth() + 2, 1);
   private postAppointmentSubscription?: Subscription;
   private updateAppointmentSubscription?: Subscription;
+  readonly additionalCustomers = signal<MinimalCustomerListEntry[]>([]);
 
   constructor(
     private apiService: ApiService,
@@ -194,8 +197,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     forkJoin({
-      customers: this.apiService.getMinimalCustomerList(),
-      employees: this.apiService.getEmployeeBaseList(),
       companyPrices: this.apiService.getCompanyPrices(),
       user: this.userService.user$,
     })
@@ -212,8 +213,6 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
           }
 
           this.user = result.user;
-          this.employees = result.employees;
-          this.customers = result.customers;
           if (this.activeRoute.snapshot.queryParams['customerId']) {
             this.appointmentForm.get('customerId')?.setValue(this.activeRoute.snapshot.queryParams['customerId']);
           }
@@ -254,9 +253,10 @@ export class AppointmentsEditorComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (result) => {
-          if (!this.customers.find((x) => x.customerId === result.customerId)) {
-            this.customers.push(result.customer!);
-          }
+          this.additionalCustomers.set([result.customer!]);
+          // if (!this.customers.find((x) => x.customerId === result.customerId)) {
+          //   this.customers.push(result.customer!);
+          // }
 
           this.appointmentForm.patchValue({
             customerId: result.customerId,

@@ -1,0 +1,7 @@
+@if(customers$ |async; as customers) {
+<ng-select [(ngModel)]="selectedCustomerId" [disabled]="isDisabled()" (change)="onChange(selectedCustomerId())" notFoundText="Keine Kunden gefunden">
+  @for (customer of customers; track customer) {
+  <ng-option [value]="customer.customerId">{{ customer.customerName }}</ng-option>
+  }
+</ng-select>
+}

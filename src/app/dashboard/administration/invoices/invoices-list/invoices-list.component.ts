@@ -20,17 +20,27 @@ import { UUID } from 'angular2-uuid';
 import { faCalendar, faUser } from '@fortawesome/free-regular-svg-icons';
 import { Page } from '@curacaru/models/page.model';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
+import { CustomerSelectComponent } from '@curacaru/shared/customer-select/customer-select.component';
 
 @Component({
   selector: 'curacaru-invoices-list',
   templateUrl: './invoices-list.component.html',
   standalone: true,
-  imports: [AsyncPipe, ClearanceTypeNamePipe, CommonModule, FontAwesomeModule, MonthNamePipe, ReactiveFormsModule, RouterModule, PagingComponent],
+  imports: [
+    AsyncPipe,
+    ClearanceTypeNamePipe,
+    CommonModule,
+    FontAwesomeModule,
+    MonthNamePipe,
+    ReactiveFormsModule,
+    RouterModule,
+    PagingComponent,
+    CustomerSelectComponent,
+  ],
 })
 export class InvoicesListComponent {
   /** injections */
   private readonly store = inject(Store<InvoicesListState>);
-  private readonly apiService = inject(ApiService);
   private readonly userService = inject(UserService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly invoiceRepository = inject(InvoiceRepository);
@@ -48,7 +58,7 @@ export class InvoicesListComponent {
   months = DateTimeService.months;
 
   /** Properties */
-  readonly model$: Observable<{ user: UserEmployee; customers: MinimalCustomerListEntry[]; invoices: Page<InvoiceListEntry> }>;
+  readonly model$: Observable<{ user: UserEmployee; invoices: Page<InvoiceListEntry> }>;
   readonly filterForm: FormGroup;
   readonly isLoading = signal(false);
 
@@ -68,7 +78,6 @@ export class InvoicesListComponent {
 
     this.model$ = combineLatest({
       user: this.userService.user$,
-      customers: this.apiService.getMinimalCustomerList(),
       state: this.store,
       refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
@@ -81,7 +90,7 @@ export class InvoicesListComponent {
             result.state.invoicesList.page,
             result.state.invoicesList.customerId
           )
-          .pipe(map((invoices) => ({ user: result.user, customers: result.customers, invoices })))
+          .pipe(map((invoices) => ({ user: result.user, invoices })))
       )
     );
   }
