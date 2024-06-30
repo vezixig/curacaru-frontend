@@ -1,10 +1,24 @@
 [
   {
+    "version": "0.9.0",
+    "releaseDate": "2024-06-11",
+    "features": [
+      "Kontaktformular zur Integration in die Firmenwebseite hinzugefügt",
+      "Interessentenliste zum Bereich Stammdaten hinzugefügt",
+      "Beim Löschen eines Kunden können optional alle offenen Termine und/oder die Budgets gelöscht werden",
+      "In den Auswahlfeldern für Mitarbeitern und Kunden ist jetzt eine Suche möglich",
+      "Der Datumsfilter in der Terminliste wurde um neue Funktionen erweitert",
+      "Die Kundenliste wird in der Desktopansicht jetzt auch als Kachelansicht angezeigt",
+      "Die Kundenkachel enthält jetzt ein Icon mit den Initialen des Kunden und einer Farbe"
+    ],
+    "changes": ["PDF Dokumente werden jetzt in einem neuen Fenster geöffnet"]
+  },
+  {
     "version": "0.8.0",
     "releaseDate": "2024-06-01",
     "bugfixes": [
       "Bei kleinen Bildschirmen kann die Navigationsleiste jetzt gescrollt angezeigt",
-      "Mitarbeiter nicht einen Termin nicht bearbeitet haben, konnten den Button zum Abschließen sehen"
+      "Mitarbeiter die einen Termin nicht bearbeitet haben, konnten den Button zum Abschließen sehen"
     ],
     "features": [
       "Seite zur Anzeige der Versionsinformationen hinzugefügt",
@@ -12,13 +26,14 @@
       "Möglichkeit Kunden einen Staus zuzuweisen hinzugefügt",
       "In der Kundenliste können über einen Schalter alle inaktiven Kunden angezeigt werden",
       "Alle Listen werden jetzt seitenweise angezeigt und haben eine Navigation am unteren Rand",
-      "Ein Schalter in der Terminliste um nur offene Termine anzuzeigen wurde hinzugefügt",
-      "Beim Löschen eines Kunden können optional alle offenen Termine und/oder die Budgets gelöscht werden"
+      "Ein Schalter in der Terminliste um nur offene Termine anzuzeigen wurde hinzugefügt"
     ],
     "changes": [
       "Bei Eingabe des Namens einer Versicherung werden jetzt alle passenden Versicherungen angezeigt",
       "Gelöschte Kunden werden jetzt in den Status 'Ehemaliger Kunde' versetzt und nicht mehr zur Auswahl angezeigt",
-      "Einsatznachweise, Abtretungserklärungen, Zeiterfassungen und Rechnungen können jetzt nur noch über die Schnellanlage angelegt werden"
+      "Einsatznachweise, Abtretungserklärungen, Zeiterfassungen und Rechnungen können jetzt nur noch über die Schnellanlage angelegt werden",
+      "Der Button zum Speichern einer Unterschrift ist jetzt auf der linken Seite",
+      "Auswahlfelder wurden durch eine Schnellwahl ersetzt"
     ]
   },
   {

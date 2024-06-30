@@ -1,0 +1,41 @@
+<div class="modal-header bg-primary text-white p-2">
+  <h4 class="modal-title" id="modal-title">Aktualisierung deines Abonnements</h4>
+  <button type="button" class="btn-close" aria-describedby="modal-title" (click)="modal.dismiss('cancel')"></button>
+</div>
+<div class="modal-body">
+  <p>
+    Möchtest du ein aktuelles <b>{{ currentSubscription()! | subscriptionTypeName }}</b> Abonnement durch ein neues
+    <b>{{ newSubscription()! | subscriptionTypeName }}</b> Abonnement ersetzen?
+  </p>
+
+  @if(isUpgrade()) {
+  <p>
+    Dein neues Abonnement wird <b>{{ currentSubscription() === 0 ? "nach Ende des Testzeitraums" : "sofort" }}</b> in Kraft treten.
+  </p>
+  <p>Dein verbleibenden Tage im aktuellen Abonnement werden dir mit der ersten Rechnung für dein neues Abonnement gutgeschrieben.</p>
+  } @else {
+  <p>
+    Dein neues Abonnement wird zum Ende des aktuellen Abrechnungszeitraums am <b>{{ subscriptionEnd() | date }}</b> in Kraft treten.
+  </p>
+  <p>Bis dahin wird dein aktuelles Abonnement weiter laufen.</p>
+  }
+
+  <p>Solltest du dein Abonnement wechseln, werden<br /></p>
+  <p class="text-center">
+    monatlich <b>{{ price() | number : "1.2-2" }} EUR</b> zzgl. MwSt.
+  </p>
+  <p>über deine hinterlegte Zahlungsmethode abgebucht.</p>
+  <p>Du kannst dein Abonnement jederzeit zum Ende des laufenden Abrechnungszeitraums beenden.</p>
+  <form>
+    <div class="form-check">
+      <input type="checkbox" name="confirm" id="confirm" [(ngModel)]="isConfirmed" required class="form-check-input" />
+      <label class="form-check-label" for="confirm">
+        Hiermit bestätige ich die <a href="#">AGB</a> und <a href="#">Datenschutzerklärung</a> gelesen und akzeptiert zu haben
+      </label>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" ngbAutofocus (click)="modal.dismiss('cancel')">Abbrechen</button>
+  <button type="button" class="btn btn-danger" [disabled]="!isConfirmed()" (click)="modal.close('yes')">Wechsel kostenpflichtig bestätigen</button>
+</div>

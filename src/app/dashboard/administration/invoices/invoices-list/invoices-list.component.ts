@@ -96,6 +96,7 @@ export class InvoicesListComponent {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
+        link.target = '_blank';
         link.download = `Rechnung ${invoice.invoiceNumber}.pdf`;
         link.click();
         this.isLoading.set(false);

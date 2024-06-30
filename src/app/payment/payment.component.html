@@ -1,0 +1,144 @@
+<h4 class="h-underline">Abonnement</h4>
+
+<!-- loading -->
+@if (isLoading()) {
+<div class="alert alert-info" role="alert"><i class="fas fa-spinner fa-spin"></i> Bitte warten, wir laden die Daten.</div>
+}
+<!-- processing -->
+@if(isProcessingSession()) {
+<div class="alert alert-info" role="alert"><i class="fas fa-spinner fa-spin"></i> Bitte warten, deine Zahlung wird verarbeitet.</div>
+}
+
+<!-- subscription status -->
+@if (!isProcessingSession() && (subscriptionStatus$ | async); as subscriptionStatus) {
+<div class="container pt-3">
+  <div class="row g-2">
+    <div class="col col-12">
+      <div class="alert alert-secondary" role="alert">
+        <!-- none -->
+        @if(subscriptionStatus.type === subscriptionType.None) { Du hast gerade kein aktives Abonnement.<br />
+        Aktuell hast du <strong>{{ subscriptionStatus.currentCustomers }}</strong> Kunden. }
+        <!-- free -->
+        @else if(subscriptionStatus.type === subscriptionType.Free) { Du hast bisher noch kein Abonnement und befindest dich in der
+        <b>kostenlosen Testphase.</b><br />
+        Dein Testzeitraum läuft noch bis zum <strong>{{ subscriptionStatus.periodEnd | date : "dd.MM.yyyy" }}</strong
+        >.<br />
+        Aktuell hast du <strong>{{ subscriptionStatus.currentCustomers }}</strong> Kunden.
+        <!-- paid -->
+        } @else { Dein aktuelles Abonnement ist: <strong>{{ subscriptionStatus.type | subscriptionTypeName }}</strong
+        ><br />
+        @if(!subscriptionStatus.isActive) { Dein Abonnement wurde beendet und wird <u>nicht</u> mehr verlängert. Es endet am
+        <strong>{{ subscriptionStatus.periodEnd | date : "dd.MM.yyyy" }}</strong
+        >.<br />
+        } Aktuell hast du <strong>{{ subscriptionStatus.currentCustomers }}</strong> @if(subscriptionStatus.type !== subscriptionType.Premium) { von
+        <strong>{{ subscriptionStatus.maxCustomers }}</strong
+        >} Kunden. }
+        <!-- next subscription -->
+        @if(subscriptionStatus.nextPeriodType) { <br />Dein neues Abonnement ist:
+        <strong>{{ subscriptionStatus.nextPeriodType | subscriptionTypeName }}</strong
+        ><br />
+        Es wird am <strong>{{ subscriptionStatus.nextPeriodStart | date : "dd.MM.yyyy" }}</strong> in Kraft treten. }
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 -4 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Starter</h3>
+          <h1>30 EUR</h1>
+          <p class="small">pro Monat</p>
+          <p class="card-text">Für bis zu 20 Kunden</p>
+          @if(subscriptionStatus.type === subscriptionType.Starter) { @if(subscriptionStatus.isActive) {
+          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
+          }
+          <!-- reactivate -->
+          @else {
+          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
+          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free ) { @if(subscriptionStatus.nextPeriodStart
+          == null) {
+          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Starter)" class="btn btn-primary w-100">Wechseln</button>
+          } } @else {
+          <button (click)="startSession(subscriptionType.Starter)" class="btn btn-primary w-100">Abonnieren</button>
+          } }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Business</h3>
+          <h1>70 EUR</h1>
+          <p class="small">pro Monat</p>
+          <p class="card-text">Für bis zu 50 Kunden</p>
+          @if(subscriptionStatus.type === subscriptionType.Business) { @if(subscriptionStatus.isActive) {
+          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
+          } @else {
+          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
+          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free) { @if(subscriptionStatus.nextPeriodStart
+          == null) {
+          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Business)" class="btn btn-primary w-100">Wechseln</button>
+          } } @else {
+          <button (click)="startSession(subscriptionType.Business)" class="btn btn-primary w-100">Abonnieren</button>
+          } }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Pro</h3>
+          <h1>130 EUR</h1>
+          <p class="small">pro Monat</p>
+          <p class="card-text">Für bis zu 100 Kunden</p>
+          @if(subscriptionStatus.type === subscriptionType.Pro) { @if(subscriptionStatus.isActive) {
+          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
+          } @else {
+          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
+          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free) { @if(subscriptionStatus.nextPeriodStart
+          == null) {
+          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Pro)" class="btn btn-primary w-100">Wechseln</button>
+          } } @else {
+          <button (click)="startSession(subscriptionType.Pro)" class="btn btn-primary w-100">Abonnieren</button>
+          } }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Premium</h3>
+          <h1>210 EUR</h1>
+          <p class="small">pro Monat</p>
+          <p class="card-text">Ab 100 Kunden</p>
+          @if(subscriptionStatus.type === subscriptionType.Premium) { @if(subscriptionStatus.isActive) {
+          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
+          } @else {
+          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
+          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free) { @if(subscriptionStatus.nextPeriodStart
+          == null) {
+          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Premium)" class="btn btn-primary w-100">Wechseln</button>
+          } } @else {
+          <button (click)="startSession(subscriptionType.Premium)" class="btn btn-primary w-100">Abonnieren</button>
+          } }
+        </div>
+      </div>
+    </div>
+
+    <div class="col col-12 text-center fi">
+      Du kannst dein Abonnement jederzeit beenden. Es wird dann zum Ende des aktuellen Abrechnungszeitraums nicht mehr verlängert.<br />
+      Wählst du ein neues Abonnement, wird dieses sofort aktiviert und das alte Abonnement beendet. Dein Restguthaben wird anteilig verrechnet.<br />
+      Weitere Informationen findest du in unseren <a href="#">AGB</a>.
+    </div>
+
+    @if(subscriptionStatus.isActive) {
+    <div class="col col-12 mt-4 text-center">
+      <button (click)="onCancelSubscription(subscriptionStatus)" class="btn btn-danger">Abonnement beenden</button>
+    </div>
+    }
+  </div>
+</div>
+<button (click)="onDelete()">ABO LÖSCHEN (NUR TEST)</button>
+}

@@ -112,6 +112,7 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
+        link.target = '_blank';
         link.download = `Abtretungserklärung ${declaration.year} - ${declaration.customerName}.pdf`;
         link.click();
         this.isLoading.set(false);

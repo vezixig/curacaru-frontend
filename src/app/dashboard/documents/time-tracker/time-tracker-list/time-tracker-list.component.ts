@@ -91,6 +91,7 @@ export class TimeTrackerListComponent {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
+        link.target = '_blank';
         link.download = `Arbeitszeiterfassung - ${report.employeeName}.pdf`;
         link.click();
       },

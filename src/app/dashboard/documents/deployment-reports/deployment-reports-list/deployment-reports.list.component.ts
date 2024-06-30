@@ -126,6 +126,7 @@ export class DeploymentReportsListComponent {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
+        link.target = '_blank';
         link.download = `Einsatznachweis - ${report.customerName}.pdf`;
         link.click();
       },

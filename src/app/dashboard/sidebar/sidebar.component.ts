@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserService } from '@curacaru/services/user.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faArrowsSpin,
   faBuilding,
   faCalendar,
   faCoins,
@@ -27,6 +28,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent {
+  faArrowsSpin = faArrowsSpin;
   faBuilding = faBuilding;
   faCalendar = faCalendar;
   faCoins = faCoins;
