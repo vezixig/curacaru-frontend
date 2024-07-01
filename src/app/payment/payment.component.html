@@ -41,91 +41,41 @@
       </div>
     </div>
 
-    <div class="col-12 col-md-6 -4 col-xl-3">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">Starter</h3>
-          <h1>30 EUR</h1>
-          <p class="small">pro Monat</p>
-          <p class="card-text">Für bis zu 20 Kunden</p>
-          @if(subscriptionStatus.type === subscriptionType.Starter) { @if(subscriptionStatus.isActive) {
-          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
-          }
-          <!-- reactivate -->
-          @else {
-          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
-          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free ) { @if(subscriptionStatus.nextPeriodStart
-          == null) {
-          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Starter)" class="btn btn-primary w-100">Wechseln</button>
-          } } @else {
-          <button (click)="startSession(subscriptionType.Starter)" class="btn btn-primary w-100">Abonnieren</button>
-          } }
-        </div>
-      </div>
-    </div>
+    <cura-price
+      class="col-12 col-md-6 col-xl-3"
+      [subscription]="subscriptionStatus"
+      [type]="subscriptionType.Starter"
+      (changeSubscription)="onChangeSubscription($event)"
+      (renewSubscription)="renewSubscription()"
+      (startSession)="startSession($event)"
+    />
 
-    <div class="col-12 col-md-6 col-xl-3">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">Business</h3>
-          <h1>70 EUR</h1>
-          <p class="small">pro Monat</p>
-          <p class="card-text">Für bis zu 50 Kunden</p>
-          @if(subscriptionStatus.type === subscriptionType.Business) { @if(subscriptionStatus.isActive) {
-          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
-          } @else {
-          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
-          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free) { @if(subscriptionStatus.nextPeriodStart
-          == null) {
-          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Business)" class="btn btn-primary w-100">Wechseln</button>
-          } } @else {
-          <button (click)="startSession(subscriptionType.Business)" class="btn btn-primary w-100">Abonnieren</button>
-          } }
-        </div>
-      </div>
-    </div>
+    <cura-price
+      class="col-12 col-md-6 col-xl-3"
+      [subscription]="subscriptionStatus"
+      [type]="subscriptionType.Business"
+      (changeSubscription)="onChangeSubscription($event)"
+      (renewSubscription)="renewSubscription()"
+      (startSession)="startSession($event)"
+    />
 
-    <div class="col-12 col-md-6 col-xl-3">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">Pro</h3>
-          <h1>130 EUR</h1>
-          <p class="small">pro Monat</p>
-          <p class="card-text">Für bis zu 100 Kunden</p>
-          @if(subscriptionStatus.type === subscriptionType.Pro) { @if(subscriptionStatus.isActive) {
-          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
-          } @else {
-          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
-          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free) { @if(subscriptionStatus.nextPeriodStart
-          == null) {
-          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Pro)" class="btn btn-primary w-100">Wechseln</button>
-          } } @else {
-          <button (click)="startSession(subscriptionType.Pro)" class="btn btn-primary w-100">Abonnieren</button>
-          } }
-        </div>
-      </div>
-    </div>
+    <cura-price
+      class="col-12 col-md-6 col-xl-3"
+      [subscription]="subscriptionStatus"
+      [type]="subscriptionType.Pro"
+      (changeSubscription)="onChangeSubscription($event)"
+      (renewSubscription)="renewSubscription()"
+      (startSession)="startSession($event)"
+    />
 
-    <div class="col-12 col-md-6 col-xl-3">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">Premium</h3>
-          <h1>210 EUR</h1>
-          <p class="small">pro Monat</p>
-          <p class="card-text">Ab 100 Kunden</p>
-          @if(subscriptionStatus.type === subscriptionType.Premium) { @if(subscriptionStatus.isActive) {
-          <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
-          } @else {
-          <button (click)="renewSubscription()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
-          } } @else { @if(subscriptionStatus.isActive && subscriptionStatus.type !== subscriptionType.Free) { @if(subscriptionStatus.nextPeriodStart
-          == null) {
-          <button (click)="onChangeSubscription(subscriptionStatus, subscriptionType.Premium)" class="btn btn-primary w-100">Wechseln</button>
-          } } @else {
-          <button (click)="startSession(subscriptionType.Premium)" class="btn btn-primary w-100">Abonnieren</button>
-          } }
-        </div>
-      </div>
-    </div>
+    <cura-price
+      class="col-12 col-md-6 col-xl-3"
+      [subscription]="subscriptionStatus"
+      [type]="subscriptionType.Premium"
+      (changeSubscription)="onChangeSubscription($event)"
+      (renewSubscription)="renewSubscription()"
+      (startSession)="startSession($event)"
+    />
 
     <div class="col col-12 text-center fi">
       Du kannst dein Abonnement jederzeit beenden. Es wird dann zum Ende des aktuellen Abrechnungszeitraums nicht mehr verlängert.<br />

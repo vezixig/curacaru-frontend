@@ -22,7 +22,8 @@
 
   <p>Solltest du dein Abonnement wechseln, werden<br /></p>
   <p class="text-center">
-    monatlich <b>{{ price() | number : "1.2-2" }} EUR</b> zzgl. MwSt.
+    monatlich <b>{{ price() | number : "1.2-2" }} EUR</b><br />
+    zzgl. USt. in Höhe von <b>{{ tax() | number : "1.2-2" }} EUR</b>
   </p>
   <p>über deine hinterlegte Zahlungsmethode abgebucht.</p>
   <p>Du kannst dein Abonnement jederzeit zum Ende des laufenden Abrechnungszeitraums beenden.</p>

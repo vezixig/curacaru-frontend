@@ -38,7 +38,7 @@ export class BudgetsEditorComponent implements OnDestroy, OnInit {
   isLoading = true;
   isSaving = false;
   nextYear = new Date().getFullYear() + 1;
-  showLastYear = new Date().getMonth() <= 6;
+  showLastYear = new Date().getMonth() < 6;
 
   /** injected services */
   private apiService = inject(ApiService);

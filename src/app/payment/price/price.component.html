@@ -1,0 +1,19 @@
+<div class="card">
+  <div class="card-body">
+    <h3 class="card-title">{{ type() | subscriptionTypeName }}</h3>
+    <h1>{{ fee() }} EUR</h1>
+    <p class="small">monatlich (exkl. Steuer)</p>
+    <p class="card-text">{{ description() }}</p>
+    @if(subscription().type === type()) { @if(subscription().isActive) {
+    <button class="btn btn-outline-primary w-100" disabled>Das ist dein aktives Abo</button>
+    }
+    <!-- reactivate -->
+    @else {
+    <button (click)="renewSubscription.emit()" class="btn btn-primary w-100">Abonnement wieder aktivieren</button>
+    } } @else { @if(subscription().isActive && subscription().type !== subscriptionType.Free ) { @if(subscription().nextPeriodStart == null) {
+    <button (click)="changeSubscription.emit({ current: subscription(), newType: type() })" class="btn btn-primary w-100">Wechseln</button>
+    } } @else {
+    <button (click)="startSession.emit(type())" class="btn btn-primary w-100">Abonnieren</button>
+    } }
+  </div>
+</div>

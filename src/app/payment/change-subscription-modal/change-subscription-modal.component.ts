@@ -19,5 +19,6 @@ export class ChangeSubscriptionModalConfirm {
   subscriptionEnd = model<Date>();
   isConfirmed = signal(false);
   price = computed(() => SubscriptionService.getPrice(this.newSubscription() ?? 0));
+  tax = computed(() => this.price() * 0.19);
   isUpgrade = computed(() => (this.newSubscription() ?? 0) > (this.currentSubscription() ?? 0));
 }

@@ -12,6 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ChangeSubscriptionModalConfirm } from './change-subscription-modal/change-subscription-modal.component';
 import { ErrorHandlerService } from '@curacaru/services';
 import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.component';
+import { PriceComponent } from './price/price.component';
 
 @Component({
   selector: 'app-payment',
@@ -19,7 +20,7 @@ import { NgbdModalConfirm } from '@curacaru/modals/confirm-modal/confirm-modal.c
   templateUrl: './payment.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, subscriptionTypeNamePipe],
+  imports: [CommonModule, subscriptionTypeNamePipe, PriceComponent],
 })
 export class PaymentComponent implements OnInit {
   private readonly httpClient = inject(HttpClient);
@@ -105,16 +106,14 @@ export class PaymentComponent implements OnInit {
     });
   }
 
-  onChangeSubscription(currentSubscription: SubscriptionStatus, newSubscriptionType: SubscriptionType) {
+  onChangeSubscription(data: { current: SubscriptionStatus; newType: SubscriptionType }) {
     const modalRef = this.modalService.open(ChangeSubscriptionModalConfirm, { size: 'lg' });
     console.log(modalRef.componentInstance);
     const componentRef = modalRef.componentInstance as ChangeSubscriptionModalConfirm;
-    componentRef.currentSubscription.set(currentSubscription.type);
-    componentRef.subscriptionEnd.set(currentSubscription.periodEnd);
-    componentRef.newSubscription.set(newSubscriptionType);
-    modalRef.result.then(() =>
-      componentRef.isUpgrade() ? this.upgradeSubscription(newSubscriptionType) : this.downgradeSubscription(newSubscriptionType)
-    );
+    componentRef.currentSubscription.set(data.current.type);
+    componentRef.subscriptionEnd.set(data.current.periodEnd);
+    componentRef.newSubscription.set(data.newType);
+    modalRef.result.then(() => (componentRef.isUpgrade() ? this.upgradeSubscription(data.newType) : this.downgradeSubscription(data.newType)));
   }
 
   private upgradeSubscription(subscriptionType: SubscriptionType) {
