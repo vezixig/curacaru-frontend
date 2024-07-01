@@ -24,6 +24,8 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin, map, startWith, switchMap } from 'rxjs';
 import { InfoComponent } from '@curacaru/shared/info-box/info.component';
+import { CustomerSelectComponent } from '@curacaru/shared/customer-select/customer-select.component';
+import { EmployeeSelectComponent } from '@curacaru/shared/employee-select/employee-select.component';
 
 @Component({
   providers: [ApiService, MonthNamePipe, ClearanceTypeNamePipe],
@@ -43,6 +45,8 @@ import { InfoComponent } from '@curacaru/shared/info-box/info.component';
     ReactiveFormsModule,
     RouterModule,
     InfoComponent,
+    EmployeeSelectComponent,
+    CustomerSelectComponent,
   ],
 })
 export class DeploymentReportsListComponent {
@@ -68,8 +72,6 @@ export class DeploymentReportsListComponent {
   months = DateTimeService.months;
 
   readonly filterModel$: Observable<{
-    customers: MinimalCustomerListEntry[];
-    employees: EmployeeBasic[];
     user: UserEmployee;
   }>;
   readonly filterForm: FormGroup;
@@ -87,8 +89,6 @@ export class DeploymentReportsListComponent {
 
     this.filterModel$ = forkJoin({
       user: this.userService.user$,
-      employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getMinimalCustomerListDeploymentReports(),
     });
 
     this.listModel$ = combineLatest({ state: this.store, refresh: this.$onRefresh.pipe(startWith({})) }).pipe(

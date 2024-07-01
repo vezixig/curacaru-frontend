@@ -8,6 +8,7 @@ import { AssignmentDeclarationListEntry } from '@curacaru/models/assignment-decl
 import { Page } from '@curacaru/models/page.model';
 import { ApiService, UserService } from '@curacaru/services';
 import { DocumentRepository } from '@curacaru/services/repositories/document.repository';
+import { EmployeeSelectComponent } from '@curacaru/shared/employee-select/employee-select.component';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import {
   AssignmentDeclarationListChangeFilterAction,
@@ -23,7 +24,7 @@ import { Observable, Subject, catchError, combineLatest, debounceTime, forkJoin,
 
 @Component({
   templateUrl: './assignment-declarations-list.component.html',
-  imports: [RouterModule, AsyncPipe, FormsModule, ReactiveFormsModule, PagingComponent, CommonModule, FontAwesomeModule],
+  imports: [RouterModule, AsyncPipe, FormsModule, ReactiveFormsModule, PagingComponent, CommonModule, FontAwesomeModule, EmployeeSelectComponent],
   selector: 'cura-assignment-declarations',
   standalone: true,
 })
@@ -36,7 +37,6 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
   faUser = faUser;
 
   readonly filterModel$: Observable<{
-    employees: EmployeeBasic[];
     user: UserEmployee;
   }>;
   readonly listModel$: Observable<Page<AssignmentDeclarationListEntry>>;
@@ -44,7 +44,6 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
   readonly isLoading = signal(false);
 
   private readonly $onRefresh = new Subject();
-  private readonly apiService = inject(ApiService);
   private readonly documentRepository = inject(DocumentRepository);
   private readonly formBuilder = inject(FormBuilder);
   private readonly modalService = inject(NgbModal);
@@ -68,7 +67,6 @@ export class AssignmentDeclarationsListComponent implements OnDestroy {
 
     this.filterModel$ = forkJoin({
       user: this.userService.user$,
-      employees: this.apiService.getEmployeeBaseList(),
     });
 
     this.listModel$ = combineLatest({ _: this.onRefresh$.pipe(startWith(null)), state: this.store }).pipe(

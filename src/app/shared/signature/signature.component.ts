@@ -29,6 +29,8 @@ export class SignatureComponent implements AfterViewInit, OnDestroy {
   private readonly $onDestroy = new Subject();
   canvasWidth = signal(0);
   canvasHeight = signal(0);
+  canvasLeft = signal('0px');
+  toolOffset = signal('0px;');
   isHorizontal = signal(false);
   faEraser = faEraser;
 
@@ -54,6 +56,8 @@ export class SignatureComponent implements AfterViewInit, OnDestroy {
         width -= this.isHorizontal() ? 105 : 0;
         height -= this.isHorizontal() ? 0 : 40;
 
+        this.canvasLeft.set((this.isHorizontal() ? 105 : 0).toString() + 'px');
+        // this.toolOffset.set(('this.isHorizontal() ? 100 : 0).toString() + 'px');
         this.canvasHeight.set(height);
         this.canvasWidth.set(width);
       });

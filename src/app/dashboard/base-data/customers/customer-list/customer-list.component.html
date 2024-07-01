@@ -1,4 +1,3 @@
-<!-- Header -->
 <h4 [class.h-underline]="!user?.isManager">Kundenliste</h4>
 
 @if (user?.isManager) {
@@ -6,16 +5,11 @@
 }
 
 <!-- Filter -->
-@if(filterModel$ | async; as filterModel) { @if (user?.isManager) {
+@if (user?.isManager) {
 
 <div class="form-group p-0">
   <label class="fw-light" for="dpFromDate">Mitarbeiter</label>
-  <select class="form-select" name="employeeSelect" [(ngModel)]="selectedEmployeeId" (change)="onFilterChanged()">
-    <option></option>
-    @for (employee of filterModel.employees; track employee) {
-    <option [value]="employee.id">{{ employee.name }}</option>
-    }
-  </select>
+  <cura-employee-select [(selectedEmployeeId)]="selectedEmployeeId" />
 </div>
 <div class="form-check form-switch m-2">
   <input
@@ -26,37 +20,32 @@
     (change)="onFilterChanged()"
     id="checkShowInactiveCustomers"
   />
-  <label class="form-check-label fw-light" for="checkShowInactiveCustomers"> Nur inaktive Kunden anzeigen</label>
+  <label class="form-check-label fw-light" for="checkShowInactiveCustomers"> Nur ehemalige Kunden anzeigen</label>
 </div>
 }
 
-<!-- customers -->
-@if(isMobile()) {
-<cura-customer-list-mobile
-  [customers]="customers()"
-  [isLoading]="isLoading()"
-  [isManager]="user!.isManager"
-  (onDelete)="handleDelete($event)"
-  (onNavigate)="handleNavigate($event)"
-  (onShowAppointments)="handleShowAppointments($event)"
-  (onShowDeploymentReports)="handleShowDeploymentReports($event)"
-  (onShowInvoices)="handleShowInvoices($event)"
-/>
-} @else {
-<cura-customer-list-table
-  [customers]="customers()"
-  [isLoading]="isLoading()"
-  [isManager]="user!.isManager"
-  (onDelete)="handleDelete($event)"
-  (onNavigate)="handleNavigate($event)"
-  (onShowAppointments)="handleShowAppointments($event)"
-  (onShowDeploymentReports)="handleShowDeploymentReports($event)"
-  (onShowInvoices)="handleShowInvoices($event)"
-/>
+<div class="p-0 pb-3 container">
+  <div class="row g-3">
+    @for (customer of customers(); track customer.id) {
+    <cura-customer-list-entry
+      [customer]="customer"
+      class="col-12 col-lg-6 col-xxl-4"
+      [routerLink]="['/dashboard/customers/', customer.id]"
+      [isLoading]="isLoading()"
+      [isManager]="user!.isManager"
+      (onDelete)="handleDelete($event)"
+      (onNavigate)="handleNavigate($event)"
+      (onShowAppointments)="handleShowAppointments($event)"
+      (onShowDeploymentReports)="handleShowDeploymentReports($event)"
+      (onShowInvoices)="handleShowInvoices($event)"
+    />
+    }
+  </div>
+</div>
+
+@if(customers().length === 0) {
+<cura-info>Es wurden keine Kunden gefunden</cura-info>
 }
 
 <!-- paging -->
 <cura-paging [page]="page()" (pageChange)="onPageChange($event)" />
-
-<!-- filter loader -->
-} @else {<cura-loader-filter />}

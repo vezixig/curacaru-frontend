@@ -1,41 +1,39 @@
-<div class="row">
-  <h4 class="h-underline">Konto bearbeiten</h4>
-  @if(model$ |async; as model) {
-  <form (ngSubmit)="onSave()" [formGroup]="employeeForm">
-    <Label class="fw-light">E-Mail Adresse</Label>
-    <p class="ms-3 mt-1 m-0 fs-6">{{ employeeForm.get("email")?.value }}</p>
-    <cura-input [maxLength]="50" key="firstName" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
-    <cura-input [maxLength]="50" key="lastName" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
-    <cura-input [maxLength]="50" key="phoneNumber" label="Telefonnummer" [form]="employeeForm" placeholder="Telefonnummer eingeben" />
+<h4 class="h-underline">Konto bearbeiten</h4>
+@if(model$ |async; as model) {
+<form class="p-0" (ngSubmit)="onSave()" [formGroup]="employeeForm">
+  <Label class="fw-light">E-Mail Adresse</Label>
+  <p class="ms-3 mt-1 m-0 fs-6">{{ employeeForm.get("email")?.value }}</p>
+  <cura-input [maxLength]="50" key="firstName" label="Vorname" [form]="employeeForm" placeholder="Vorname eingeben" />
+  <cura-input [maxLength]="50" key="lastName" label="Nachname" [form]="employeeForm" placeholder="Nachname eingeben" />
+  <cura-input [maxLength]="50" key="phoneNumber" label="Telefonnummer" [form]="employeeForm" placeholder="Telefonnummer eingeben" />
 
-    <div class="form-group">
-      <label class="fw-light" for="exampleFormControlSelect1">Mitarbeiterrolle</label>
-      <p class="ms-3 my-1 m-0 fs-6">{{ model.user.isManager ? "Manager" : "Mitarbeiter" }}</p>
-    </div>
+  <div class="form-group">
+    <label class="fw-light" for="exampleFormControlSelect1">Mitarbeiterrolle</label>
+    <p class="ms-3 my-1 m-0 fs-6">{{ model.user.isManager ? "Manager" : "Mitarbeiter" }}</p>
+  </div>
 
-    <div class="row g-2 mt-3">
-      <div class="col">
-        <button [disabled]="isSaving()" type="submit" class="form-control btn btn-primary text-white h-100">
-          @if (isSaving()) {
-          <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-          }
-          <span>Daten speichern</span>
-          @if (isSaving()) {
-          <span>...</span>
-          }
-        </button>
-      </div>
-      <div class="col">
-        <button type="button" [disabled]="isSending()" (click)="onResetPassword()" class="form-control btn btn-outline-primary h-100">
-          Passwort ändern @if (isSending()) {
-          <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
-          }
-        </button>
-      </div>
-      <div class="col">
-        <button type="button" [routerLink]="['/dashboard/']" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
-      </div>
+  <div class="row g-2 mt-3">
+    <div class="col">
+      <button [disabled]="isSaving()" type="submit" class="form-control btn btn-primary text-white h-100">
+        @if (isSaving()) {
+        <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        }
+        <span>Daten speichern</span>
+        @if (isSaving()) {
+        <span>...</span>
+        }
+      </button>
     </div>
-  </form>
-  }
-</div>
+    <div class="col">
+      <button type="button" [disabled]="isSending()" (click)="onResetPassword()" class="form-control btn btn-outline-primary h-100">
+        Passwort ändern @if (isSending()) {
+        <span class="spinner-border spinner-border-sm mx-2" aria-hidden="true"></span>
+        }
+      </button>
+    </div>
+    <div class="col">
+      <button type="button" [routerLink]="['/dashboard/']" class="form-control btn btn-outline-secondary h-100">Verwerfen</button>
+    </div>
+  </div>
+</form>
+}

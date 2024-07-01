@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, TemplateRef, ViewChild, inject, model, signal } from '@angular/core';
+import { Component, OnDestroy, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -33,12 +33,10 @@ import { EMPTY, Observable, Subject, catchError, combineLatest, debounceTime, fo
 import { GermanDateParserFormatter } from '../../../i18n/date-formatter';
 import { NgbdModalConfirm } from '../../../modals/confirm-modal/confirm-modal.component';
 import { AppointmentListEntry } from '../../../models/appointment-list-entry.model';
-import { EmployeeBasic } from '../../../models/employee-basic.model';
 import { TimeFormatPipe } from '../../../pipes/time.pipe';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ReplacePipe } from '@curacaru/pipes/replace.pipe';
 import { ApiService, DateTimeService, LocationService, UserService } from '@curacaru/services';
-import { MinimalCustomerListEntry, UserEmployee } from '@curacaru/models';
 import { NgbDatePipe } from '@curacaru/pipes/ngb-date-pipe';
 import { AppointmentListActions, AppointmentListState } from '@curacaru/state/appointment-list.state';
 import { Store } from '@ngrx/store';
@@ -46,15 +44,24 @@ import { AppointmentRepository } from '@curacaru/services/repositories/appointme
 import { SignatureComponent } from '@curacaru/shared/signature/signature.component';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import { Page } from '@curacaru/models/page.model';
+import { DatepickerComponent } from '@curacaru/shared/datepicker/datepicker.component';
+import { EmployeeSelectComponent } from '../../../shared/employee-select/employee-select.component';
+import { CustomerSelectComponent } from '../../../shared/customer-select/customer-select.component';
+import { UserEmployee } from '@curacaru/models';
 
 @Component({
+  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }],
+  selector: 'cura-appointments-list',
+  standalone: true,
+  styleUrls: ['./appointments-list.component.scss'],
+  templateUrl: './appointments-list.component.html',
   imports: [
     CommonModule,
     FontAwesomeModule,
     FormsModule,
     NgbCollapseModule,
-    NgbDatePipe,
     NgbDatepickerModule,
+    NgbDatePipe,
     NgxSkeletonLoaderModule,
     PagingComponent,
     ReactiveFormsModule,
@@ -62,12 +69,10 @@ import { Page } from '@curacaru/models/page.model';
     RouterModule,
     SignatureComponent,
     TimeFormatPipe,
+    DatepickerComponent,
+    EmployeeSelectComponent,
+    CustomerSelectComponent,
   ],
-  providers: [{ provide: NgbDateParserFormatter, useClass: GermanDateParserFormatter }, ApiService],
-  selector: 'cura-appointments-list',
-  standalone: true,
-  styleUrls: ['./appointments-list.component.scss'],
-  templateUrl: './appointments-list.component.html',
 })
 export class AppointmentsListComponent implements OnDestroy {
   /** injections */
@@ -105,7 +110,6 @@ export class AppointmentsListComponent implements OnDestroy {
 
   /** properties  */
   @ViewChild('signature') signatureTemplate!: TemplateRef<any>;
-  hoveredDate: NgbDate | null = null;
   isLoading = true;
   isCollapsed = true;
   today = new Date();
@@ -115,8 +119,6 @@ export class AppointmentsListComponent implements OnDestroy {
   readonly signatureTitle = signal('');
   readonly showPriceInfo$: Observable<boolean>;
   readonly filterModel$: Observable<{
-    employees: EmployeeBasic[];
-    customers: MinimalCustomerListEntry[];
     user: UserEmployee;
   }>;
   readonly dataModel$: Observable<{
@@ -133,8 +135,6 @@ export class AppointmentsListComponent implements OnDestroy {
     this.showPriceInfo$ = this.apiService.getCompanyPrices().pipe(map((result) => result.pricePerHour == 0));
 
     this.filterModel$ = forkJoin({
-      employees: this.apiService.getEmployeeBaseList(),
-      customers: this.apiService.getMinimalCustomerList(),
       user: this.userService.user$,
     }).pipe(
       catchError((error) => {
@@ -148,6 +148,7 @@ export class AppointmentsListComponent implements OnDestroy {
       customerId: [undefined],
       start: [DateTimeService.toNgbDate(new Date())],
       end: [DateTimeService.toNgbDate(new Date())],
+      dateMode: [1],
       onlyOpen: [false],
     });
 
@@ -176,15 +177,17 @@ export class AppointmentsListComponent implements OnDestroy {
       state: this.store,
       refresh: this.$onRefresh.pipe(startWith(true)),
     }).pipe(
-      debounceTime(250),
-      tap(() => (this.isLoading = true)),
-      switchMap((next) => {
+      tap((next) => {
         if (next.state.appointmentList.dateStart != this.filterForm.get('start')?.value) {
           this.filterForm.patchValue({ start: next.state.appointmentList.dateStart }, { emitEvent: false });
         }
 
         if (next.state.appointmentList.dateEnd != this.filterForm.get('end')?.value) {
           this.filterForm.patchValue({ end: next.state.appointmentList.dateEnd }, { emitEvent: false });
+        }
+
+        if (next.state.appointmentList.dateMode != this.filterForm.get('dateMode')?.value) {
+          this.filterForm.patchValue({ dateMode: next.state.appointmentList.dateMode }, { emitEvent: false });
         }
 
         if (next.filter.user.isManager && next.state.appointmentList.employeeId != this.filterForm.get('employeeId')?.value) {
@@ -198,7 +201,10 @@ export class AppointmentsListComponent implements OnDestroy {
         if (next.state.appointmentList.onlyOpen != this.filterForm.get('onlyOpen')?.value) {
           this.filterForm.patchValue({ onlyOpen: next.state.appointmentList.onlyOpen }, { emitEvent: false });
         }
-
+      }),
+      debounceTime(250),
+      tap(() => (this.isLoading = true)),
+      switchMap((next) => {
         return this.apiService
           .getAppointmentList(
             this.filterForm.get('start')?.value,
@@ -240,25 +246,17 @@ export class AppointmentsListComponent implements OnDestroy {
 
   onSetToday() {
     this.store.dispatch(
-      AppointmentListActions.changeDateFilter({ dateStart: DateTimeService.toNgbDate(new Date()), dateEnd: DateTimeService.toNgbDate(new Date()) })
+      AppointmentListActions.changeDateFilter({
+        dateStart: DateTimeService.toNgbDate(new Date()),
+        dateEnd: DateTimeService.toNgbDate(new Date()),
+        dateMode: this.filterForm.get('dateMode')?.value,
+      })
     );
   }
 
-  onOffsetDate(offset: number) {
-    var start = this.filterForm.get('start')!.value as NgbDate;
-    var startDate = new Date(start.year, start.month - 1, start.day);
-    startDate.setDate(startDate.getDate() + offset);
-    const ngbStartDate = DateTimeService.toNgbDate(startDate);
-
-    this.filterForm.patchValue({ start: ngbStartDate, end: ngbStartDate });
-    this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: ngbStartDate, dateEnd: ngbStartDate }));
-  }
-
-  onDateSelection(date: NgbDate) {
-    // this.fromDate.set(date);
-    // this.toDate = date;
-    this.filterForm.patchValue({ start: date, end: date });
-    this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: date, dateEnd: date }));
+  onDateSelection(range: { start: NgbDate; end: NgbDate; dateMode: number }) {
+    this.store.dispatch(AppointmentListActions.changeDateFilter({ dateStart: range.start, dateEnd: range.end, dateMode: range.dateMode }));
+    this.filterForm.patchValue({ start: range.start, end: range.end, dateMode: range.dateMode });
   }
 
   onDelete(appointment: AppointmentListEntry) {

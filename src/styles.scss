@@ -4,6 +4,7 @@ $primary: #ff7f02;
 /* Importing Bootstrap SCSS file. */
 @import "bootstrap/scss/bootstrap";
 @import "ngx-toastr/toastr-bs5-alert";
+@import "@ng-select/ng-select/themes/default.theme.css";
 
 body {
   height: -webkit-fill-available;
@@ -123,4 +124,52 @@ select {
 
 .mw-90 {
   max-width: 90%;
+}
+
+.btn-check:checked + .btn {
+  background-color: #eee !important;
+  border-color: #bbb !important;
+}
+
+.btn-check:checked + .btn {
+  background-color: #eee !important;
+  border-color: #bbb !important;
+}
+
+.page-item {
+  cursor: pointer;
+}
+
+input.btn-check {
+  display: none !important;
+}
+
+.ng-option.ng-option-marked {
+  background-color: #ff7f02 !important;
+  color: #fff !important;
+}
+
+.ng-option.ng-option-selected {
+  background-color: #ffbe7c !important;
+  color: #fff !important;
+}
+
+.ng-select.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+  border-color: #ffbe7c;
+  box-shadow: 0 0 0 0.25rem rgba(255, 127, 2, 0.25);
+}
+
+.ng-select .ng-select-container {
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+.ng-select.ng-select-opened > .ng-select-container {
+  border: var(--bs-border-width) solid var(--bs-border-color);
+}
+
+.ng-dropdown-panel.ng-select-bottom {
+  border-bottom-left-radius: var(--bs-border-radius);
+  border-bottom-right-radius: var(--bs-border-radius);
+  border: var(--bs-border-width) solid var(--bs-border-color);
 }

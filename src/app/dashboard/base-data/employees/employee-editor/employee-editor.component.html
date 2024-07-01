@@ -29,15 +29,13 @@
     />
 
     <div class="form-group">
-      <label class="fw-light" for="exampleFormControlSelect1">Mitarbeiterrolle</label>
-      @if (isLoading) {
-      <ngx-skeleton-loader />
-      } @if (!isLoading) {
-      <select formControlName="role" class="form-control" id="exampleFormControlSelect1">
-        <option value="employee">Mitarbeiter</option>
-        <option value="manager">Manager</option>
-      </select>
-      }
+      <label class="fw-light" for="exampleFormControlSelect1">Mitarbeiterrolle</label><br />
+
+      <input type="radio" class="btn-check" id="option_employee" autocomplete="off" value="employee" formControlName="role" />
+      <label class="btn" for="option_employee">Mitarbeiter</label>
+
+      <input type="radio" class="btn-check" id="option_manager" autocomplete="off" value="manager" formControlName="role" />
+      <label class="btn" for="option_manager">Manager</label>
     </div>
   </div>
 

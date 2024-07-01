@@ -1,0 +1,61 @@
+<div class="input-group">
+  <div class="position-absolute">
+    <div class="input-group">
+      <input
+        id="datepicker"
+        class="form-control"
+        ngbDatepicker
+        [autoClose]="false"
+        style="margin-left: 35px"
+        #datepicker="ngbDatepicker"
+        (dateSelect)="onDateSelection($event)"
+        [displayMonths]="1"
+        outsideDays="collapsed"
+        (closed)="onClosed()"
+        [startDate]="fromDate()"
+        [footerTemplate]="footerTemplate"
+        [dayTemplate]="dayTemplate"
+        #d="ngbDatepicker"
+      />
+
+      <ng-template #dayTemplate let-date let-focused="focused">
+        <span
+          class="custom-day"
+          [class.focused]="isFocused(date)"
+          [class.range]="isRange(date)"
+          [class.faded]="isInside(date)"
+          (mouseenter)="hoveredDate.set(date)"
+          (mouseleave)="hoveredDate.set(null)"
+        >
+          {{ date.day }}
+        </span>
+      </ng-template>
+
+      <ng-template #footerTemplate>
+        <!-- today button -->
+        <button class="btn w-100 btn-sm btn-outline-primary btn-sm" (click)="onSetToday(); d.close()">
+          @if(mode() === 1) { Heute } @else if (mode() === 2) { Aktuelle Woche } @else { Aktueller Monat }
+        </button>
+
+        <!-- mode selection -->
+        <select [(ngModel)]="mode" class="form-select outline-primary mt-2 form-select-sm text-center">
+          <option [ngValue]="1">Tag</option>
+          <option [ngValue]="2">Woche</option>
+          <option [ngValue]="3">Monat</option>
+        </select>
+      </ng-template>
+    </div>
+  </div>
+  <button class="btn btn-sm btn-outline-secondary" (click)="onOffsetDate(-1)" type="button">
+    <fa-icon [icon]="['fas', 'caret-left']" [fixedWidth]="true" />
+  </button>
+
+  <input readonly (click)="datepicker.open()" [value]="dateText()" class="form-control" />
+
+  <button class="btn btn-sm btn-outline-secondary" (click)="onOffsetDate(1)" type="button">
+    <fa-icon [icon]="['fas', 'caret-right']" [fixedWidth]="true" />
+  </button>
+  <button id="dpFromDate" class="btn btn-sm btn-outline-secondary" (click)="datepicker.open()" type="button">
+    <fa-icon [icon]="['far', 'calendar']" [fixedWidth]="true" />
+  </button>
+</div>

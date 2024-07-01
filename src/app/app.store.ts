@@ -8,6 +8,7 @@ import { InvoicesListState, invoicesListReducer } from './state/invoices-list.st
 import { EmployeeListState, employeeListReducer } from './state/employee-list.state';
 import { BudgetsListState, budgetsListReducer } from './state/budgets-list.state';
 import { InsurancesListState, insurancesListReducer } from './state/insurances-list.state';
+import { ProspectListState, prospectListReducer } from './dashboard/base-data/prospects/prospect-list/prospect-list.state';
 
 export interface AppStore {
   appointmentList: ActionReducer<AppointmentListState, Action>;
@@ -18,6 +19,7 @@ export interface AppStore {
   customerList: ActionReducer<CustomerListState, Action>;
   insurancesList: ActionReducer<InsurancesListState, Action>;
   invoicesList: ActionReducer<InvoicesListState, Action>;
+  prospectList: ActionReducer<ProspectListState, Action>;
   timeTracker: ActionReducer<TimeTrackerState, Action>;
 }
 
@@ -30,5 +32,6 @@ export const appStore: AppStore = {
   employeeList: employeeListReducer,
   invoicesList: invoicesListReducer,
   insurancesList: insurancesListReducer,
+  prospectList: prospectListReducer,
   timeTracker: timeTrackerReducer,
 };

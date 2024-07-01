@@ -18,6 +18,7 @@ import { CustomerBudget } from '@curacaru/models/customer-budget.model';
 import { CompanyPrices } from '@curacaru/models/company-prices.model';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
 import { Page } from '@curacaru/models/page.model';
+import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -70,6 +71,15 @@ export class ApiService {
     return this.httpClient.delete(`${this.apiUrl}/customer/${id}`, { params: { deleteOpenAppointments, deleteBudgets } });
   }
 
+  /**
+   * Deletes a customer with the prospect status
+   * @param id the customer id
+   * @returns An observable that completes when the request is done
+   */
+  deleteProspect(id: UUID) {
+    return this.httpClient.delete(`${this.apiUrl}/customer/${id}/prospect`);
+  }
+
   /** Deletes the insurance with the given id */
   deleteInsurance = (id: UUID) => this.httpClient.delete(`${this.apiUrl}/insurance/${id}`);
 
@@ -120,12 +130,16 @@ export class ApiService {
   getCustomer = (id: UUID) => this.httpClient.get<Customer>(`${this.apiUrl}/customer/${id}`);
 
   /** Gets the list of customers from the API */
-  getCustomerList(page: number, onlyActive: boolean, employeeId?: UUID) {
+  getCustomerList(page: number, customerStatus: CustomerStatus, employeeId?: UUID, orderBy?: string) {
     const options = { params: new HttpParams() };
     options.params = options.params.append('page', page);
-    options.params = options.params.append('onlyActive', onlyActive);
+    options.params = options.params.append('pageSize', 18);
+    options.params = options.params.append('status', customerStatus);
     if (employeeId) {
       options.params = options.params.append('employeeId', employeeId.toString());
+    }
+    if (orderBy) {
+      options.params = options.params.append('orderBy', orderBy);
     }
     return this.httpClient.get<Page<CustomerListEntry>>(`${this.apiUrl}/customer/list`, options);
   }

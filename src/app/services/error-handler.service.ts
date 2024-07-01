@@ -6,7 +6,7 @@ import { EMPTY } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class ErrorHandlingService {
+export class ErrorHandlerService {
   constructor(public toastrService: ToastrService) {}
 
   handleError(error: any) {

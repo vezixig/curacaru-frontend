@@ -1,13 +1,13 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, model, signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, combineLatest, firstValueFrom, map, mergeMap, startWith, takeUntil, tap } from 'rxjs';
+import { Subject, combineLatest, firstValueFrom, mergeMap, startWith, takeUntil, tap } from 'rxjs';
 import { CustomerListEntry } from '@curacaru/models/customer-list-entry.model';
-import { EmployeeBasic, UserEmployee } from '@curacaru/models';
+import { UserEmployee } from '@curacaru/models';
 import { FormsModule } from '@angular/forms';
-import { ApiService, ErrorHandlingService, LocationService, ScreenService, UserService } from '@curacaru/services';
+import { ApiService, DateTimeService, ErrorHandlerService, LocationService, ScreenService, UserService } from '@curacaru/services';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { ChangeEmployeeFilterAction, ChangePageAction } from '@curacaru/state/customer-list.state';
@@ -16,27 +16,33 @@ import { AppointmentListActions, AppointmentListState } from '@curacaru/state/ap
 import { DeploymentReportChangeCustomerAction, DeploymentReportListState } from '@curacaru/state/deployment-report-list.state';
 import { InvoiceChangeCustomerAction, InvoicesListState } from '@curacaru/state/invoices-list.state';
 import { LoaderFilterComponent } from '@curacaru/shared/loader-filter/loader-filter.component';
-import { CustomerListeTableComponent } from '../customer-list-table/customer-list-table.component';
-import { CustomerListMobileComponent } from '../customer-list-mobile/customer-list-mobile.component';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
 import { Page } from '@curacaru/models/page.model';
 import { DeleteCustomerModal } from '../delete-customer-modal/delete-customer-modal.component';
 import { DeleteCustomerModalModel } from '../delete-customer-modal/delete-customer-model.model';
+import { CustomerStatus } from '@curacaru/enums/customer-status.enum';
+import { CustomerListEntryComponent } from '../customer-list-entry/customer-list-entry.component';
+import { InfoComponent } from '../../../../shared/info-box/info.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { EmployeeSelectComponent } from '@curacaru/shared/employee-select/employee-select.component';
 
 @Component({
   providers: [ApiService],
   selector: 'cura-customer-list',
   standalone: true,
   templateUrl: './customer-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    FontAwesomeModule,
-    RouterModule,
-    FormsModule,
     AsyncPipe,
-    PagingComponent,
+    CustomerListEntryComponent,
+    EmployeeSelectComponent,
+    FontAwesomeModule,
+    FormsModule,
+    InfoComponent,
     LoaderFilterComponent,
-    CustomerListeTableComponent,
-    CustomerListMobileComponent,
+    NgSelectModule,
+    PagingComponent,
+    RouterModule,
   ],
 })
 export class CustomerListComponent implements OnDestroy, OnInit {
@@ -51,16 +57,15 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   private readonly toastr = inject(ToastrService);
   private readonly userService = inject(UserService);
   private readonly screenService = inject(ScreenService);
-  private readonly errorHandlerService = inject(ErrorHandlingService);
+  private readonly errorHandlerService = inject(ErrorHandlerService);
 
   user?: UserEmployee;
   isMobile = this.screenService.isMobile;
 
   customers = signal<CustomerListEntry[]>([]);
   page = signal<Page<CustomerListEntry> | undefined>(undefined);
-  filterModel$ = new Observable<{ employees: EmployeeBasic[] }>();
   isLoading = signal(true);
-  selectedEmployeeId = signal<UUID | undefined>(undefined);
+  selectedEmployeeId = model<UUID | undefined>(undefined);
   showInactiveCustomers = signal<boolean>(false);
 
   private $onRefresh = new Subject<void>();
@@ -74,13 +79,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   async ngOnInit() {
     this.user = await firstValueFrom(this.userService.user$);
 
-    this.filterModel$ = combineLatest({
-      employees: this.apiService.getEmployeeBaseList(),
-    }).pipe(
-      map((o) => {
-        return { employees: o.employees };
-      })
-    );
+    this.selectedEmployeeId.subscribe(() => this.onFilterChanged());
 
     combineLatest({
       refresh: this.$onRefresh.pipe(startWith({})),
@@ -88,7 +87,8 @@ export class CustomerListComponent implements OnDestroy, OnInit {
     })
       .pipe(
         takeUntil(this.$onDestroy),
-        tap(() => {
+        tap((o) => {
+          this.selectedEmployeeId.set(o.state.customerList.employeeId);
           this.customers.set([]);
           this.isLoading.set(true);
         }),
@@ -96,7 +96,7 @@ export class CustomerListComponent implements OnDestroy, OnInit {
           this.showInactiveCustomers.set(o.state.customerList.showInactiveCustomers);
           return this.apiService.getCustomerList(
             o.state.customerList.page,
-            !o.state.customerList.showInactiveCustomers,
+            o.state.customerList.showInactiveCustomers ? CustomerStatus.Former : CustomerStatus.Customer,
             o.state.customerList.employeeId
           );
         })
@@ -134,6 +134,12 @@ export class CustomerListComponent implements OnDestroy, OnInit {
   }
 
   handleShowAppointments(customer: CustomerListEntry) {
+    var today = new Date();
+    var begin = new Date();
+    begin.setDate(today.getDate() - 28);
+    this.appointmentListStore.dispatch(
+      AppointmentListActions.changeDateFilter({ dateEnd: DateTimeService.toNgbDate(today), dateStart: DateTimeService.toNgbDate(begin), dateMode: 3 })
+    );
     this.appointmentListStore.dispatch(AppointmentListActions.changeCustomerFilter({ customerId: customer.id }));
     this.router.navigate(['/dashboard/appointments']);
   }

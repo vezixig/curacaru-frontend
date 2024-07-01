@@ -7,7 +7,7 @@ import { Subject, combineLatest, mergeMap, startWith, takeUntil, tap } from 'rxj
 import { ToastrService } from 'ngx-toastr';
 import { EmployeeListMobileComponent } from '../employee-list-mobile/employee-list-mobile.component';
 import { EmployeeListTableComponent } from '../employee-list-table/employee-list-table.component';
-import { ApiService, ErrorHandlingService, LoaderService, ScreenService } from '@curacaru/services';
+import { ApiService, ErrorHandlerService, LoaderService, ScreenService } from '@curacaru/services';
 import { Page } from '@curacaru/models/page.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { PagingComponent } from '@curacaru/shared/paging/paging.component';
@@ -23,7 +23,7 @@ import { Store } from '@ngrx/store';
 })
 export class EmployeeListComponent implements OnDestroy, OnInit {
   private readonly apiService = inject(ApiService);
-  private readonly errorHandlerService = inject(ErrorHandlingService);
+  private readonly errorHandlerService = inject(ErrorHandlerService);
   private readonly loaderService = inject(LoaderService);
   private readonly modalService = inject(NgbModal);
   private readonly screenService = inject(ScreenService);

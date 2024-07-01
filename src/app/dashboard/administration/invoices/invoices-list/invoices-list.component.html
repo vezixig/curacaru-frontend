@@ -1,175 +1,162 @@
-<div class="row">
-  <h4 class="h-underline">Rechnungsliste</h4>
+<h4 class="h-underline">Rechnungsliste</h4>
 
-  @if(model$ | async; as model) {
+@if(model$ | async; as model) {
 
-  <form [formGroup]="filterForm" class="p-0">
-    <!-- year -->
-    <div class="row gx-3">
-      <div class="col col-12 col-md">
-        <label class="fw-light" for="inputYear">Jahr</label>
-        <div class="input-group">
-          <input
-            id="inputYear"
-            class="form-control"
-            type="number"
-            formControlName="year"
-            [ngClass]="{ 'is-invalid': filterForm.controls['year'].invalid }"
-          />
-        </div>
-      </div>
-      <!-- month -->
-      <div class="col col-12 col-md">
-        <label class="fw-light" for="selectMonth">Monat</label>
-        <select id="selectMonth" class="form-control" formControlName="month">
-          @for (month of months; track month) {
-          <option [value]="month.value">{{ month.name }}</option>
-          }
-        </select>
-      </div>
-      <!-- customer -->
-      <div class="col col-12 col-md">
-        <label class="fw-light" for="selectCustomer">Kunde</label>
-        <select id="selectCustomer" class="form-select" formControlName="customerId">
-          <option></option>
-          @for (customer of model.customers; track customer) {
-          <option [value]="customer.customerId">{{ customer.customerName }}</option>
-          }
-        </select>
+<form [formGroup]="filterForm" class="p-0">
+  <!-- year -->
+  <div class="row gx-3">
+    <div class="col col-12 col-md">
+      <label class="fw-light" for="inputYear">Jahr</label>
+      <div class="input-group">
+        <input
+          id="inputYear"
+          class="form-control"
+          type="number"
+          formControlName="year"
+          [ngClass]="{ 'is-invalid': filterForm.controls['year'].invalid }"
+        />
       </div>
     </div>
-  </form>
+    <!-- month -->
+    <div class="col col-12 col-md">
+      <label class="fw-light" for="selectMonth">Monat</label>
+      <select id="selectMonth" class="form-control" formControlName="month">
+        @for (month of months; track month) {
+        <option [value]="month.value">{{ month.name }}</option>
+        }
+      </select>
+    </div>
+    <!-- customer -->
+    <div class="col col-12 col-md">
+      <label class="fw-light" for="selectCustomer">Kunde</label>
+      <cura-customer-select formControlName="customerId" id="selectCustomer" />
+    </div>
+  </div>
+</form>
 
-  <table class="d-none mt-2 d-md-table table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Jahr</th>
-        <th scope="col">Monat</th>
-        <th scope="col">Kunde</th>
-        <th scope="col">Bearbeitung</th>
-        <th scope="col">Abrechnungsoption</th>
-        <th class="text-center" scope="col">Status</th>
-        <th scope="col">Rechnungsnr.</th>
-        <th class="text-center" scope="col">Aktion</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (invoice of model.invoices.items; track invoice) {
-      <tr>
-        <td>{{ invoice.year }}</td>
-        <td>{{ invoice.month | monthName }}</td>
-        <td>{{ invoice.customerName }}</td>
-        <td>{{ invoice.employeeName }}</td>
-        <td>{{ invoice.clearanceType | clearanceTypeName }}</td>
-        <td class="text-center">
-          <div
-            width="16"
-            height="16"
-            [class.bg-success]="invoice.invoiceNumber"
-            [class.bg-danger]="!invoice.invoiceNumber"
-            class="status-bullet"
-          ></div>
-        </td>
-        <td>{{ invoice.invoiceNumber }}</td>
-        <td class="text-center">
-          <div class="btn-group" role="group">
-            @if(!invoice.invoiceId) {
-            <button
-              type="button"
-              [routerLink]="['/dashboard/invoices/new']"
-              [queryParams]="{ year: invoice.year, month: invoice.month, customerId: invoice.customerId, clearanceType: invoice.clearanceType }"
-              class="btn btn-outline-secondary btn-sm"
-              title="Rechnung erstellen"
-            >
-              <fa-icon [icon]="faGear" [fixedWidth]="true" />
-            </button>
-            } @else {
-            <button
-              [disabled]="isLoading()"
-              type="button"
-              class="btn btn-outline-secondary btn-sm"
-              title="Einsatznachweis herunterladen"
-              (click)="onDownloadInvoice(invoice)"
-            >
-              <fa-icon [icon]="faDownload" [fixedWidth]="true" />
-            </button>
-            @if(model.user.isManager) {
-            <button
-              [disabled]="isLoading()"
-              type="button"
-              (click)="onDeleteInvoice(invoice)"
-              class="btn btn-outline-secondary btn-sm"
-              title="Kunden löschen"
-            >
-              <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
-            </button>
-            } }
-          </div>
-        </td>
-      </tr>
-      }
-    </tbody>
-  </table>
-
-  <div class="d-md-none p-0">
+<table class="d-none mt-2 d-md-table table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Jahr</th>
+      <th scope="col">Monat</th>
+      <th scope="col">Kunde</th>
+      <th scope="col">Bearbeitung</th>
+      <th scope="col">Abrechnungsoption</th>
+      <th class="text-center" scope="col">Status</th>
+      <th scope="col">Rechnungsnr.</th>
+      <th class="text-center" scope="col">Aktion</th>
+    </tr>
+  </thead>
+  <tbody>
     @for (invoice of model.invoices.items; track invoice) {
-    <div class="card my-3">
-      <div class="card-header d-flex">
-        <img class="me-2" width="10" [class.bg-success]="invoice.invoiceNumber" [class.bg-danger]="!invoice.invoiceNumber" />
-        <span class="lead text-truncate">{{ invoice.customerName }}</span>
-        <div class="btn-group ms-auto" role="group">
-          @if(invoice.invoiceNumber) {
+    <tr>
+      <td>{{ invoice.year }}</td>
+      <td>{{ invoice.month | monthName }}</td>
+      <td>{{ invoice.customerName }}</td>
+      <td>{{ invoice.employeeName }}</td>
+      <td>{{ invoice.clearanceType | clearanceTypeName }}</td>
+      <td class="text-center">
+        <div width="16" height="16" [class.bg-success]="invoice.invoiceNumber" [class.bg-danger]="!invoice.invoiceNumber" class="status-bullet"></div>
+      </td>
+      <td>{{ invoice.invoiceNumber }}</td>
+      <td class="text-center">
+        <div class="btn-group" role="group">
+          @if(!invoice.invoiceId) {
           <button
             type="button"
-            [disabled]="isLoading()"
+            [routerLink]="['/dashboard/invoices/new']"
+            [queryParams]="{ year: invoice.year, month: invoice.month, customerId: invoice.customerId, clearanceType: invoice.clearanceType }"
             class="btn btn-outline-secondary btn-sm"
-            title="Rechnung herunterladen"
+            title="Rechnung erstellen"
+          >
+            <fa-icon [icon]="faGear" [fixedWidth]="true" />
+          </button>
+          } @else {
+          <button
+            [disabled]="isLoading()"
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            title="Einsatznachweis herunterladen"
             (click)="onDownloadInvoice(invoice)"
           >
             <fa-icon [icon]="faDownload" [fixedWidth]="true" />
           </button>
-          } @else {
-          <button
-            type="button"
-            class="btn btn-outline-secondary btn-sm"
-            title="Rechnung erstellen"
-            [routerLink]="['/dashboard/invoices/new']"
-            [queryParams]="{ year: invoice.year, month: invoice.month, customerId: invoice.customerId, clearanceType: invoice.clearanceType }"
-          >
-            <fa-icon [icon]="faGear" [fixedWidth]="true" />
-          </button>
-          } @if(model.user.isManager && invoice.invoiceNumber) {
+          @if(model.user.isManager) {
           <button
             [disabled]="isLoading()"
             type="button"
             (click)="onDeleteInvoice(invoice)"
             class="btn btn-outline-secondary btn-sm"
-            title="Rechnung löschen"
+            title="Kunden löschen"
           >
             <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
           </button>
-          }
+          } }
         </div>
-      </div>
-      <div class="card-body">
-        <ul class="card-text list-unstyled">
-          <li class="pb-2">{{ invoice.clearanceType | clearanceTypeName }}</li>
-          <li><fa-icon [icon]="faCalendar" [fixedWidth]="true" /> {{ invoice.month | monthName }} {{ invoice.year }}</li>
-          @if (invoice.invoiceNumber) {
-          <li><fa-icon [icon]="faHashtag" [fixedWidth]="true" /> {{ invoice.invoiceNumber }}</li>
-          <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ invoice.employeeName }}</li>
-          }
-        </ul>
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+
+<div class="d-md-none p-0">
+  @for (invoice of model.invoices.items; track invoice) {
+  <div class="card my-3">
+    <div class="card-header d-flex">
+      <img class="me-2" width="10" [class.bg-success]="invoice.invoiceNumber" [class.bg-danger]="!invoice.invoiceNumber" />
+      <span class="lead text-truncate">{{ invoice.customerName }}</span>
+      <div class="btn-group ms-auto" role="group">
+        @if(invoice.invoiceNumber) {
+        <button
+          type="button"
+          [disabled]="isLoading()"
+          class="btn btn-outline-secondary btn-sm"
+          title="Rechnung herunterladen"
+          (click)="onDownloadInvoice(invoice)"
+        >
+          <fa-icon [icon]="faDownload" [fixedWidth]="true" />
+        </button>
+        } @else {
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          title="Rechnung erstellen"
+          [routerLink]="['/dashboard/invoices/new']"
+          [queryParams]="{ year: invoice.year, month: invoice.month, customerId: invoice.customerId, clearanceType: invoice.clearanceType }"
+        >
+          <fa-icon [icon]="faGear" [fixedWidth]="true" />
+        </button>
+        } @if(model.user.isManager && invoice.invoiceNumber) {
+        <button
+          [disabled]="isLoading()"
+          type="button"
+          (click)="onDeleteInvoice(invoice)"
+          class="btn btn-outline-secondary btn-sm"
+          title="Rechnung löschen"
+        >
+          <fa-icon [icon]="faTrashCan" [fixedWidth]="true" />
+        </button>
+        }
       </div>
     </div>
-
-    }
+    <div class="card-body">
+      <ul class="card-text list-unstyled">
+        <li class="pb-2">{{ invoice.clearanceType | clearanceTypeName }}</li>
+        <li><fa-icon [icon]="faCalendar" [fixedWidth]="true" /> {{ invoice.month | monthName }} {{ invoice.year }}</li>
+        @if (invoice.invoiceNumber) {
+        <li><fa-icon [icon]="faHashtag" [fixedWidth]="true" /> {{ invoice.invoiceNumber }}</li>
+        <li><fa-icon [icon]="faUser" [fixedWidth]="true" /> {{ invoice.employeeName }}</li>
+        }
+      </ul>
+    </div>
   </div>
 
-  <cura-paging [page]="model.invoices" (pageChange)="onPageChange($event)" />
-
-  <!-- show info if no invoices were found -->
-  @if(model.invoices.items.length == 0) {
-  <div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Rechnungen gefunden.</div>
-  } }
+  }
 </div>
+
+<cura-paging [page]="model.invoices" (pageChange)="onPageChange($event)" />
+
+<!-- show info if no invoices were found -->
+@if(model.invoices.items.length == 0) {
+<div class="alert alert-secondary mt-3" role="alert"><fa-icon [icon]="faCircleInfo" /> Es wurden keine Rechnungen gefunden.</div>
+} }

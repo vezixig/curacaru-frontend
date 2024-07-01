@@ -15,7 +15,7 @@
   },
   {
     "version": "0.8.0",
-    "releaseDate": "2024-06-01",
+    "releaseDate": "2024-05-19",
     "bugfixes": [
       "Bei kleinen Bildschirmen kann die Navigationsleiste jetzt gescrollt angezeigt",
       "Mitarbeiter die einen Termin nicht bearbeitet haben, konnten den Button zum Abschließen sehen"

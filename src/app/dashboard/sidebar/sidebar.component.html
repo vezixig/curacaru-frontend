@@ -24,6 +24,14 @@
         Kunden
       </a>
     </li>
+    @if (isManager | async ) {
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/dashboard/base-data/prospects" routerLinkActive="active text-white" ariaCurrentWhenActive="page">
+        <fa-icon [icon]="['far', 'address-card']" [fixedWidth]="true" />
+        Interessenten
+      </a>
+    </li>
+    }
 
     <li class="nav-item mt-2 fw-light">PLANUNG</li>
 
